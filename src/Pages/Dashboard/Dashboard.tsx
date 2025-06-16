@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/Common/Button";
 
-const Dashboard: React.FC<{ onViewChange: (view: string) => void }> = ({
-  onViewChange,
-}) => {
+const Dashboard: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +23,6 @@ const Dashboard: React.FC<{ onViewChange: (view: string) => void }> = ({
 
   const handleSignOut = () => {
     console.log("User signing out (Simulated)");
-    onViewChange("signIn");
   };
 
   // Mock userId for display
@@ -77,33 +74,6 @@ const Dashboard: React.FC<{ onViewChange: (view: string) => void }> = ({
           No user data found. Please ensure you've signed up.
         </p>
       )}
-
-      <div className="mt-8 text-center">
-        <button
-          onClick={() => onViewChange("signUp")}
-          className="text-blue-500 hover:underline mx-2"
-        >
-          Sign Up Page
-        </button>
-        <button
-          onClick={() => onViewChange("signIn")}
-          className="text-blue-500 hover:underline mx-2"
-        >
-          Sign In Page
-        </button>
-        <button
-          onClick={() => onViewChange("adminLogin")}
-          className="text-blue-500 hover:underline mx-2"
-        >
-          Admin Login Page
-        </button>
-        <button
-          onClick={() => onViewChange("adminApprovalRequests")}
-          className="text-blue-500 hover:underline mx-2"
-        >
-          Admin Approval Requests Page
-        </button>
-      </div>
     </div>
   );
 };

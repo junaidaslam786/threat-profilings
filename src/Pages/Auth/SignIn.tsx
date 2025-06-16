@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import InputField from "../../components/Common/InputField";
 import Button from "../../components/Common/Button";
 import AuthLayout from "../../components/Common/AuthLayout";
+import { useLoginMutation } from "../../Redux/api/authApi";
+import { useDispatch } from "react-redux";
+import { setAccessToken } from "../../Redux/slices/authSlice";
+import toast from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
-const SignIn: React.FC<{ onViewChange: (view: string) => void }> = ({
-  onViewChange,
-}) => {
+const SignIn: React.FC = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,23 +39,36 @@ const SignIn: React.FC<{ onViewChange: (view: string) => void }> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignIn = () => {
-    setGeneralError(null);
-    if (!validateForm()) return;
+  const handleSignIn = async () => {
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly.");
+      return;
+    }
 
-    // Simulate sign-in success
-    console.log(
-      `Sign In attempt with email: ${formData.email} and password: ${formData.password}`
-    );
-    alert("Sign in successful! (Simulated)");
-    onViewChange("dashboard"); // Navigate to a mock dashboard or home page
+    try {
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
+
+      console.log("Login successful:", result);
+      dispatch(setAccessToken(result.access_token));
+      toast.success("Signed in successfully!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Failed to sign in:", error);
+      let errorMessage = "An unexpected error occurred during sign in.";
+      if (error && typeof error === 'object' && 'data' in error && error.data && typeof error.data === 'object' && 'message' in error.data) {
+        errorMessage = (error.data as { message: string }).message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
+    }
   };
 
   return (
     <AuthLayout title="Sign In">
-      {generalError && (
-        <p className="text-red-500 text-center mb-4">{generalError}</p>
-      )}
       <InputField
         label="Email"
         type="email"
@@ -69,20 +87,22 @@ const SignIn: React.FC<{ onViewChange: (view: string) => void }> = ({
         placeholder="********"
         error={errors.password}
       />
-      <Button onClick={handleSignIn}>Sign In</Button>
+      <Button onClick={handleSignIn} disabled={isLoginLoading}>
+        {isLoginLoading ? "Signing In..." : "Sign In"}
+      </Button>
       <p className="text-center text-gray-400 text-sm mt-4">
         Don't have an account?{" "}
         <button
-          onClick={() => onViewChange("signUp")}
           className="text-blue-500 hover:underline"
+          onClick={() => navigate("/signup")}
         >
           Sign Up
         </button>
       </p>
       <p className="text-center text-gray-400 text-sm mt-2">
         <button
-          onClick={() => onViewChange("adminLogin")}
           className="text-blue-500 hover:underline"
+          onClick={() => navigate("/admin/login")}
         >
           Admin Login
         </button>
