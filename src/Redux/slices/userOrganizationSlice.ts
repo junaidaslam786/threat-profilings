@@ -1,66 +1,64 @@
-// src/store/authSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
-export interface CreateUserDto {
+// Renamed from CreateUserDto
+export interface RegisterUserDto {
   email: string;
-  username: string;
-  password: string;
-}
-
-export interface LoginUserDto {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  access_token: string;
+  name: string;
 }
 
 export interface RegisterResponse {
   message: string;
+  client_name: string;
 }
 
 export interface AuthState {
   accessToken: string | null;
   user: {
     email: string;
-    username: string;
+    name: string;
+    organization_name?: string;
   } | null;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
-  accessToken: Cookies.get("accessToken") || null,
+  accessToken: Cookies.get("userOrganizationAccessToken") || null,
   user: null,
   isLoading: false,
   error: null,
 };
 
-export const authSlice = createSlice({
-  name: "auth",
+export const userOrganizationSlice = createSlice({
+  name: "userOrganization",
   initialState,
   reducers: {
-    setAccessToken: (state, action: PayloadAction<string>) => {
+    setUserOrganizationAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
       state.isLoading = false;
       state.error = null;
-      Cookies.set("accessToken", action.payload, {
+      // Updated cookie key
+      Cookies.set("userOrganizationAccessToken", action.payload, {
         expires: 7,
         secure: true,
         sameSite: "Strict",
       });
     },
-    setUserDetails: (state, action: PayloadAction<AuthState["user"]>) => {
+    setUserOrganizationDetails: (
+      state,
+      action: PayloadAction<AuthState["user"]>
+    ) => {
       state.user = action.payload;
     },
-    logout: (state) => {
+    logoutUserOrganization: (state) => {
+      // Renamed logout
       state.accessToken = null;
       state.user = null;
       state.isLoading = false;
       state.error = null;
-      Cookies.remove("accessToken");
+      // Updated cookie key
+      Cookies.remove("userOrganizationAccessToken");
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -71,7 +69,12 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setAccessToken, setUserDetails, logout, setLoading, setError } =
-  authSlice.actions;
+export const {
+  setUserOrganizationAccessToken,
+  setUserOrganizationDetails,
+  logoutUserOrganization,
+  setLoading,
+  setError,
+} = userOrganizationSlice.actions;
 
-export default authSlice.reducer;
+export default userOrganizationSlice.reducer;

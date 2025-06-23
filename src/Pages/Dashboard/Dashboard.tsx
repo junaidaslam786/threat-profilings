@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/Common/Button";
 
+type UserData = {
+  userId: string;
+  organization_name: string;
+  email: string;
+  client_name: string;
+};
+
 const Dashboard: React.FC = () => {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching user data
     setLoading(true);
     setTimeout(() => {
-      // Mock user data as Firebase is removed
       const mockUserData = {
         userId: "mockUser12345",
         organization_name: "Mock Org Inc.",
@@ -21,12 +26,12 @@ const Dashboard: React.FC = () => {
     }, 1000);
   }, []);
 
-  const handleSignOut = () => {
-    console.log("User signing out (Simulated)");
-  };
-
   // Mock userId for display
   const mockUserIdDisplay = userData?.userId || "N/A";
+
+  const handleSignInClick = () => {
+    window.location.href = "https://eu-north-1p9cm0plzr.auth.eu-north-1.amazoncognito.com/login?client_id=5h8d5bk73e6f8m9fdvkkaq8mbt&response_type=token&scope=email+openid+phone&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F";
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -34,12 +39,14 @@ const Dashboard: React.FC = () => {
         <h2 className="text-4xl font-bold text-blue-500">
           Welcome to Your Dashboard!
         </h2>
-        <Button
-          onClick={handleSignOut}
-          className="bg-red-600 hover:bg-red-700 w-auto px-6 py-2"
-        >
-          Sign Out
-        </Button>
+        <div>
+          <Button
+            onClick={handleSignInClick}
+            className="bg-green-600 hover:bg-green-700 w-auto px-6 py-2"
+          >
+            Sign In
+          </Button>
+        </div>
       </div>
 
       {loading ? (

@@ -3,23 +3,23 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { combineReducers } from "redux";
 
-import authReducer from "./slices/authSlice";
+import userOrganizationReducer from "./slices/userOrganizationSlice";
 import userReducer from "./slices/userSlice";
 
-import { authApi } from "./api/authApi";
+import { userOrganizationApi } from "./api/userOrganizationApi";
 import { userApi } from "./api/userApi";
 
 const rootReducer = combineReducers({
-  auth: authReducer,
+  userOrganization: userOrganizationReducer,
   user: userReducer,
-  [authApi.reducerPath]: authApi.reducer,
+  [userOrganizationApi.reducerPath]: userOrganizationApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
 });
 
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, userApi.middleware),
+    getDefaultMiddleware().concat(userOrganizationApi.middleware, userApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
