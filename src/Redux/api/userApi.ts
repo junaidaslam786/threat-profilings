@@ -1,29 +1,59 @@
-// src/services/userApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { type RootState } from "../store";
+import Cookies from "js-cookie";
+import type {
+  RegisterUserDto,
+  RegisterResponse,
+  UserMeResponse,
+  ApproveJoinRequestDto,
+} from "../slices/userSlice";
 
-interface UserProfileResponse {
-  email: string;
-  username: string;
+interface GenericSuccessResponse {
+  message: string;
 }
 
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const accessToken = (getState() as RootState).auth.accessToken;
-      if (accessToken) {
-        headers.set("Authorization", `Bearer ${accessToken}`);
+    prepareHeaders: (headers) => {
+      const idToken = Cookies.get("id_token");
+
+      if (idToken) {
+        headers.set("Authorization", `Bearer ${idToken}`);
       }
       return headers;
     },
   }),
   endpoints: (builder) => ({
-    getUser: builder.query<UserProfileResponse, void>({
-      query: () => "/auth/profile",
+    createUser: builder.mutation<RegisterResponse, RegisterUserDto>({
+      query: (body) => ({
+        url: "/users/register",
+        method: "POST",
+        body,
+      }),
+    }),
+    approveJoinRequest: builder.mutation<
+      GenericSuccessResponse,
+      { joinId: string; body: ApproveJoinRequestDto }
+    >({
+      query: ({ joinId, body }) => ({
+        url: `/users/approve-join/${joinId}`,
+        method: "POST",
+        body,
+      }),
+    }),
+    getProfile: builder.mutation<UserMeResponse, void>({
+      query: () => ({
+        url: "/users/me",
+        method: "POST",
+        body: {},
+      }),
     }),
   }),
 });
 
-export const { useGetUserQuery } = userApi;
+export const {
+  useCreateUserMutation,
+  useApproveJoinRequestMutation,
+  useGetProfileMutation,
+} = userApi;

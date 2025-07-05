@@ -16,7 +16,7 @@ const AuthRedirectHandler: React.FC = () => {
 
         if (idToken && accessToken) {
           const expires = expiresIn
-            ? new Date(Date.now() + parseInt(expiresIn) * 1000)
+            ? new Date(Date.now() + parseInt(expiresIn) * 100000)
             : undefined;
 
           Cookies.set("id_token", idToken, {

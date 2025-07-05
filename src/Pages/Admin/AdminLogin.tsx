@@ -18,7 +18,6 @@ const AdminLogin: React.FC = () => {
       setGeneralError("Please enter both email and password.");
       return;
     }
-    // Simulate admin login
     console.log(
       `Admin Sign In attempt with email: ${formData.email} and password: ${formData.password}`
     );

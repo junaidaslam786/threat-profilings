@@ -3,23 +3,26 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { combineReducers } from "redux";
 
-import userOrganizationReducer from "./slices/userOrganizationSlice";
 import userReducer from "./slices/userSlice";
+import orgSubscriptionReducer from "./slices/orgSubscriptionSlice";
 
-import { userOrganizationApi } from "./api/userOrganizationApi";
 import { userApi } from "./api/userApi";
+import { orgSubscriptionApi } from "./api/orgSubscriptionApi";
 
 const rootReducer = combineReducers({
-  userOrganization: userOrganizationReducer,
   user: userReducer,
-  [userOrganizationApi.reducerPath]: userOrganizationApi.reducer,
+  orgSubscription: orgSubscriptionReducer,
   [userApi.reducerPath]: userApi.reducer,
+  [orgSubscriptionApi.reducerPath]: orgSubscriptionApi.reducer,
 });
 
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userOrganizationApi.middleware, userApi.middleware),
+    getDefaultMiddleware().concat(
+      userApi.middleware,
+      orgSubscriptionApi.middleware
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

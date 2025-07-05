@@ -1,12 +1,12 @@
-import React from 'react'
-import AuthRedirectHandler from '../../components/Auth/AuthRedirectHandler'
+import React from "react";
+import AuthRedirectHandler from "../../components/Auth/AuthRedirectHandler";
 
 const AuthRedirectHandlerPage: React.FC = () => {
   return (
     <>
-    <AuthRedirectHandler />
+      <AuthRedirectHandler />
     </>
-  )
-}
+  );
+};
 
-export default AuthRedirectHandlerPage
+export default AuthRedirectHandlerPage;

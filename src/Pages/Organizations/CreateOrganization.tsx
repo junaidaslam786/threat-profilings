@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import InputField from "../../components/Common/InputField";
 import Button from "../../components/Common/Button";
 import AuthLayout from "../../components/Common/AuthLayout";
-import { useRegisterUserMutation } from "../../Redux/api/userOrganizationApi"; 
-import toast from 'react-hot-toast';
+import { useCreateUserMutation } from "../../Redux/api/userApi";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const CreateOrganization: React.FC = () => {
   const [formData, setFormData] = useState({ email: "", name: "" });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [registerUser, { isLoading: isRegisterLoading }] = useRegisterUserMutation();
+  const [createUser, { isLoading: isRegisterLoading }] =
+    useCreateUserMutation();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,18 +58,26 @@ const CreateOrganization: React.FC = () => {
     }
 
     try {
-      const result = await registerUser({
+      const result = await createUser({
         email: formData.email,
         name: formData.name,
       }).unwrap();
 
       console.log("Organization registration successful:", result);
       toast.success("Organization created successfully! Please sign in.");
-      navigate("/login");
+      navigate("/dashboard");
     } catch (error: unknown) {
       console.error("Failed to create organization:", error);
-      let errorMessage = "An unexpected error occurred during organization creation.";
-      if (error && typeof error === 'object' && 'data' in error && error.data && typeof error.data === 'object' && 'message' in error.data) {
+      let errorMessage =
+        "An unexpected error occurred during organization creation.";
+      if (
+        error &&
+        typeof error === "object" &&
+        "data" in error &&
+        error.data &&
+        typeof error.data === "object" &&
+        "message" in error.data
+      ) {
         errorMessage = (error.data as { message: string }).message;
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -100,15 +109,6 @@ const CreateOrganization: React.FC = () => {
       <Button onClick={handleCreateOrganization} disabled={isRegisterLoading}>
         {isRegisterLoading ? "Creating Organization..." : "Create Organization"}
       </Button>
-      {/* <p className="text-center text-gray-400 text-sm mt-4">
-        Already have an organization?{" "}
-        <button
-          className="text-blue-500 hover:underline"
-          onClick={() => navigate("/login")}
-        >
-          Sign In
-        </button>
-      </p> */}
     </AuthLayout>
   );
 };
