@@ -11,6 +11,14 @@ interface GenericSuccessResponse {
   message: string;
 }
 
+export interface PendingUser {
+  join_id: string;
+  email: string;
+  name: string;
+  requestedRole: "Admin" | "Viewer";
+  // ...add more fields as needed from your backend
+}
+
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
@@ -49,6 +57,9 @@ export const userApi = createApi({
         body: {},
       }),
     }),
+    getPendingJoinRequests: builder.query<PendingUser[], string>({
+      query: (orgName) => `/users/join-requests?org=${orgName}`,
+    }),
   }),
 });
 
@@ -56,4 +67,5 @@ export const {
   useCreateUserMutation,
   useApproveJoinRequestMutation,
   useGetProfileMutation,
+  useGetPendingJoinRequestsQuery,
 } = userApi;

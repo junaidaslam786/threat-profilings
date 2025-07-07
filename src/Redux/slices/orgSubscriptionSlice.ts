@@ -56,7 +56,13 @@ export interface OrgDetails {
   homeUrl?: string;
   aboutUsUrl?: string;
   additionalDetails?: string;
+  admins?: string[];
+  viewers?: string[];
+  subscriptionTier?: "L0" | "L1" | "L2" | "L3" | "LE";
+  run_number?: number;
+  status?: string;
 }
+
 
 export interface SubscriptionDetails {
   client_name: string;

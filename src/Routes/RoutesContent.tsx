@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import OrganizationManagement from "../Pages/Organizations/OrganizationManagement";
 const LoadingScreen = lazy(() => import("../components/Common/LoadingScreen"));
 const AuthRedirectHandlerPage = lazy(() => import("../Pages/Auth/AuthRedirectHandlerPage"));
 const CreateOrganization = lazy(() => import("../Pages/Organizations/CreateOrganization"));
@@ -25,6 +26,7 @@ const RoutesContent: React.FC = () => {
         <Route path="/user/organization/create/le" element={<CreateLEOrganization />} />
         <Route path="/auth-redirect-handler" element={<AuthRedirectHandlerPage />} />
         <Route path="/admin/approval-requests" element={<AdminApprovalRequests />} />
+        <Route path="/admin/organization-management" element={<OrganizationManagement />} />
       </Routes>
     </Suspense>
   );
