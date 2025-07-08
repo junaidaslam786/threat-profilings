@@ -4,16 +4,29 @@ import { useDispatch } from "react-redux";
 import { combineReducers } from "redux";
 
 import userReducer from "./slices/userSlice";
-import orgSubscriptionReducer from "./slices/orgSubscriptionSlice";
+import organizationsReducer from "./slices/organizationsSlice";
+import rolesReducer from "./slices/rolesSlice";
+import subscriptionsReducer from "./slices/subscriptionsSlice";
+import tiersReducer from "./slices/tiersSlice";
 
 import { userApi } from "./api/userApi";
-import { orgSubscriptionApi } from "./api/orgSubscriptionApi";
+import { organizationsApi } from "./api/organizationsApi";
+import { tiersApi } from "./api/tiersApi";
+import { rolesApi } from "./api/rolesApi";
+import { subscriptionsApi } from "./api/subscriptionsApi";
 
 const rootReducer = combineReducers({
   user: userReducer,
-  orgSubscription: orgSubscriptionReducer,
+  organizations: organizationsReducer,
+  roles: rolesReducer,
+  subscriptions: subscriptionsReducer,
+  tiers: tiersReducer,
   [userApi.reducerPath]: userApi.reducer,
-  [orgSubscriptionApi.reducerPath]: orgSubscriptionApi.reducer,
+  [organizationsApi.reducerPath]: organizationsApi.reducer,
+  [rolesApi.reducerPath]: rolesApi.reducer,
+  [subscriptionsApi.reducerPath]: subscriptionsApi.reducer,
+  [tiersApi.reducerPath]: tiersApi.reducer,
+
 });
 
 const store = configureStore({
@@ -21,7 +34,10 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       userApi.middleware,
-      orgSubscriptionApi.middleware
+      organizationsApi.middleware,
+      rolesApi.middleware,
+      subscriptionsApi.middleware,
+      tiersApi.middleware
     ),
 });
 

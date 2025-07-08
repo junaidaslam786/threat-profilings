@@ -1,42 +1,71 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import Cookies from "js-cookie";
+
+
+export type UserRole = 'admin' | 'viewer' | 'runner';
+
 export interface RegisterUserDto {
   email: string;
   name: string;
   partnerCode?: string;
 }
 
-export interface ApproveJoinRequestDto {
-  role: "Admin" | "Viewer";
+export interface JoinOrgRequestDto {
+  orgDomain: string;
+  message?: string;
 }
-export interface RegisterResponse {
-  message: string;
-  client_name: string;
+
+export interface ApproveJoinDto {
+  role: UserRole;
 }
+
+export interface InviteUserDto {
+  email: string;
+  name: string;
+}
+
+export interface UpdateUserRoleDto {
+  role: UserRole;
+}
+
 export interface UserMeResponse {
   email: string;
   name: string;
-  client_name?: string;
-  role: "Admin" | "Viewer" | "LE_Admin";
-  status: string;
-  partner_code?: string;
+  client_name: string;
+  partner_code?: string | null;
+  role: UserRole;
+  status: 'active' | 'pending_approval';
   created_at: string;
 }
-export interface AuthState {
+
+export interface PendingJoinDto {
+  join_id: string;
+  client_name: string;
+  email: string;
+  name: string;
+  created_at: string;
+  status: 'pending' | 'approved' | 'rejected';
+  message?: string;
+}
+
+interface UserState {
   accessToken: string | null;
   user: UserMeResponse | null;
   isLoading: boolean;
   error: string | null;
+  pendingJoinRequests: PendingJoinDto[];
+  users: UserMeResponse[];
 }
 
-const initialState: AuthState = {
-  accessToken: Cookies.get("userAccessToken") || null,
+const initialState: UserState = {
+  accessToken: null,
   user: null,
   isLoading: false,
   error: null,
+  pendingJoinRequests: [],
+  users: [],
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -44,11 +73,6 @@ export const userSlice = createSlice({
       state.accessToken = action.payload;
       state.isLoading = false;
       state.error = null;
-      Cookies.set("userAccessToken", action.payload, {
-        expires: 7,
-        secure: true,
-        sameSite: "Strict",
-      });
     },
     setUserDetails: (state, action: PayloadAction<UserMeResponse | null>) => {
       state.user = action.payload;
@@ -60,7 +84,6 @@ export const userSlice = createSlice({
       state.user = null;
       state.isLoading = false;
       state.error = null;
-      Cookies.remove("userAccessToken");
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -68,6 +91,12 @@ export const userSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setPendingJoinRequests: (state, action: PayloadAction<PendingJoinDto[]>) => {
+      state.pendingJoinRequests = action.payload;
+    },
+    setUsers: (state, action: PayloadAction<UserMeResponse[]>) => {
+      state.users = action.payload;
+    }
   },
 });
 
@@ -77,6 +106,8 @@ export const {
   logoutUser,
   setLoading,
   setError,
+  setPendingJoinRequests,
+  setUsers,
 } = userSlice.actions;
 
 export default userSlice.reducer;

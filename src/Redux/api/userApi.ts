@@ -1,22 +1,18 @@
+// src/api/userApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type {
   RegisterUserDto,
-  RegisterResponse,
+  JoinOrgRequestDto,
+  ApproveJoinDto,
+  InviteUserDto,
+  UpdateUserRoleDto,
   UserMeResponse,
-  ApproveJoinRequestDto,
+  PendingJoinDto,
 } from "../slices/userSlice";
 
 interface GenericSuccessResponse {
   message: string;
-}
-
-export interface PendingUser {
-  join_id: string;
-  email: string;
-  name: string;
-  requestedRole: "Admin" | "Viewer";
-  // ...add more fields as needed from your backend
 }
 
 export const userApi = createApi({
@@ -25,7 +21,6 @@ export const userApi = createApi({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
       const idToken = Cookies.get("id_token");
-
       if (idToken) {
         headers.set("Authorization", `Bearer ${idToken}`);
       }
@@ -33,23 +28,58 @@ export const userApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    createUser: builder.mutation<RegisterResponse, RegisterUserDto>({
+    // Register user
+    createUser: builder.mutation<GenericSuccessResponse, RegisterUserDto>({
       query: (body) => ({
         url: "/users/register",
         method: "POST",
         body,
       }),
     }),
-    approveJoinRequest: builder.mutation<
-      GenericSuccessResponse,
-      { joinId: string; body: ApproveJoinRequestDto }
-    >({
+    // Request to join org
+    joinOrgRequest: builder.mutation<GenericSuccessResponse, JoinOrgRequestDto>({
+      query: (body) => ({
+        url: "/users/join-request",
+        method: "POST",
+        body,
+      }),
+    }),
+    // Approve join request
+    approveJoinRequest: builder.mutation<GenericSuccessResponse, { joinId: string; body: ApproveJoinDto }>({
       query: ({ joinId, body }) => ({
         url: `/users/approve-join/${joinId}`,
         method: "POST",
         body,
       }),
     }),
+    // Invite user
+    inviteUser: builder.mutation<GenericSuccessResponse, InviteUserDto>({
+      query: (body) => ({
+        url: "/users/invite",
+        method: "POST",
+        body,
+      }),
+    }),
+    // Update user role
+    updateUserRole: builder.mutation<GenericSuccessResponse, { userId: string; body: UpdateUserRoleDto }>({
+      query: ({ userId, body }) => ({
+        url: `/users/role/${userId}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
+    // Remove user
+    removeUser: builder.mutation<GenericSuccessResponse, { userId: string }>({
+      query: ({ userId }) => ({
+        url: `/users/remove/${userId}`,
+        method: "DELETE",
+      }),
+    }),
+    // Get all pending join requests
+    getPendingJoinRequests: builder.query<PendingJoinDto[], void>({
+      query: () => `/users/join-requests`,
+    }),
+    // Get profile (me)
     getProfile: builder.mutation<UserMeResponse, void>({
       query: () => ({
         url: "/users/me",
@@ -57,15 +87,16 @@ export const userApi = createApi({
         body: {},
       }),
     }),
-    getPendingJoinRequests: builder.query<PendingUser[], string>({
-      query: (orgName) => `/users/join-requests?org=${orgName}`,
-    }),
   }),
 });
 
 export const {
   useCreateUserMutation,
+  useJoinOrgRequestMutation,
   useApproveJoinRequestMutation,
-  useGetProfileMutation,
+  useInviteUserMutation,
+  useUpdateUserRoleMutation,
+  useRemoveUserMutation,
   useGetPendingJoinRequestsQuery,
+  useGetProfileMutation,
 } = userApi;

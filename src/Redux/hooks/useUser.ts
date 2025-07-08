@@ -25,9 +25,9 @@ export function useUser() {
     }
   }, [user, isLoading, fetchUser, dispatch]);
 
-  const isAdmin = user?.role === "Admin";
-  const isLEAdmin = user?.role === "LE_Admin";
-  const isViewer = user?.role === "Viewer";
+  const isAdmin = user?.role === ("admin" as string);
+  const isLEAdmin = user?.role === ("le_admin" as string);
+  const isViewer = user?.role === ("viewer" as string);
 
   return {
     user,
