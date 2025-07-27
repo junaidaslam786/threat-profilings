@@ -1,4 +1,3 @@
-// src/slices/rolesSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface RoleConfigDto {
@@ -8,42 +7,37 @@ export interface RoleConfigDto {
   permissions: string[];
 }
 
+export interface RoleCreateResponse {
+  saved: boolean;
+  role_id: string;
+}
+
+export interface RoleDeleteResponse {
+  deleted: boolean;
+  role_id: string;
+}
+
 interface RolesState {
-  roles: RoleConfigDto[];
   selectedRole: RoleConfigDto | null;
-  isLoading: boolean;
-  error: string | null;
 }
 
 const initialState: RolesState = {
-  roles: [],
   selectedRole: null,
-  isLoading: false,
-  error: null,
 };
 
 const rolesSlice = createSlice({
   name: "roles",
   initialState,
   reducers: {
-    setRoles: (state, action: PayloadAction<RoleConfigDto[]>) => {
-      state.roles = action.payload;
-      state.isLoading = false;
-    },
     setSelectedRole: (state, action: PayloadAction<RoleConfigDto | null>) => {
       state.selectedRole = action.payload;
     },
-    setRolesLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    setRolesError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-      state.isLoading = false;
+    clearSelectedRole: (state) => {
+      state.selectedRole = null;
     },
   },
 });
 
-export const { setRoles, setSelectedRole, setRolesLoading, setRolesError } =
-  rolesSlice.actions;
+export const { setSelectedRole, clearSelectedRole } = rolesSlice.actions;
 
 export default rolesSlice.reducer;

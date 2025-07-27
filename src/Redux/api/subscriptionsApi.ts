@@ -1,4 +1,3 @@
-// src/api/subscriptionsApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type {
@@ -7,24 +6,21 @@ import type {
   UpdateSubscriptionDto,
 } from "../slices/subscriptionsSlice";
 
-// For PATCH/POST responses
-export interface GenericSuccessResponse {
-  message: string;
-}
-
 export const subscriptionsApi = createApi({
   reducerPath: "subscriptionsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
       const idToken = Cookies.get("id_token");
-      if (idToken) headers.set("Authorization", `Bearer ${idToken}`);
+      if (idToken) {
+        headers.set("Authorization", `Bearer ${idToken}`);
+      }
+      headers.set("Content-Type", "application/json");
       return headers;
     },
   }),
   tagTypes: ["Subscription"],
   endpoints: (builder) => ({
-    // POST /subscriptions - create a new subscription
     createSubscription: builder.mutation<ClientSubscriptionDto, CreateSubscriptionDto>({
       query: (body) => ({
         url: "/subscriptions",
@@ -32,23 +28,37 @@ export const subscriptionsApi = createApi({
         body,
       }),
       invalidatesTags: [{ type: "Subscription", id: "LIST" }],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to create subscription';
+      },
     }),
-    // GET /subscriptions/:client_name - get a subscription by client_name
+
     getSubscription: builder.query<ClientSubscriptionDto, string>({
-      query: (clientName) => `/subscriptions/${clientName}`,
-      providesTags: (_res, _err, clientName) => [{ type: "Subscription", id: clientName }],
+      query: (clientName) => `/subscriptions/${encodeURIComponent(clientName)}`,
+      providesTags: (_result, _error, clientName) => [
+        { type: "Subscription", id: clientName },
+      ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to fetch subscription';
+      },
     }),
-    // PATCH /subscriptions/:client_name - update a subscription
-    updateSubscription: builder.mutation<ClientSubscriptionDto, { clientName: string; body: UpdateSubscriptionDto }>({
+
+    updateSubscription: builder.mutation<
+      ClientSubscriptionDto, 
+      { clientName: string; body: UpdateSubscriptionDto }
+    >({
       query: ({ clientName, body }) => ({
-        url: `/subscriptions/${clientName}`,
+        url: `/subscriptions/${encodeURIComponent(clientName)}`,
         method: "PATCH",
         body,
       }),
-      invalidatesTags: (_res, _err, arg) => [
+      invalidatesTags: (_result, _error, arg) => [
         { type: "Subscription", id: arg.clientName },
         { type: "Subscription", id: "LIST" },
       ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to update subscription';
+      },
     }),
   }),
 });
@@ -57,4 +67,5 @@ export const {
   useCreateSubscriptionMutation,
   useGetSubscriptionQuery,
   useUpdateSubscriptionMutation,
+  useLazyGetSubscriptionQuery,
 } = subscriptionsApi;

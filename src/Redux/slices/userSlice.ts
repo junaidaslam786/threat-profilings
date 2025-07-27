@@ -1,11 +1,17 @@
+// src/slices/userSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
 
 export type UserRole = 'admin' | 'viewer' | 'runner';
 
+// ✅ Fixed to match backend CreateUserDto
 export interface RegisterUserDto {
   email: string;
   name: string;
+  org_name: string;
+  org_domain: string;
+  industry: string;
+  org_size: '1-10' | '11-50' | '51-100' | '101-500' | '500+';
+  user_type?: 'standard' | 'LE';
   partnerCode?: string;
 }
 
@@ -18,9 +24,11 @@ export interface ApproveJoinDto {
   role: UserRole;
 }
 
+// ✅ Fixed to match backend InviteUserDto
 export interface InviteUserDto {
   email: string;
   name: string;
+  orgName: string; // ✅ Added missing field
 }
 
 export interface UpdateUserRoleDto {
@@ -47,6 +55,16 @@ export interface PendingJoinDto {
   message?: string;
 }
 
+// ✅ Added missing interface for admin organizations
+export interface AdminOrgResponse {
+  client_name: string;
+  organization_name: string;
+  created_at: string;
+  owner_email: string;
+  admins: string[];
+  viewers: string[];
+}
+
 interface UserState {
   accessToken: string | null;
   user: UserMeResponse | null;
@@ -54,6 +72,7 @@ interface UserState {
   error: string | null;
   pendingJoinRequests: PendingJoinDto[];
   users: UserMeResponse[];
+  adminOrganizations: AdminOrgResponse[]; // ✅ Added
 }
 
 const initialState: UserState = {
@@ -63,6 +82,7 @@ const initialState: UserState = {
   error: null,
   pendingJoinRequests: [],
   users: [],
+  adminOrganizations: [], // ✅ Added
 };
 
 const userSlice = createSlice({
@@ -84,6 +104,7 @@ const userSlice = createSlice({
       state.user = null;
       state.isLoading = false;
       state.error = null;
+      state.adminOrganizations = [];
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -96,7 +117,10 @@ const userSlice = createSlice({
     },
     setUsers: (state, action: PayloadAction<UserMeResponse[]>) => {
       state.users = action.payload;
-    }
+    },
+    setAdminOrganizations: (state, action: PayloadAction<AdminOrgResponse[]>) => {
+      state.adminOrganizations = action.payload;
+    },
   },
 });
 
@@ -108,6 +132,7 @@ export const {
   setError,
   setPendingJoinRequests,
   setUsers,
+  setAdminOrganizations,
 } = userSlice.actions;
 
 export default userSlice.reducer;

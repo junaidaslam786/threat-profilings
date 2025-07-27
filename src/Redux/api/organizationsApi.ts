@@ -1,4 +1,3 @@
-// src/api/organizationsApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type {
@@ -6,9 +5,14 @@ import type {
   CreateOrgDto,
   LeCreateOrgDto,
   UpdateOrgDto,
+  CreateOrgResponse,
+  LeCreateOrgResponse,
+  SwitchOrgResponse,
+  UpdateOrgResponse,
+  DeleteOrgResponse,
 } from "../slices/organizationsSlice";
 
-export  interface GenericSuccessResponse {
+export interface GenericSuccessResponse {
   message: string;
 }
 
@@ -22,10 +26,9 @@ export const organizationsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Organization"],
+  tagTypes: ["Organization", "AllOrgs"],
   endpoints: (builder) => ({
-    // POST /orgs - Create Org
-    createOrg: builder.mutation<ClientDataDto, CreateOrgDto>({
+    createOrg: builder.mutation<CreateOrgResponse, CreateOrgDto>({
       query: (body) => ({
         url: "/orgs",
         method: "POST",
@@ -33,8 +36,8 @@ export const organizationsApi = createApi({
       }),
       invalidatesTags: [{ type: "Organization", id: "LIST" }],
     }),
-    // POST /orgs/le - Create Org as LE user
-    createLeOrg: builder.mutation<ClientDataDto, LeCreateOrgDto>({
+
+    createLeOrg: builder.mutation<LeCreateOrgResponse, LeCreateOrgDto>({
       query: (body) => ({
         url: "/orgs/le",
         method: "POST",
@@ -42,13 +45,27 @@ export const organizationsApi = createApi({
       }),
       invalidatesTags: [{ type: "Organization", id: "LIST" }],
     }),
-    // GET /orgs - List Orgs (for current user)
-    getOrgs: builder.query<ClientDataDto[], void>({
+
+    getOrgs: builder.query<
+      | ClientDataDto[]
+      | {
+          le_master: ClientDataDto | null;
+          managed_orgs: ClientDataDto[];
+          total_managed: number;
+        },
+      void
+    >({
       query: () => "/orgs",
       providesTags: [{ type: "Organization", id: "LIST" }],
     }),
-    // PATCH /orgs/:clientName - Update Org
-    updateOrg: builder.mutation<ClientDataDto, { clientName: string; body: UpdateOrgDto }>({
+
+    updateOrg: builder.mutation<
+      UpdateOrgResponse,
+      {
+        clientName: string;
+        body: UpdateOrgDto;
+      }
+    >({
       query: ({ clientName, body }) => ({
         url: `/orgs/${clientName}`,
         method: "PATCH",
@@ -56,9 +73,25 @@ export const organizationsApi = createApi({
       }),
       invalidatesTags: [{ type: "Organization", id: "LIST" }],
     }),
-    // GET /orgs/switch/:clientName - Switch Org Context
-    switchOrg: builder.query<ClientDataDto, string>({
+
+    switchOrg: builder.query<SwitchOrgResponse, string>({
       query: (clientName) => `/orgs/switch/${clientName}`,
+    }),
+
+    getAllOrgs: builder.query<ClientDataDto[], void>({
+      query: () => "/orgs/all",
+      providesTags: [{ type: "AllOrgs", id: "LIST" }],
+    }),
+
+    deleteOrg: builder.mutation<DeleteOrgResponse, string>({
+      query: (clientName) => ({
+        url: `/orgs/${clientName}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [
+        { type: "Organization", id: "LIST" },
+        { type: "AllOrgs", id: "LIST" },
+      ],
     }),
   }),
 });
@@ -69,4 +102,6 @@ export const {
   useGetOrgsQuery,
   useUpdateOrgMutation,
   useSwitchOrgQuery,
+  useGetAllOrgsQuery,
+  useDeleteOrgMutation,
 } = organizationsApi;

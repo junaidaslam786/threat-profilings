@@ -1,4 +1,3 @@
-// src/api/userApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type {
@@ -9,6 +8,7 @@ import type {
   UpdateUserRoleDto,
   UserMeResponse,
   PendingJoinDto,
+  AdminOrgResponse,
 } from "../slices/userSlice";
 
 interface GenericSuccessResponse {
@@ -27,65 +27,88 @@ export const userApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['User', 'PendingJoins', 'AdminOrgs'],
   endpoints: (builder) => ({
-    // Register user
     createUser: builder.mutation<GenericSuccessResponse, RegisterUserDto>({
       query: (body) => ({
         url: "/users/register",
         method: "POST",
         body,
       }),
+      invalidatesTags: ['User'],
     }),
-    // Request to join org
+
     joinOrgRequest: builder.mutation<GenericSuccessResponse, JoinOrgRequestDto>({
       query: (body) => ({
         url: "/users/join-request",
         method: "POST",
         body,
       }),
+      invalidatesTags: ['PendingJoins'],
     }),
-    // Approve join request
-    approveJoinRequest: builder.mutation<GenericSuccessResponse, { joinId: string; body: ApproveJoinDto }>({
+
+    approveJoinRequest: builder.mutation<
+      GenericSuccessResponse, 
+      { joinId: string; body: ApproveJoinDto }
+    >({
       query: ({ joinId, body }) => ({
         url: `/users/approve-join/${joinId}`,
         method: "POST",
         body,
       }),
+      invalidatesTags: ['PendingJoins', 'User'],
     }),
-    // Invite user
+
     inviteUser: builder.mutation<GenericSuccessResponse, InviteUserDto>({
       query: (body) => ({
         url: "/users/invite",
         method: "POST",
         body,
       }),
+      invalidatesTags: ['User'],
     }),
-    // Update user role
-    updateUserRole: builder.mutation<GenericSuccessResponse, { userId: string; body: UpdateUserRoleDto }>({
-      query: ({ userId, body }) => ({
-        url: `/users/role/${userId}`,
+
+    updateUserRole: builder.mutation<
+      GenericSuccessResponse, 
+      { userId: string; org: string; body: UpdateUserRoleDto }
+    >({
+      query: ({ userId, org, body }) => ({
+        url: `/users/role/${userId}?org=${encodeURIComponent(org)}`,
         method: "PATCH",
         body,
       }),
+      invalidatesTags: ['User'],
     }),
-    // Remove user
-    removeUser: builder.mutation<GenericSuccessResponse, { userId: string }>({
-      query: ({ userId }) => ({
-        url: `/users/remove/${userId}`,
+
+    removeUser: builder.mutation<
+      GenericSuccessResponse, 
+      { userId: string; org: string }
+    >({
+      query: ({ userId, org }) => ({
+        url: `/users/remove/${userId}?org=${encodeURIComponent(org)}`,
         method: "DELETE",
       }),
+      invalidatesTags: ['User'],
     }),
-    // Get all pending join requests
-    getPendingJoinRequests: builder.query<PendingJoinDto[], void>({
-      query: () => `/users/join-requests`,
+
+    getPendingJoinRequests: builder.query<PendingJoinDto[], { org: string }>({
+      query: ({ org }) => `/users/join-requests?org=${encodeURIComponent(org)}`,
+      providesTags: ['PendingJoins'],
     }),
-    // Get profile (me)
+
+    // ✅ Get profile (me)
     getProfile: builder.mutation<UserMeResponse, void>({
       query: () => ({
         url: "/users/me",
         method: "POST",
         body: {},
       }),
+      invalidatesTags: ['User'],
+    }),
+
+    getAdminOrganizations: builder.query<AdminOrgResponse[], void>({
+      query: () => "/users/admin-orgs",
+      providesTags: ['AdminOrgs'],
     }),
   }),
 });
@@ -99,4 +122,5 @@ export const {
   useRemoveUserMutation,
   useGetPendingJoinRequestsQuery,
   useGetProfileMutation,
+  useGetAdminOrganizationsQuery,
 } = userApi;

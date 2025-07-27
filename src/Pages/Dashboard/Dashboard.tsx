@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "../../components/Common/Button";
-import { useUser } from "../../Redux/hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 

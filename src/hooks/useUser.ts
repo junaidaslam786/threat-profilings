@@ -1,11 +1,11 @@
 // src/hooks/useUser.ts
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../store";
-import type { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../Redux/store";
+import type { RootState } from "../Redux/store";
 
-import { useGetProfileMutation } from "../api/userApi";
+import { useGetProfileMutation } from "../Redux/api/userApi";
 
-import { setUserDetails, logoutUser } from "../slices/userSlice";
+import { setUserDetails, logoutUser } from "../Redux/slices/userSlice";
 import toast from "react-hot-toast";
 
 export function useUser() {

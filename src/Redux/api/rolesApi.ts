@@ -1,11 +1,10 @@
-// src/api/rolesApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
-import type { RoleConfigDto } from "../slices/rolesSlice";
-
-interface GenericSuccessResponse {
-  message: string;
-}
+import type { 
+  RoleConfigDto, 
+  RoleCreateResponse, 
+  RoleDeleteResponse 
+} from "../slices/rolesSlice";
 
 export const rolesApi = createApi({
   reducerPath: "rolesApi",
@@ -13,38 +12,67 @@ export const rolesApi = createApi({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
       const idToken = Cookies.get("id_token");
-      if (idToken) headers.set("Authorization", `Bearer ${idToken}`);
+      if (idToken) {
+        headers.set("Authorization", `Bearer ${idToken}`);
+      }
+      headers.set("Content-Type", "application/json");
       return headers;
     },
   }),
   tagTypes: ["Role"],
   endpoints: (builder) => ({
-    // POST /roles - Create new role
-    createRole: builder.mutation<RoleConfigDto, RoleConfigDto>({
+    createRole: builder.mutation<RoleCreateResponse, RoleConfigDto>({
       query: (body) => ({
         url: "/roles",
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: "Role", id: "LIST" }],
+      invalidatesTags: (_result: RoleCreateResponse | undefined, _error: unknown, arg: RoleConfigDto) => [
+        { type: "Role", id: "LIST" },
+        { type: "Role", id: arg.role_id },
+      ],
+            transformErrorResponse: (response: { status: number; data?: { message?: string } }): string => {
+        return response.data?.message || 'Failed to create/update role';
+      },
     }),
+
     // GET /roles - Get all roles
     getRoles: builder.query<RoleConfigDto[], void>({
       query: () => "/roles",
-      providesTags: [{ type: "Role", id: "LIST" }],
+      providesTags: (result) => [
+        { type: "Role", id: "LIST" },
+        // Provide tags for each individual role
+        ...(result?.map(role => ({ type: "Role" as const, id: role.role_id })) || []),
+      ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to fetch roles';
+      },
     }),
+
     // GET /roles/:role_id - Get a specific role
     getRole: builder.query<RoleConfigDto, string>({
-      query: (role_id) => `/roles/${role_id}`,
-      providesTags: (_res, _err, role_id) => [{ type: "Role", id: role_id }],
+      query: (role_id) => `/roles/${encodeURIComponent(role_id)}`,
+      providesTags: (_result, _error, role_id) => [
+        { type: "Role", id: role_id },
+      ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to fetch role';
+      },
     }),
+
     // DELETE /roles/:role_id - Delete a role
-    deleteRole: builder.mutation<GenericSuccessResponse, string>({
+    deleteRole: builder.mutation<RoleDeleteResponse, string>({
       query: (role_id) => ({
-        url: `/roles/${role_id}`,
+        url: `/roles/${encodeURIComponent(role_id)}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Role", id: "LIST" }],
+      invalidatesTags: (_result, _error, role_id) => [
+        { type: "Role", id: "LIST" },
+        { type: "Role", id: role_id },
+      ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to delete role';
+      },
     }),
   }),
 });
@@ -54,4 +82,13 @@ export const {
   useGetRolesQuery,
   useGetRoleQuery,
   useDeleteRoleMutation,
+  // Export lazy queries for more control
+  useLazyGetRoleQuery,
+  useLazyGetRolesQuery,
 } = rolesApi;
+
+// Export selectors for getting cached data
+export const selectRoleById = (role_id: string) => 
+  rolesApi.endpoints.getRole.select(role_id);
+
+export const selectAllRoles = rolesApi.endpoints.getRoles.select();
