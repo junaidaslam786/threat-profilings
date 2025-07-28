@@ -54,7 +54,6 @@ export interface InvoiceRecord {
   created_at: string;
 }
 
-// Simplified state - let RTK Query handle most data management
 interface PaymentsState {
   currentPaymentIntent: PaymentIntentResponse | null;
   lastPaymentResult: ProcessPaymentResponse | null;
