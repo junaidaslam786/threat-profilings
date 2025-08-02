@@ -1,17 +1,15 @@
-// src/slices/userSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-export type UserRole = 'admin' | 'viewer' | 'runner';
+export type UserRole = "admin" | "viewer" | "runner";
 
-// ✅ Fixed to match backend CreateUserDto
 export interface RegisterUserDto {
   email: string;
   name: string;
   org_name: string;
   org_domain: string;
   industry: string;
-  org_size: '1-10' | '11-50' | '51-100' | '101-500' | '500+';
-  user_type?: 'standard' | 'LE';
+  org_size: "1-10" | "11-50" | "51-100" | "101-500" | "500+";
+  user_type?: "standard" | "LE";
   partnerCode?: string;
 }
 
@@ -24,11 +22,10 @@ export interface ApproveJoinDto {
   role: UserRole;
 }
 
-// ✅ Fixed to match backend InviteUserDto
 export interface InviteUserDto {
   email: string;
   name: string;
-  orgName: string; // ✅ Added missing field
+  orgName: string;
 }
 
 export interface UpdateUserRoleDto {
@@ -41,7 +38,7 @@ export interface UserMeResponse {
   client_name: string;
   partner_code?: string | null;
   role: UserRole;
-  status: 'active' | 'pending_approval';
+  status: "active" | "pending_approval";
   created_at: string;
 }
 
@@ -51,11 +48,10 @@ export interface PendingJoinDto {
   email: string;
   name: string;
   created_at: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   message?: string;
 }
 
-// ✅ Added missing interface for admin organizations
 export interface AdminOrgResponse {
   client_name: string;
   organization_name: string;
@@ -72,7 +68,7 @@ interface UserState {
   error: string | null;
   pendingJoinRequests: PendingJoinDto[];
   users: UserMeResponse[];
-  adminOrganizations: AdminOrgResponse[]; // ✅ Added
+  adminOrganizations: AdminOrgResponse[];
 }
 
 const initialState: UserState = {
@@ -82,7 +78,7 @@ const initialState: UserState = {
   error: null,
   pendingJoinRequests: [],
   users: [],
-  adminOrganizations: [], // ✅ Added
+  adminOrganizations: [],
 };
 
 const userSlice = createSlice({
@@ -112,13 +108,19 @@ const userSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setPendingJoinRequests: (state, action: PayloadAction<PendingJoinDto[]>) => {
+    setPendingJoinRequests: (
+      state,
+      action: PayloadAction<PendingJoinDto[]>
+    ) => {
       state.pendingJoinRequests = action.payload;
     },
     setUsers: (state, action: PayloadAction<UserMeResponse[]>) => {
       state.users = action.payload;
     },
-    setAdminOrganizations: (state, action: PayloadAction<AdminOrgResponse[]>) => {
+    setAdminOrganizations: (
+      state,
+      action: PayloadAction<AdminOrgResponse[]>
+    ) => {
       state.adminOrganizations = action.payload;
     },
   },

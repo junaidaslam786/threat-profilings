@@ -10,6 +10,23 @@ export interface TierConfigDto {
   run_quota: number;
   price_monthly: number;
   price_onetime_registration: number;
+  features?: {
+    threat_detection?: boolean;
+    compliance_reports?: boolean;
+    api_access?: boolean;
+    custom_branding?: boolean;
+    priority_support?: boolean;
+    sso_integration?: boolean;
+    audit_logs?: boolean;
+    data_export?: boolean;
+    compliance_frameworks?: string[];
+    is_active?: boolean;
+    discount_percent?: number;
+    promotion_code?: string;
+    max_users?: number;
+    storage_limit_gb?: number;
+    le_eligible?: boolean;
+  };
 }
 
 export interface TierCreateResponse {

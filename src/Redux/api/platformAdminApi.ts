@@ -34,12 +34,18 @@ export const platformAdminApi = createApi({
     getPlatformStats: builder.query<PlatformStats, void>({
       query: () => "/stats",
       providesTags: ["PlatformStats"],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to fetch platform statistics';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch platform statistics";
       },
     }),
 
-    getActivityLogs: builder.query<ActivityLogsResponse, ActivityLogQueryDto | void>({
+    getActivityLogs: builder.query<
+      ActivityLogsResponse,
+      ActivityLogQueryDto | void
+    >({
       query: (params = {}) => ({
         url: "/activity-logs",
         params: {
@@ -50,8 +56,11 @@ export const platformAdminApi = createApi({
         },
       }),
       providesTags: ["ActivityLogs"],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to fetch activity logs';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch activity logs";
       },
     }),
 
@@ -59,10 +68,18 @@ export const platformAdminApi = createApi({
       query: () => "/admins",
       providesTags: (result) => [
         { type: "PlatformAdmin", id: "LIST" },
-        ...(result?.admins?.map(admin => ({ type: "PlatformAdmin" as const, id: admin.email })) || []),
+        ...(result?.admins?.map((admin) => ({
+          type: "PlatformAdmin" as const,
+          id: admin.email,
+        })) || []),
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to fetch platform administrators';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return (
+          response.data?.message || "Failed to fetch platform administrators"
+        );
       },
     }),
 
@@ -77,8 +94,11 @@ export const platformAdminApi = createApi({
         "PlatformStats",
         "ActivityLogs",
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to grant platform admin access';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to grant platform admin access";
       },
     }),
 
@@ -93,23 +113,29 @@ export const platformAdminApi = createApi({
         "PlatformStats",
         "ActivityLogs",
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to revoke platform admin access';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to revoke platform admin access";
       },
     }),
 
-    suspendUser: builder.mutation<SuspendUserResponse, { email: string } & Omit<SuspendUserDto, 'email'>>({
+    suspendUser: builder.mutation<
+      SuspendUserResponse,
+      { email: string } & Omit<SuspendUserDto, "email">
+    >({
       query: ({ email, ...body }) => ({
         url: `/users/${encodeURIComponent(email)}/suspend`,
         method: "POST",
         body,
       }),
-      invalidatesTags: [
-        "PlatformStats",
-        "ActivityLogs",
-      ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to suspend user';
+      invalidatesTags: ["PlatformStats", "ActivityLogs"],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to suspend user";
       },
     }),
 
@@ -118,36 +144,45 @@ export const platformAdminApi = createApi({
         url: `/users/${encodeURIComponent(email)}/activate`,
         method: "POST",
       }),
-      invalidatesTags: [
-        "PlatformStats",
-        "ActivityLogs",
-      ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to activate user';
+      invalidatesTags: ["PlatformStats", "ActivityLogs"],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to activate user";
       },
     }),
 
-    deleteUser: builder.mutation<DeleteUserResponse, { email: string; force?: boolean }>({
+    deleteUser: builder.mutation<
+      DeleteUserResponse,
+      { email: string; force?: boolean }
+    >({
       query: ({ email, force = false }) => ({
         url: `/users/${encodeURIComponent(email)}`,
         method: "DELETE",
-        params: force ? { force: 'true' } : {},
+        params: force ? { force: "true" } : {},
       }),
       invalidatesTags: [
         "PlatformStats",
         "ActivityLogs",
         { type: "PlatformAdmin", id: "LIST" },
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to delete user';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to delete user";
       },
     }),
 
     getCurrentAdmin: builder.query<CurrentAdminResponse, void>({
       query: () => "/me",
       providesTags: ["CurrentAdmin"],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to fetch current admin info';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch current admin info";
       },
     }),
   }),
@@ -169,8 +204,11 @@ export const {
   useLazyGetCurrentAdminQuery,
 } = platformAdminApi;
 
-export const selectPlatformStats = platformAdminApi.endpoints.getPlatformStats.select();
-export const selectPlatformAdmins = platformAdminApi.endpoints.listPlatformAdmins.select();
-export const selectCurrentAdmin = platformAdminApi.endpoints.getCurrentAdmin.select();
-export const selectActivityLogs = (params?: ActivityLogQueryDto) => 
+export const selectPlatformStats =
+  platformAdminApi.endpoints.getPlatformStats.select();
+export const selectPlatformAdmins =
+  platformAdminApi.endpoints.listPlatformAdmins.select();
+export const selectCurrentAdmin =
+  platformAdminApi.endpoints.getCurrentAdmin.select();
+export const selectActivityLogs = (params?: ActivityLogQueryDto) =>
   platformAdminApi.endpoints.getActivityLogs.select(params || {});

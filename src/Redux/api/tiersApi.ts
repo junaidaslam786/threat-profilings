@@ -17,11 +17,11 @@ export const tiersApi = createApi({
       }
       headers.set("Content-Type", "application/json");
       return headers;
-        },
-      }),
-      tagTypes: ["Tier"],
-      endpoints: (builder) => ({
-        createTier: builder.mutation<TierCreateResponse, TierConfigDto>({
+    },
+  }),
+  tagTypes: ["Tier"],
+  endpoints: (builder) => ({
+    createTier: builder.mutation<TierCreateResponse, TierConfigDto>({
       query: (body: TierConfigDto) => ({
         url: "/tiers",
         method: "POST",
@@ -56,6 +56,7 @@ export const tiersApi = createApi({
         return response.data?.message || 'Failed to fetch tier';
       },
     }),
+
     deleteTier: builder.mutation<TierDeleteResponse, string>({
       query: (sub_level) => ({
         url: `/tiers/${encodeURIComponent(sub_level)}`,

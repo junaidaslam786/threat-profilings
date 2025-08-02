@@ -48,7 +48,7 @@ export const userApi = createApi({
     }),
 
     approveJoinRequest: builder.mutation<
-      GenericSuccessResponse, 
+      GenericSuccessResponse,
       { joinId: string; body: ApproveJoinDto }
     >({
       query: ({ joinId, body }) => ({
@@ -69,7 +69,7 @@ export const userApi = createApi({
     }),
 
     updateUserRole: builder.mutation<
-      GenericSuccessResponse, 
+      GenericSuccessResponse,
       { userId: string; org: string; body: UpdateUserRoleDto }
     >({
       query: ({ userId, org, body }) => ({
@@ -81,7 +81,7 @@ export const userApi = createApi({
     }),
 
     removeUser: builder.mutation<
-      GenericSuccessResponse, 
+      GenericSuccessResponse,
       { userId: string; org: string }
     >({
       query: ({ userId, org }) => ({
@@ -96,14 +96,9 @@ export const userApi = createApi({
       providesTags: ['PendingJoins'],
     }),
 
-    // ✅ Get profile (me)
-    getProfile: builder.mutation<UserMeResponse, void>({
-      query: () => ({
-        url: "/users/me",
-        method: "POST",
-        body: {},
-      }),
-      invalidatesTags: ['User'],
+    getProfile: builder.query<UserMeResponse, void>({
+      query: () => "/users/me",
+      providesTags: ['User'],
     }),
 
     getAdminOrganizations: builder.query<AdminOrgResponse[], void>({
@@ -121,6 +116,6 @@ export const {
   useUpdateUserRoleMutation,
   useRemoveUserMutation,
   useGetPendingJoinRequestsQuery,
-  useGetProfileMutation,
+  useGetProfileQuery,
   useGetAdminOrganizationsQuery,
 } = userApi;

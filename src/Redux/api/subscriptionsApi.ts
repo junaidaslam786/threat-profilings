@@ -21,15 +21,21 @@ export const subscriptionsApi = createApi({
   }),
   tagTypes: ["Subscription"],
   endpoints: (builder) => ({
-    createSubscription: builder.mutation<ClientSubscriptionDto, CreateSubscriptionDto>({
+    createSubscription: builder.mutation<
+      ClientSubscriptionDto,
+      CreateSubscriptionDto
+    >({
       query: (body) => ({
         url: "/subscriptions",
         method: "POST",
         body,
       }),
       invalidatesTags: [{ type: "Subscription", id: "LIST" }],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to create subscription';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to create subscription";
       },
     }),
 
@@ -38,13 +44,16 @@ export const subscriptionsApi = createApi({
       providesTags: (_result, _error, clientName) => [
         { type: "Subscription", id: clientName },
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to fetch subscription';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch subscription";
       },
     }),
 
     updateSubscription: builder.mutation<
-      ClientSubscriptionDto, 
+      ClientSubscriptionDto,
       { clientName: string; body: UpdateSubscriptionDto }
     >({
       query: ({ clientName, body }) => ({
@@ -56,8 +65,11 @@ export const subscriptionsApi = createApi({
         { type: "Subscription", id: arg.clientName },
         { type: "Subscription", id: "LIST" },
       ],
-      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
-        return response.data?.message || 'Failed to update subscription';
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to update subscription";
       },
     }),
   }),

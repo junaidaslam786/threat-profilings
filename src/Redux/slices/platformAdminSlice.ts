@@ -1,13 +1,41 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+export interface AdminActionDto {
+  action:
+    | "grant"
+    | "revoke"
+    | "suspend"
+    | "activate"
+    | "delete"
+    | "update_subscription";
+  target_email: string;
+  reason?: string;
+  admin_level?: string;
+  subscription_level?: string;
+  force?: boolean;
+}
+
+export interface AdminAction {
+  action: "grant" | "revoke" | "suspend" | "activate" | "delete";
+  target_email: string;
+  reason?: string;
+  admin_level?: string;
+}
+
 export interface PlatformAdminUser {
   email: string;
   name: string;
-  level: 'super' | 'admin' | 'read-only';
+  level: "super" | "admin" | "read-only";
   created_at: string;
   last_login?: string;
   granted_by?: string;
   granted_at?: string;
+}
+export interface StatsQueryDto {
+  start_date?: string;
+  end_date?: string;
+  granularity?: "day" | "week" | "month";
+  limit?: number;
 }
 
 export interface UserStats {
@@ -74,6 +102,15 @@ export interface ActivityLog {
   user_agent?: string;
 }
 
+export interface ActivityLogQueryDto {
+  user_email?: string;
+  action?: string;
+  start_date?: string;
+  end_date?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export interface PlatformStats {
   users: UserStats;
   organizations: OrganizationStats;
@@ -84,7 +121,7 @@ export interface PlatformStats {
 
 export interface GrantAdminDto {
   email: string;
-  level: 'super' | 'admin' | 'read-only';
+  level: "super" | "admin" | "read-only";
   reason?: string;
 }
 
@@ -182,13 +219,19 @@ const platformAdminSlice = createSlice({
   name: "platformAdmin",
   initialState,
   reducers: {
-    setSelectedAdmin: (state, action: PayloadAction<PlatformAdminUser | null>) => {
+    setSelectedAdmin: (
+      state,
+      action: PayloadAction<PlatformAdminUser | null>
+    ) => {
       state.selectedAdmin = action.payload;
     },
     clearSelectedAdmin: (state) => {
       state.selectedAdmin = null;
     },
-    setCurrentAdminInfo: (state, action: PayloadAction<CurrentAdminResponse | null>) => {
+    setCurrentAdminInfo: (
+      state,
+      action: PayloadAction<CurrentAdminResponse | null>
+    ) => {
       state.currentAdminInfo = action.payload;
     },
     clearCurrentAdminInfo: (state) => {

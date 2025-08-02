@@ -1,13 +1,13 @@
-// src/api/paymentsApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type {
   StripePaymentDto,
   CreatePaymentIntentDto,
   PaymentIntentResponse,
-  ProcessPaymentResponse,
   PaymentStatusResponse,
-  InvoiceRecord,
+  PaymentRecord,
+  StripeCheckoutDto,
+  StripeCheckoutResponse,
 } from "../slices/paymentsSlice";
 
 export const paymentsApi = createApi({
@@ -42,7 +42,18 @@ export const paymentsApi = createApi({
       },
     }),
 
-    processPayment: builder.mutation<ProcessPaymentResponse, StripePaymentDto>({
+    createCheckoutSession: builder.mutation<
+      StripeCheckoutResponse,
+      StripeCheckoutDto
+    >({
+      query: (body) => ({
+        url: "/payments/create-checkout-session",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    processPayment: builder.mutation<PaymentRecord, StripePaymentDto>({
       query: (body) => ({
         url: "/payments/process",
         method: "POST",
@@ -75,7 +86,7 @@ export const paymentsApi = createApi({
       },
     }),
 
-    getInvoices: builder.query<InvoiceRecord[], string>({
+    getInvoices: builder.query<PaymentRecord[], string>({
       query: (client_name) =>
         `/payments/invoices/${encodeURIComponent(client_name)}`,
       providesTags: (_result, _error, client_name) => [
@@ -98,15 +109,14 @@ export const paymentsApi = createApi({
 
 export const {
   useCreatePaymentIntentMutation,
+  useCreateCheckoutSessionMutation,
   useProcessPaymentMutation,
   useGetPaymentStatusQuery,
   useGetInvoicesQuery,
-  // Export lazy queries for more control
   useLazyGetPaymentStatusQuery,
   useLazyGetInvoicesQuery,
 } = paymentsApi;
 
-// Export selectors for getting cached data
 export const selectPaymentStatusByClient = (client_name: string) =>
   paymentsApi.endpoints.getPaymentStatus.select(client_name);
 

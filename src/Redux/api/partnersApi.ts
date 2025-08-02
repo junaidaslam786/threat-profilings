@@ -6,7 +6,6 @@ import type {
   UpdatePartnerCodeDto,
   CreatePartnerCodeResponse,
   PartnerStats,
-  GenericSuccessResponse,
 } from "../slices/partnersSlice";
 
 export const partnersApi = createApi({
@@ -23,7 +22,10 @@ export const partnersApi = createApi({
   }),
   tagTypes: ["PartnerCode", "PartnerStats"],
   endpoints: (builder) => ({
-    createPartnerCode: builder.mutation<CreatePartnerCodeResponse, CreatePartnerCodeDto>({
+    createPartnerCode: builder.mutation<
+      CreatePartnerCodeResponse,
+      CreatePartnerCodeDto
+    >({
       query: (body) => ({
         url: "/partners/codes",
         method: "POST",
@@ -40,14 +42,17 @@ export const partnersApi = createApi({
     validatePartnerCode: builder.query<PartnerCode, string>({
       query: (code) => `/partners/codes/${encodeURIComponent(code)}`,
       providesTags: (_result, _error, code) => [
-        { type: "PartnerCode", id: code }
+        { type: "PartnerCode", id: code },
       ],
     }),
 
-    updatePartnerCode: builder.mutation<GenericSuccessResponse, {
-      code: string;
-      body: UpdatePartnerCodeDto;
-    }>({
+    updatePartnerCode: builder.mutation<
+      PartnerCode,
+      {
+        code: string;
+        body: UpdatePartnerCodeDto;
+      }
+    >({
       query: ({ code, body }) => ({
         url: `/partners/codes/${encodeURIComponent(code)}`,
         method: "PATCH",
@@ -55,25 +60,25 @@ export const partnersApi = createApi({
       }),
       invalidatesTags: (_result, _error, { code }) => [
         { type: "PartnerCode", id: "LIST" },
-        { type: "PartnerCode", id: code }
+        { type: "PartnerCode", id: code },
       ],
     }),
 
-    deletePartnerCode: builder.mutation<GenericSuccessResponse, string>({
+    deletePartnerCode: builder.mutation<PartnerCode, string>({
       query: (code) => ({
         url: `/partners/codes/${encodeURIComponent(code)}`,
         method: "DELETE",
       }),
       invalidatesTags: (_result, _error, code) => [
         { type: "PartnerCode", id: "LIST" },
-        { type: "PartnerCode", id: code }
+        { type: "PartnerCode", id: code },
       ],
     }),
 
     getPartnerStats: builder.query<PartnerStats, string>({
       query: (code) => `/partners/codes/${encodeURIComponent(code)}/stats`,
       providesTags: (_result, _error, code) => [
-        { type: "PartnerStats", id: code }
+        { type: "PartnerStats", id: code },
       ],
     }),
   }),

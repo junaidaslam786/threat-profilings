@@ -27,11 +27,11 @@ export const rolesApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: (_result: RoleCreateResponse | undefined, _error: unknown, arg: RoleConfigDto) => [
+      invalidatesTags: (_result, _error, arg) => [
         { type: "Role", id: "LIST" },
         { type: "Role", id: arg.role_id },
       ],
-            transformErrorResponse: (response: { status: number; data?: { message?: string } }): string => {
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }): string => {
         return response.data?.message || 'Failed to create/update role';
       },
     }),
