@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../components/Common/Button";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
@@ -20,16 +20,37 @@ const USER_ROUTES = [
   { label: "Profile", path: "/profile" },
 ];
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const Dashboard: React.FC = () => {
   const { user, isLoading } = useUser();
   const navigate = useNavigate();
+  const [signInUrl, setSignInUrl] = useState<string>("/");
 
   const role = user?.role?.toLowerCase();
   const isAdmin = role === "admin";
   const isLEAdmin = role === "le_admin";
   const isActive = user?.status?.toLowerCase() === "active";
 
-  // Choose which routes to show
+  // Fetch auth config to get external sign-in URL
+  useEffect(() => {
+    const fetchAuthConfig = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/auth/config`);
+        if (response.ok) {
+          const config = await response.json();
+          if (config.signInUrl) {
+            setSignInUrl(config.signInUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch auth config:", error);
+      }
+    };
+
+    fetchAuthConfig();
+  }, []);
+
   const routes =
     isAdmin || isLEAdmin
       ? [
@@ -51,17 +72,20 @@ const Dashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 text-center">
-          <h2 className="text-2xl font-bold text-blue-400 mb-4">Sign In Required</h2>
+          <h2 className="text-2xl font-bold text-blue-400 mb-4">
+            Sign In Required
+          </h2>
           <p className="mb-4">
             You are not signed in. Please log in to access the dashboard.
           </p>
-          <Button onClick={() => (window.location.href = "/")}>Go to Login</Button>
+          <Button onClick={() => (window.location.href = signInUrl)}>
+            Go to Login
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Not approved? Only show profile + status.
   if (!isActive) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -70,10 +94,13 @@ const Dashboard: React.FC = () => {
             Awaiting Approval
           </h2>
           <p className="mb-4 text-yellow-300">
-            Your account is pending approval. You will receive an email when your access is activated.
+            Your account is pending approval. You will receive an email when
+            your access is activated.
           </p>
           <div className="bg-gray-900 p-5 rounded-xl border border-blue-700 mb-3">
-            <h3 className="text-lg text-blue-300 font-bold mb-2">Your Profile</h3>
+            <h3 className="text-lg text-blue-300 font-bold mb-2">
+              Your Profile
+            </h3>
             <div className="text-left">
               <div>
                 <b>Name:</b> {user.name}
@@ -88,7 +115,8 @@ const Dashboard: React.FC = () => {
                 <b>Organization:</b> {user.client_name}
               </div>
               <div>
-                <b>Status:</b> <span className="text-yellow-300">{user.status}</span>
+                <b>Status:</b>{" "}
+                <span className="text-yellow-300">{user.status}</span>
               </div>
             </div>
           </div>
@@ -98,7 +126,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // Approved - Show full dashboard
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
@@ -119,7 +146,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-2xl mx-auto mb-10">
-        <h3 className="text-2xl font-semibold mb-3 text-blue-300">User Profile</h3>
+        <h3 className="text-2xl font-semibold mb-3 text-blue-300">
+          User Profile
+        </h3>
         <div className="mb-1">
           <b>Name:</b> {user.name}
         </div>
@@ -152,10 +181,7 @@ const Dashboard: React.FC = () => {
         <ul className="grid gap-4 md:grid-cols-2">
           {routes.map((route) => (
             <li key={route.path}>
-              <Button
-                className="w-full"
-                onClick={() => navigate(route.path)}
-              >
+              <Button className="w-full" onClick={() => navigate(route.path)}>
                 {route.label}
               </Button>
             </li>
