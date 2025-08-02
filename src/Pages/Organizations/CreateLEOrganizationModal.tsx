@@ -33,7 +33,6 @@ export default function LEOrganizationCreateModal({
       setError("Organization name and domain are required.");
       return;
     }
-    // Define a type for the error object structure
     type ApiError = {
       data?: {
         message?: string;

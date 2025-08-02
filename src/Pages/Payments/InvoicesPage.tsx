@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useGetInvoicesQuery } from "../../Redux/api/paymentsApi";
 import LoadingSpinner from "../../components/Common/LoadingScreen";
 import ErrorMessage from "../../components/Common/ErrorMessage";
-import { type InvoiceRecord } from "../../Redux/slices/paymentsSlice";
 
 const InvoicesPage: React.FC = () => {
   const { client_name } = useParams<{ client_name: string }>();
@@ -115,7 +114,7 @@ const InvoicesPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {invoices.map((invoice: InvoiceRecord) => (
+              {invoices.map((invoice) => (
                 <tr key={invoice.payment_id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {invoice.payment_id}

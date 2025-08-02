@@ -1,5 +1,276 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+export type ThreatLevel = "low" | "medium" | "high" | "critical";
+
+export type AssessmentStatus =
+  | "pending"
+  | "in_progress"
+  | "completed"
+  | "approved"
+  | "rejected";
+
+export type ComplianceFramework =
+  | "ISM"
+  | "NIST"
+  | "ISO27001"
+  | "SOC2"
+  | "GDPR"
+  | "E8"
+  | "ACSC_ESSENTIAL_EIGHT";
+
+export type ControlStatus =
+  | "not_implemented"
+  | "partially_implemented"
+  | "fully_implemented"
+  | "not_applicable";
+
+export interface ThreatActor {
+  id: string;
+  name: string;
+  type:
+    | "nation_state"
+    | "cybercriminal"
+    | "insider"
+    | "hacktivist"
+    | "terrorist";
+  sophistication: "low" | "medium" | "high" | "expert";
+  motivation: string[];
+  capabilities: string[];
+}
+
+export interface Vulnerability {
+  id: string;
+  cve_id?: string;
+  title: string;
+  description: string;
+  severity: ThreatLevel;
+  cvss_score?: number;
+  affected_components: string[];
+  mitigation_status: "open" | "in_progress" | "mitigated" | "accepted";
+  remediation_steps?: string[];
+}
+
+export interface ThreatScenario {
+  id: string;
+  title: string;
+  description: string;
+  threat_actors: string[];
+  attack_vectors: string[];
+  likelihood: ThreatLevel;
+  impact: ThreatLevel;
+  risk_level: ThreatLevel;
+  mitigation_controls: string[];
+}
+
+export interface RiskMetrics {
+  total_risks: number;
+  critical_risks: number;
+  high_risks: number;
+  medium_risks: number;
+  low_risks: number;
+  mitigated_risks: number;
+  accepted_risks: number;
+  residual_risk_score: number;
+}
+
+export interface ThreatProfilingReport {
+  report_id: string;
+  version: string;
+  generated_at: string;
+  generated_by: string;
+  executive_summary: {
+    overview: string;
+    key_findings: string[];
+    recommendations: string[];
+    risk_posture: ThreatLevel;
+  };
+  organization_context: {
+    business_model: string;
+    critical_assets: string[];
+    regulatory_requirements: ComplianceFramework[];
+    threat_landscape: string;
+  };
+  threat_analysis: {
+    threat_actors: ThreatActor[];
+    threat_scenarios: ThreatScenario[];
+    vulnerabilities: Vulnerability[];
+    attack_surface: {
+      external_facing_assets: string[];
+      internal_systems: string[];
+      third_party_dependencies: string[];
+    };
+  };
+  risk_assessment: {
+    methodology: string;
+    risk_metrics: RiskMetrics;
+    risk_matrix: {
+      likelihood_scale: string[];
+      impact_scale: string[];
+      risk_levels: Record<string, ThreatLevel>;
+    };
+    top_risks: Array<{
+      id: string;
+      title: string;
+      description: string;
+      likelihood: ThreatLevel;
+      impact: ThreatLevel;
+      risk_level: ThreatLevel;
+      business_impact: string;
+    }>;
+  };
+  controls_assessment: {
+    frameworks_assessed: ComplianceFramework[];
+    control_effectiveness: Record<
+      string,
+      {
+        control_id: string;
+        control_name: string;
+        status: ControlStatus;
+        effectiveness_rating: number;
+        gaps_identified: string[];
+        recommendations: string[];
+      }
+    >;
+  };
+  recommendations: {
+    immediate_actions: Array<{
+      priority: "critical" | "high" | "medium" | "low";
+      recommendation: string;
+      rationale: string;
+      estimated_effort: string;
+      expected_impact: string;
+    }>;
+    strategic_initiatives: Array<{
+      initiative: string;
+      timeline: string;
+      resources_required: string;
+      expected_outcomes: string[];
+    }>;
+  };
+  compliance_status: Record<
+    ComplianceFramework,
+    {
+      overall_compliance: number;
+      compliant_controls: number;
+      non_compliant_controls: number;
+      gaps: Array<{
+        control_id: string;
+        gap_description: string;
+        remediation_steps: string[];
+      }>;
+    }
+  >;
+  appendices?: {
+    methodology_details?: string;
+    threat_intelligence_sources?: string[];
+    glossary?: Record<string, string>;
+    references?: string[];
+  };
+}
+
+export interface SecurityAssessment {
+  assessment_id: string;
+  assessment_type: "initial" | "periodic" | "targeted" | "compliance";
+  status: AssessmentStatus;
+  metadata: {
+    created_at: string;
+    updated_at: string;
+    created_by: string;
+    assessed_by?: string;
+    approved_by?: string;
+    assessment_period: {
+      start_date: string;
+      end_date: string;
+    };
+    scope: string[];
+    exclusions?: string[];
+  };
+  methodology: {
+    framework: ComplianceFramework[];
+    assessment_approach:
+      | "questionnaire"
+      | "interview"
+      | "technical_review"
+      | "hybrid";
+    evidence_requirements: string[];
+    scoring_criteria: Record<string, any>;
+  };
+  results: {
+    overall_score: number;
+    maturity_level:
+      | "initial"
+      | "developing"
+      | "defined"
+      | "managed"
+      | "optimizing";
+
+    domain_scores: Record<
+      string,
+      {
+        domain_name: string;
+        score: number;
+        max_score: number;
+        percentage: number;
+        findings: string[];
+        recommendations: string[];
+      }
+    >;
+
+    control_assessments: Record<
+      string,
+      {
+        control_id: string;
+        control_name: string;
+        requirement: string;
+        implementation_status: ControlStatus;
+        evidence_provided: string[];
+        evidence_quality: "insufficient" | "adequate" | "comprehensive";
+        assessor_notes: string;
+        score: number;
+        max_score: number;
+      }
+    >;
+  };
+
+  findings: {
+    strengths: string[];
+    weaknesses: string[];
+    critical_gaps: Array<{
+      gap_id: string;
+      title: string;
+      description: string;
+      affected_controls: string[];
+      risk_level: ThreatLevel;
+      remediation_priority:
+        | "immediate"
+        | "short_term"
+        | "medium_term"
+        | "long_term";
+    }>;
+  };
+  action_plan: {
+    remediation_roadmap: Array<{
+      item_id: string;
+      action: string;
+      responsible_party: string;
+      due_date: string;
+      status: "not_started" | "in_progress" | "completed" | "overdue";
+      dependencies?: string[];
+      resources_required: string[];
+    }>;
+
+    quick_wins: string[];
+    strategic_improvements: string[];
+  };
+  quality_assurance?: {
+    reviewed_by?: string;
+    review_date?: string;
+    review_comments?: string;
+    approved_by?: string;
+    approval_date?: string;
+  };
+}
+
 export interface OrgApp {
   app_name: string;
   app_profile: string;
@@ -63,8 +334,8 @@ export interface ClientDataDto {
     app_additional_details?: string;
   }>;
   user_ids?: string[];
-  report?: any;
-  assessment?: any;
+  report?: ThreatProfilingReport;
+  assessment?: SecurityAssessment;
   controls_accepted_implemented?: {
     controls_implemented?: Record<string, { comment: string }>;
     controls_risk_accepted?: Record<string, { comment: string }>;

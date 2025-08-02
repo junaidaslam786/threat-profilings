@@ -28,12 +28,16 @@ const UserManagement: React.FC = () => {
   const [deleteUser] = useDeleteUserMutation();
 
   const [showSuspendModal, setShowSuspendModal] = useState(false);
-  const [userToSuspend, setUserToSuspend] = useState<PlatformAdminUser | null>(null);
+  const [userToSuspend, setUserToSuspend] = useState<PlatformAdminUser | null>(
+    null
+  );
   const [suspendReason, setSuspendReason] = useState("");
   const [suspendDuration, setSuspendDuration] = useState(""); // e.g., "7d", "30d", "permanent"
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<PlatformAdminUser | null>(null);
+  const [userToDelete, setUserToDelete] = useState<PlatformAdminUser | null>(
+    null
+  );
   const [forceDelete, setForceDelete] = useState(false);
 
   const handleSuspendClick = (user: PlatformAdminUser) => {
@@ -42,7 +46,9 @@ const UserManagement: React.FC = () => {
   };
 
   const handleActivateClick = async (user: PlatformAdminUser) => {
-    if (window.confirm(`Are you sure you want to activate user ${user.email}?`)) {
+    if (
+      window.confirm(`Are you sure you want to activate user ${user.email}?`)
+    ) {
       try {
         await activateUser({ email: user.email }).unwrap();
         toast.success(`Successfully activated user ${user.email}`);
@@ -51,7 +57,8 @@ const UserManagement: React.FC = () => {
         const errorMessage =
           typeof err === "string"
             ? err
-            : (err as { data?: { message?: string } }).data?.message || "Failed to activate user.";
+            : (err as { data?: { message?: string } }).data?.message ||
+              "Failed to activate user.";
         toast.error(errorMessage);
       }
     }
@@ -80,7 +87,8 @@ const UserManagement: React.FC = () => {
         const errorMessage =
           typeof err === "string"
             ? err
-            : (err as { data?: { message?: string } }).data?.message || "Failed to suspend user.";
+            : (err as { data?: { message?: string } }).data?.message ||
+              "Failed to suspend user.";
         toast.error(errorMessage);
       }
     }
@@ -102,7 +110,8 @@ const UserManagement: React.FC = () => {
         const errorMessage =
           typeof err === "string"
             ? err
-            : (err as { data?: { message?: string } }).data?.message || "Failed to delete user.";
+            : (err as { data?: { message?: string } }).data?.message ||
+              "Failed to delete user.";
         toast.error(errorMessage);
       }
     }
@@ -234,7 +243,9 @@ const UserManagement: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {user.last_login ? new Date(user.last_login).toLocaleString() : "N/A"}
+                      {user.last_login
+                        ? new Date(user.last_login).toLocaleString()
+                        : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex gap-2">

@@ -2,9 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Common/Button";
-import {
-  useGetActivityLogsQuery,
-} from "../../Redux/api/platformAdminApi";
+import { useGetActivityLogsQuery } from "../../Redux/api/platformAdminApi";
 import Input from "../../components/Common/InputField"; // Assuming you have a reusable Input component
 import type { ActivityLog } from "../../Redux/slices/platformAdminSlice";
 

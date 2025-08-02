@@ -1,9 +1,8 @@
-// src/hooks/useUser.ts
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../Redux/store";
 import type { RootState } from "../Redux/store";
 
-import { useGetProfileMutation } from "../Redux/api/userApi";
+import { useGetProfileQuery } from "../Redux/api/userApi";
 
 import { setUserDetails, logoutUser } from "../Redux/slices/userSlice";
 import toast from "react-hot-toast";
@@ -11,7 +10,7 @@ import toast from "react-hot-toast";
 export function useUser() {
   const dispatch = useAppDispatch();
   const { user, isLoading } = useAppSelector((state: RootState) => state.user);
-  const [fetchUser] = useGetProfileMutation();
+  const { refetch: fetchUser } = useGetProfileQuery();
 
   useEffect(() => {
     if (!user && !isLoading) {
@@ -25,9 +24,9 @@ export function useUser() {
     }
   }, [user, isLoading, fetchUser, dispatch]);
 
-  const isAdmin = user?.role === ("admin" as string);
-  const isLEAdmin = user?.role === ("le_admin" as string);
-  const isViewer = user?.role === ("viewer" as string);
+  const isAdmin = user?.role === "admin";
+  const isLEAdmin = user?.role === "runner";
+  const isViewer = user?.role === "viewer";
 
   return {
     user,

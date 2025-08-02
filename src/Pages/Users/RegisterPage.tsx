@@ -7,12 +7,19 @@ export default function RegisterPage() {
   const [fields, setFields] = useState({
     name: "",
     email: "",
+    org_name: "",
+    org_domain: "",
+    industry: "",
+    org_size: "1-10" as const,
+    user_type: "standard" as const,
     partnerCode: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -20,18 +27,40 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (!fields.name || !fields.email) {
-      setError("Both name and email are required.");
+    if (
+      !fields.name ||
+      !fields.email ||
+      !fields.org_name ||
+      !fields.org_domain ||
+      !fields.industry
+    ) {
+      setError(
+        "Name, email, organization name, domain, and industry are required."
+      );
       return;
     }
     try {
       await createUser({
         name: fields.name,
         email: fields.email,
+        org_name: fields.org_name,
+        org_domain: fields.org_domain,
+        industry: fields.industry,
+        org_size: fields.org_size,
+        user_type: fields.user_type,
         partnerCode: fields.partnerCode || undefined,
       }).unwrap();
       setSuccess("Registration successful!");
-      setFields({ name: "", email: "", partnerCode: "" });
+      setFields({
+        name: "",
+        email: "",
+        org_name: "",
+        org_domain: "",
+        industry: "",
+        org_size: "1-10",
+        user_type: "standard",
+        partnerCode: "",
+      });
     } catch (err: unknown) {
       if (
         typeof err === "object" &&
@@ -62,7 +91,7 @@ export default function RegisterPage() {
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
             name="name"
-            placeholder="Name"
+            placeholder="Full Name"
             value={fields.name}
             onChange={handleChange}
             required
@@ -70,11 +99,58 @@ export default function RegisterPage() {
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
             name="email"
-            placeholder="Email"
+            type="email"
+            placeholder="Email Address"
             value={fields.email}
             onChange={handleChange}
             required
           />
+          <input
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="org_name"
+            placeholder="Organization Name"
+            value={fields.org_name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="org_domain"
+            placeholder="Organization Domain (e.g., company.com)"
+            value={fields.org_domain}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="industry"
+            placeholder="Industry"
+            value={fields.industry}
+            onChange={handleChange}
+            required
+          />
+          <select
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="org_size"
+            value={fields.org_size}
+            onChange={handleChange}
+            required
+          >
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-100">51-100 employees</option>
+            <option value="101-500">101-500 employees</option>
+            <option value="500+">500+ employees</option>
+          </select>
+          <select
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="user_type"
+            value={fields.user_type}
+            onChange={handleChange}
+          >
+            <option value="standard">Standard User</option>
+            <option value="LE">Law Enforcement</option>
+          </select>
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
             name="partnerCode"

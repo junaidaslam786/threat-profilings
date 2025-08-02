@@ -26,7 +26,9 @@ const AdminManagement: React.FC = () => {
   const [revokeAdmin] = useRevokePlatformAdminMutation();
 
   const [showRevokeModal, setShowRevokeModal] = useState(false);
-  const [adminToRevoke, setAdminToRevoke] = useState<PlatformAdminUser | null>(null);
+  const [adminToRevoke, setAdminToRevoke] = useState<PlatformAdminUser | null>(
+    null
+  );
   const [revokeReason, setRevokeReason] = useState("");
 
   const [showGrantModal, setShowGrantModal] = useState(false);
@@ -59,7 +61,8 @@ const AdminManagement: React.FC = () => {
         const errorMessage =
           typeof err === "string"
             ? err
-            : (err as { data?: { message?: string } }).data?.message || "Failed to revoke admin access.";
+            : (err as { data?: { message?: string } }).data?.message ||
+              "Failed to revoke admin access.";
         toast.error(errorMessage);
       }
     }
@@ -73,7 +76,9 @@ const AdminManagement: React.FC = () => {
         level: newAdminLevel,
         reason: grantReason,
       }).unwrap();
-      toast.success(`Successfully granted ${newAdminLevel} access to ${newAdminEmail}`);
+      toast.success(
+        `Successfully granted ${newAdminLevel} access to ${newAdminEmail}`
+      );
       setShowGrantModal(false);
       setNewAdminEmail("");
       setNewAdminLevel("read-only");
@@ -83,7 +88,8 @@ const AdminManagement: React.FC = () => {
       const errorMessage =
         typeof err === "string"
           ? err
-          : (err as { data?: { message?: string } }).data?.message || "Failed to grant admin access.";
+          : (err as { data?: { message?: string } }).data?.message ||
+            "Failed to grant admin access.";
       toast.error(errorMessage);
     }
   };
@@ -142,7 +148,9 @@ const AdminManagement: React.FC = () => {
 
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700">
         {admins.length === 0 ? (
-          <p className="text-center text-gray-400">No platform administrators found.</p>
+          <p className="text-center text-gray-400">
+            No platform administrators found.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-700">
@@ -212,7 +220,9 @@ const AdminManagement: React.FC = () => {
                       {admin.granted_by || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {admin.granted_at ? new Date(admin.granted_at).toLocaleString() : "N/A"}
+                      {admin.granted_at
+                        ? new Date(admin.granted_at).toLocaleString()
+                        : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Button
@@ -232,7 +242,9 @@ const AdminManagement: React.FC = () => {
 
       {/* Revoke Admin Modal */}
       <Modal show={showRevokeModal} onClose={() => setShowRevokeModal(false)}>
-        <h2 className="text-xl font-bold text-red-400 mb-4">Revoke Admin Access</h2>
+        <h2 className="text-xl font-bold text-red-400 mb-4">
+          Revoke Admin Access
+        </h2>
         <p className="mb-4 text-gray-300">
           Are you sure you want to revoke admin access for{" "}
           <span className="font-semibold text-blue-300">
@@ -266,7 +278,9 @@ const AdminManagement: React.FC = () => {
 
       {/* Grant Admin Modal */}
       <Modal show={showGrantModal} onClose={() => setShowGrantModal(false)}>
-        <h2 className="text-xl font-bold text-blue-400 mb-4">Grant Admin Access</h2>
+        <h2 className="text-xl font-bold text-blue-400 mb-4">
+          Grant Admin Access
+        </h2>
         <form onSubmit={handleGrantSubmit}>
           <InputField
             label="User Email"
@@ -279,7 +293,10 @@ const AdminManagement: React.FC = () => {
             className="mb-4"
           />
           <div className="mb-4">
-            <label htmlFor="adminLevel" className="block text-gray-300 text-sm font-bold mb-2">
+            <label
+              htmlFor="adminLevel"
+              className="block text-gray-300 text-sm font-bold mb-2"
+            >
               Admin Level
             </label>
             <select

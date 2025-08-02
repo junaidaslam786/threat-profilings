@@ -28,7 +28,9 @@ export default function SubscriptionCreate() {
     try {
       await createSubscription({
         client_name: fields.client_name,
-        tier: fields.tier as SubscriptionLevel,
+        subscription_level: fields.tier as SubscriptionLevel,
+        payment_method: "credit_card",
+        billing_info: {}
       }).unwrap();
       setSuccess("Subscription created successfully.");
       navigate(`/subscriptions/${fields.client_name}`);

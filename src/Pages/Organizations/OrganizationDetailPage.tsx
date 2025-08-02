@@ -1,16 +1,18 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useSwitchOrgQuery, useUpdateOrgMutation } from "../../Redux/api/organizationsApi";
+import { useGetAllOrgsQuery, useUpdateOrgMutation } from "../../Redux/api/organizationsApi";
 import Button from "../../components/Common/Button";
 
 export default function OrganizationDetailPage() {
   const { client_name } = useParams<{ client_name: string }>();
   const {
-    data: org,
+    data: allOrgs,
     isLoading,
     error,
     refetch,
-  } = useSwitchOrgQuery(client_name!);
+  } = useGetAllOrgsQuery();
+  
+  const org = allOrgs?.find((o) => o.client_name === client_name);
   const [editing, setEditing] = useState(false);
   type OrgFields = {
     sector: string;

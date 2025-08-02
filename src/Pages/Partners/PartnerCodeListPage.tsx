@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetAllPartnerCodesQuery } from "../../Redux/api/partnersApi";
 import LoadingSpinner from "../../components/Common/LoadingScreen";
@@ -7,11 +7,6 @@ import ErrorMessage from "../../components/Common/ErrorMessage";
 const PartnerCodeListPage: React.FC = () => {
   const { data: partnerCodes, error, isLoading } = useGetAllPartnerCodesQuery();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // You might want to refetch on mount or focus, RTK Query handles basic caching
-    // For manual refresh, you can use a button that calls refetch()
-  }, []);
 
   if (isLoading) {
     return (

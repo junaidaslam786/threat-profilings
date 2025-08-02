@@ -19,7 +19,7 @@ export default function OrganizationSwitcher() {
         onChange={(e) => setSelected(e.target.value)}
       >
         <option value="">Select organization...</option>
-        {orgs?.map((org) => (
+        {(Array.isArray(orgs) ? orgs : orgs?.managed_orgs || [])?.map((org) => (
           <option key={org.client_name} value={org.client_name}>
             {org.organization_name}
           </option>
@@ -30,7 +30,6 @@ export default function OrganizationSwitcher() {
           <div className="font-bold text-blue-400">
             {switchedOrg.organization_name}
           </div>
-          <div className="text-xs text-gray-400">{switchedOrg.client_name}</div>
         </div>
       )}
     </div>

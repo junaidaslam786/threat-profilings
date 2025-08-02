@@ -15,8 +15,9 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-200 text-2xl"
+          aria-label="Close modal"
         >
-          &times;
+          ✕
         </button>
         {children}
       </div>

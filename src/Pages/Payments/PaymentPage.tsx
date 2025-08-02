@@ -138,7 +138,7 @@ const CheckoutForm: React.FC<{ clientName: string; userEmail: string }> = ({
         }).unwrap();
 
         setPaymentMessage(
-          `Payment successful! Payment ID: ${processResult.payment_id}, Invoice: ${processResult.invoice_number}`
+          `Payment successful! Payment ID: ${processResult.payment_id}, Invoice: ${processResult.payment_id}`
         );
         dispatch(clearPaymentState());
         alert("Payment successful! Redirecting to dashboard...");

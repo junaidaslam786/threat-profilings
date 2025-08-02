@@ -1,11 +1,7 @@
-import { useEffect } from "react";
-import { useGetProfileMutation } from "../../Redux/api/userApi";
+import { useGetProfileQuery } from "../../Redux/api/userApi";
 
 export default function ProfilePage() {
-  const [getProfile, { data, isLoading, error }] = useGetProfileMutation();
-  useEffect(() => {
-    getProfile();
-  }, [getProfile]);
+  const { data, isLoading, error } = useGetProfileQuery();
 
   if (isLoading)
     return (

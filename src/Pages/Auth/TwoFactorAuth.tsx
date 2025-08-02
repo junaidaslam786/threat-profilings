@@ -31,7 +31,8 @@ const TwoFactorAuth: React.FC<{ onViewChange: (view: string) => void }> = ({
       } else {
         setGeneralError("Invalid OTP. Please try again.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      console.error("2FA verification error:", error);
       setGeneralError("Error during 2FA verification. (Simulated)");
     } finally {
       setIsVerifying(false);

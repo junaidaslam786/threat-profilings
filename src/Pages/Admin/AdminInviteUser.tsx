@@ -4,7 +4,7 @@ import Button from "../../components/Common/Button";
 
 export default function AdminInviteUser() {
   const [inviteUser, { isLoading }] = useInviteUserMutation();
-  const [fields, setFields] = useState({ name: "", email: "" });
+  const [fields, setFields] = useState({ name: "", email: "", orgName: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -16,14 +16,18 @@ export default function AdminInviteUser() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (!fields.name || !fields.email) {
-      setError("Both name and email are required.");
+    if (!fields.name || !fields.email || !fields.orgName) {
+      setError("Name, email, and organization name are required.");
       return;
     }
     try {
-      await inviteUser({ name: fields.name, email: fields.email }).unwrap();
+      await inviteUser({
+        name: fields.name,
+        email: fields.email,
+        orgName: fields.orgName,
+      }).unwrap();
       setSuccess("User invited!");
-      setFields({ name: "", email: "" });
+      setFields({ name: "", email: "", orgName: "" });
     } catch (err: unknown) {
       if (
         typeof err === "object" &&
@@ -64,6 +68,14 @@ export default function AdminInviteUser() {
             name="email"
             placeholder="Email"
             value={fields.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            name="orgName"
+            placeholder="Organization Name"
+            value={fields.orgName}
             onChange={handleChange}
             required
           />

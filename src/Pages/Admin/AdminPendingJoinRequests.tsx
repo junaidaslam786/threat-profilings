@@ -12,7 +12,7 @@ export default function AdminPendingJoinRequests() {
     isLoading,
     error,
     refetch,
-  } = useGetPendingJoinRequestsQuery();
+  } = useGetPendingJoinRequestsQuery({ org: "" });
   const [approveJoinRequest, { isLoading: isApproving }] =
     useApproveJoinRequestMutation();
   const [selectedRole, setSelectedRole] = useState<{ [id: string]: string }>(
