@@ -123,8 +123,8 @@ export default function EnhancedPartnerCodeModal({
   const labelClasses = "block text-sm font-medium text-gray-300 mb-2";
 
   return (
-    <Modal show={isOpen} onClose={onClose}>
-      <div className="text-white">
+    <Modal show={isOpen} onClose={onClose} size="xl">
+      <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
         <h2 className="text-2xl font-bold text-blue-300 mb-6">
           {isEditing ? "Edit Partner Code" : "Create Partner Code"}
         </h2>

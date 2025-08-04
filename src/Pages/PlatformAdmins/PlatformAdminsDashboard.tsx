@@ -79,7 +79,7 @@ const PlatformAdminDashboard: React.FC = () => {
       </div>
 
       {/* Admin Profile Card */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-2xl mx-auto mb-10">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 mb-10">
         <h3 className="text-2xl font-semibold mb-3 text-blue-300">
           Platform Admin Profile
         </h3>
@@ -120,7 +120,7 @@ const PlatformAdminDashboard: React.FC = () => {
 
       {/* Platform Statistics Overview */}
       {!statsLoading && platformStats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-6 mb-10">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-blue-700">
             <h4 className="text-lg font-semibold text-blue-300 mb-2">
               Total Users
@@ -172,7 +172,7 @@ const PlatformAdminDashboard: React.FC = () => {
       )}
 
       {/* Navigation Menu */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-4xl mx-auto">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700">
         <h3 className="text-2xl font-semibold mb-5 text-blue-400">
           Platform Administration
         </h3>
@@ -190,7 +190,7 @@ const PlatformAdminDashboard: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-yellow-700 max-w-4xl mx-auto mt-10">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-yellow-700 mt-10">
         <h3 className="text-2xl font-semibold mb-5 text-yellow-400">
           Quick Actions
         </h3>

@@ -58,6 +58,18 @@ export const organizationsApi = createApi({
       query: () => "/orgs",
       providesTags: [{ type: "Organization", id: "LIST" }],
     }),
+    getOrg: builder.query<
+      | ClientDataDto
+      | {
+          le_master: ClientDataDto | null;
+          managed_org: ClientDataDto;
+          total_managed: number;
+        },
+      string
+    >({
+      query: (client_name) => `/orgs/${client_name}`,
+      providesTags: [{ type: "Organization", id: "LIST" }],
+    }),
 
     updateOrg: builder.mutation<
       UpdateOrgResponse,
@@ -100,6 +112,7 @@ export const {
   useCreateOrgMutation,
   useCreateLeOrgMutation,
   useGetOrgsQuery,
+  useGetOrgQuery,
   useUpdateOrgMutation,
   useSwitchOrgQuery,
   useGetAllOrgsQuery,

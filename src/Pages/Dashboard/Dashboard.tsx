@@ -33,7 +33,9 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchAuthConfig = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/config`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/auth/config`
+        );
         if (response.ok) {
           const config = await response.json();
           if (config.signInUrl) {
@@ -130,17 +132,26 @@ const Dashboard: React.FC = () => {
         <h1 className="text-4xl font-bold text-blue-400">
           Dashboard - {isAdmin ? "Admin" : isLEAdmin ? "LE Admin" : "Viewer"}
         </h1>
-        <Button
-          onClick={() => {
-            Cookies.remove("id_token");
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.reload();
-          }}
-          className="bg-red-600 hover:bg-red-700 px-6 py-2"
-        >
-          Sign Out
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => {
+              window.location.href = "/enhanced";
+            }}
+          >
+            Enhanced
+          </Button>
+          <Button
+            onClick={() => {
+              Cookies.remove("id_token");
+              localStorage.clear();
+              sessionStorage.clear();
+              window.location.reload();
+            }}
+            className="bg-red-600 hover:bg-red-700 px-6 py-2"
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
 
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-2xl mx-auto mb-10">

@@ -98,7 +98,9 @@ export const platformAdminApi = createApi({
         status: number;
         data?: { message?: string };
       }) => {
-        return response.data?.message || "Failed to grant platform admin access";
+        return (
+          response.data?.message || "Failed to grant platform admin access"
+        );
       },
     }),
 
@@ -117,7 +119,9 @@ export const platformAdminApi = createApi({
         status: number;
         data?: { message?: string };
       }) => {
-        return response.data?.message || "Failed to revoke platform admin access";
+        return (
+          response.data?.message || "Failed to revoke platform admin access"
+        );
       },
     }),
 

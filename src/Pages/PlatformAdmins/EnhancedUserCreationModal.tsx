@@ -548,8 +548,8 @@ export default function EnhancedUserCreationModal({
   };
 
   return (
-    <Modal show={isOpen} onClose={onClose}>
-      <div className="text-white max-h-[80vh] overflow-y-auto">
+    <Modal show={isOpen} onClose={onClose} size="2xl">
+      <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
         <h2 className="text-2xl font-bold text-blue-300 mb-6">
           Create New User Account
         </h2>

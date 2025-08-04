@@ -24,7 +24,7 @@ const GrantAdminAccess: React.FC = () => {
       setEmail("");
       setLevel("read-only");
       setReason("");
-      navigate("/super-admin/admins");
+      navigate("/platform-admins/admins");
     } catch (err: unknown) {
       const errorMessage =
         typeof err === "string"
@@ -40,7 +40,7 @@ const GrantAdminAccess: React.FC = () => {
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-4xl font-bold text-blue-400">Grant Admin Access</h1>
         <Button
-          onClick={() => navigate("/super-admin")}
+          onClick={() => navigate("/platform-admins")}
           className="bg-gray-600 hover:bg-gray-700"
         >
           Back to Dashboard
@@ -100,7 +100,7 @@ const GrantAdminAccess: React.FC = () => {
           <div className="flex justify-end gap-4">
             <Button
               type="button"
-              onClick={() => navigate("/super-admin")}
+              onClick={() => navigate("/platform-admins")}
               className="bg-gray-600 hover:bg-gray-700"
             >
               Cancel

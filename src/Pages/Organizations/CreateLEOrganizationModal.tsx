@@ -1,11 +1,14 @@
 import Button from "../../components/Common/Button";
+import Modal from "../../components/Common/Modal";
 import { useCreateOrgMutation } from "../../Redux/api/organizationsApi";
 import { useState } from "react";
 
 export default function LEOrganizationCreateModal({
   onClose,
+  isOpen = true,
 }: {
   onClose: () => void;
+  isOpen?: boolean;
 }) {
   const [createOrg, { isLoading }] = useCreateOrgMutation();
   const [fields, setFields] = useState({
@@ -73,15 +76,18 @@ export default function LEOrganizationCreateModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-800 p-8 rounded-xl border border-blue-700 w-full max-w-md shadow-lg"
-      >
+    <Modal show={isOpen} onClose={onClose} size="xl">
+      <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
         <h2 className="text-xl font-bold text-blue-300 mb-4">
-          Create Organization
+          Create LE Organization
         </h2>
-        <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
             name="orgName"
@@ -140,17 +146,17 @@ export default function LEOrganizationCreateModal({
             value={fields.additionalDetails}
             onChange={handleChange}
           />
-        </div>
-        {error && <div className="text-red-400 mt-2">{error}</div>}
-        <div className="flex gap-2 mt-4">
-          <Button type="submit" loading={isLoading}>
-            Create
-          </Button>
-          <Button variant="ghost" type="button" onClick={onClose}>
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button type="submit" loading={isLoading}>
+              Create
+            </Button>
+            <Button variant="ghost" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </div>
+    </Modal>
   );
 }

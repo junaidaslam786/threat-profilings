@@ -25,7 +25,7 @@ const ActivityLogs: React.FC = () => {
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
-    setPagination({ ...pagination, offset: 0 }); // Reset offset on filter change
+    setPagination({ ...pagination, offset: 0 });
   };
 
   const handleClearFilters = () => {

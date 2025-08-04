@@ -162,7 +162,7 @@ const UserManagement: React.FC = () => {
             Refresh Users
           </Button>
           <Button
-            onClick={() => navigate("/super-admin")}
+            onClick={() => navigate("/platform-admins")}
             className="bg-gray-600 hover:bg-gray-700"
           >
             Back to Dashboard

@@ -2,8 +2,15 @@
 import { useState } from "react";
 import { useCreateRoleMutation } from "../../Redux/api/rolesApi";
 import Button from "../Common/Button";
+import Modal from "../Common/Modal";
 
-export default function RoleCreateModal({ onClose }: { onClose: () => void }) {
+export default function RoleCreateModal({ 
+  onClose, 
+  isOpen = true 
+}: { 
+  onClose: () => void;
+  isOpen?: boolean;
+}) {
   const [createRole, { isLoading }] = useCreateRoleMutation();
   const [fields, setFields] = useState({
     role_id: "",
@@ -57,13 +64,16 @@ export default function RoleCreateModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-800 p-8 rounded-xl border border-blue-700 w-full max-w-md shadow-lg"
-      >
+    <Modal show={isOpen} onClose={onClose} size="lg">
+      <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
         <h2 className="text-xl font-bold text-blue-300 mb-4">Create Role</h2>
-        <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
             name="role_id"
@@ -94,17 +104,17 @@ export default function RoleCreateModal({ onClose }: { onClose: () => void }) {
             value={fields.permissions}
             onChange={handleChange}
           />
-        </div>
-        {error && <div className="text-red-400 mt-2">{error}</div>}
-        <div className="flex gap-2 mt-4">
-          <Button type="submit" loading={isLoading}>
-            Create
-          </Button>
-          <Button variant="ghost" type="button" onClick={onClose}>
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button type="submit" loading={isLoading}>
+              Create
+            </Button>
+            <Button variant="ghost" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </div>
+    </Modal>
   );
 }

@@ -1,18 +1,34 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useGetAllOrgsQuery, useUpdateOrgMutation } from "../../Redux/api/organizationsApi";
+import { useGetOrgQuery, useUpdateOrgMutation } from "../../Redux/api/organizationsApi";
 import Button from "../../components/Common/Button";
+import type { ClientDataDto } from "../../Redux/slices/organizationsSlice";
 
 export default function OrganizationDetailPage() {
   const { client_name } = useParams<{ client_name: string }>();
-  const {
-    data: allOrgs,
-    isLoading,
-    error,
-    refetch,
-  } = useGetAllOrgsQuery();
-  
-  const org = allOrgs?.find((o) => o.client_name === client_name);
+  const { data: orgData, isLoading, error, refetch } = useGetOrgQuery(client_name!, {
+    skip: !client_name
+  });
+
+  // Helper function to extract the actual organization data
+  const getOrgData = (data: typeof orgData): ClientDataDto | null => {
+    if (!data) return null;
+    
+    // Check if it's a complex object with managed_org
+    if ('managed_org' in data && data.managed_org) {
+      return data.managed_org;
+    }
+    
+    // Check if it's a direct ClientDataDto
+    if ('client_name' in data && 'organization_name' in data) {
+      return data as ClientDataDto;
+    }
+    
+    return null;
+  };
+
+  const org = getOrgData(orgData);
+
   const [editing, setEditing] = useState(false);
   type OrgFields = {
     sector: string;
