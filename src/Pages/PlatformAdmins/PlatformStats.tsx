@@ -31,7 +31,7 @@ const PlatformStats: React.FC = () => {
           <div className="flex gap-4 justify-center">
             <Button onClick={() => refetch()}>Retry</Button>
             <Button
-              onClick={() => navigate("/super-admin")}
+              onClick={() => navigate("/platform-admins")}
               className="bg-gray-600 hover:bg-gray-700"
             >
               Back to Dashboard
@@ -60,7 +60,7 @@ const PlatformStats: React.FC = () => {
             Refresh Data
           </Button>
           <Button
-            onClick={() => navigate("/super-admin")}
+            onClick={() => navigate("/platform-admins")}
             className="bg-gray-600 hover:bg-gray-700"
           >
             Back to Dashboard

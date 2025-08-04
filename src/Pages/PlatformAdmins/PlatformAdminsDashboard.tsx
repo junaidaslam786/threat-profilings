@@ -8,11 +8,11 @@ import {
 import Cookies from "js-cookie";
 
 const PLATFORM_ADMIN_ROUTES = [
-  { label: "Platform Statistics", path: "/super-admin/stats" },
-  { label: "Activity Logs", path: "/super-admin/activity-logs" },
-  { label: "Admin Management", path: "/super-admin/admins" },
-  { label: "User Management", path: "/super-admin/users" },
-  { label: "Grant Admin Access", path: "/super-admin/grant-admin" },
+  { label: "Platform Statistics", path: "/platform-admins/stats" },
+  { label: "Activity Logs", path: "/platform-admins/activity-logs" },
+  { label: "Admin Management", path: "/platform-admins/admins" },
+  { label: "User Management", path: "/platform-admins/users" },
+  { label: "Grant Admin Access", path: "/platform-admins/grant-admin" },
 ];
 
 const PlatformAdminDashboard: React.FC = () => {
@@ -196,19 +196,19 @@ const PlatformAdminDashboard: React.FC = () => {
         </h3>
         <div className="grid gap-4 md:grid-cols-3">
           <Button
-            onClick={() => navigate("/super-admin/grant-admin")}
+            onClick={() => navigate("/platform-admins/grant-admin")}
             className="bg-green-600 hover:bg-green-700 w-full py-3"
           >
             Grant Admin Access
           </Button>
           <Button
-            onClick={() => navigate("/super-admin/users?action=suspend")}
+            onClick={() => navigate("/platform-admins/users?action=suspend")}
             className="bg-orange-600 hover:bg-orange-700 w-full py-3"
           >
             Suspend User
           </Button>
           <Button
-            onClick={() => navigate("/super-admin/activity-logs")}
+            onClick={() => navigate("/platform-admins/activity-logs")}
             className="bg-purple-600 hover:bg-purple-700 w-full py-3"
           >
             View Recent Activity

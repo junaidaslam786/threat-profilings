@@ -10,6 +10,7 @@ const AdminLogin = lazy(() => import("../Pages/Admin/AdminLogin"));
 
 // Dashboard
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
+const EnhancedComponentsDashboard = lazy(() => import("../Pages/Dashboard/EnhancedComponentsDashboard"));
 
 // Admin-specific Pages (non-platform admin)
 const AdminPendingJoinRequests = lazy(
@@ -40,6 +41,7 @@ const SubscriptionCreate = lazy(
 // Tier Pages
 const TierListPage = lazy(() => import("../Pages/Tiers/TierListPage"));
 const TierDetailPage = lazy(() => import("../Pages/Tiers/TierDetailPage"));
+const TierCreateEnhanced = lazy(() => import("../Pages/Tiers/TierCreateEnhanced"));
 
 // User Pages
 const RegisterPage = lazy(() => import("../Pages/Users/RegisterPage"));
@@ -101,6 +103,7 @@ const RoutesContent: React.FC = () => {
     >
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/enhanced" element={<EnhancedComponentsDashboard />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route
@@ -122,18 +125,19 @@ const RoutesContent: React.FC = () => {
         />
         <Route path="/subscriptions/create" element={<SubscriptionCreate />} />
         <Route path="/tiers" element={<TierListPage />} />
+        <Route path="/tiers/create" element={<TierCreateEnhanced />} />
         <Route path="/tiers/:sub_level" element={<TierDetailPage />} />
         <Route path="/user/organization/create" element={<RegisterPage />} />
         <Route path="/join-org-request" element={<JoinOrgRequestPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 
          {/* Platform Admin Routes */}
-        <Route path="/super-admin" element={<PlatformAdminDashboard />} />
-        <Route path="/super-admin/stats" element={<PlatformStats />} />
-        <Route path="/super-admin/activity-logs" element={<ActivityLogs />} />
-        <Route path="/super-admin/admins" element={<AdminManagement />} />
-        <Route path="/super-admin/users" element={<UserManagement />} />
-        <Route path="/super-admin/grant-admin" element={<GrantAdminAccess />} />
+        <Route path="/platform-admins" element={<PlatformAdminDashboard />} />
+        <Route path="/platform-admins/stats" element={<PlatformStats />} />
+        <Route path="/platform-admins/activity-logs" element={<ActivityLogs />} />
+        <Route path="/platform-admins/admins" element={<AdminManagement />} />
+        <Route path="/platform-admins/users" element={<UserManagement />} />
+        <Route path="/platform-admins/grant-admin" element={<GrantAdminAccess />} />
 
        {/* Partner Management Routes */}
         <Route path="/partners" element={<PartnerCodeListPage />} />

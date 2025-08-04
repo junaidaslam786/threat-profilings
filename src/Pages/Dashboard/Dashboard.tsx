@@ -20,8 +20,6 @@ const USER_ROUTES = [
   { label: "Profile", path: "/profile" },
 ];
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
 const Dashboard: React.FC = () => {
   const { user, isLoading } = useUser();
   const navigate = useNavigate();
@@ -32,11 +30,10 @@ const Dashboard: React.FC = () => {
   const isLEAdmin = role === "le_admin";
   const isActive = user?.status?.toLowerCase() === "active";
 
-  // Fetch auth config to get external sign-in URL
   useEffect(() => {
     const fetchAuthConfig = async () => {
       try {
-        const response = await fetch(`${baseUrl}/auth/config`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/config`);
         if (response.ok) {
           const config = await response.json();
           if (config.signInUrl) {
@@ -44,7 +41,8 @@ const Dashboard: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch auth config:", error);
+        console.warn("Failed to fetch auth config:", error);
+        // Continue with default sign-in URL
       }
     };
 
