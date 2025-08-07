@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useGetProfileQuery } from "../../Redux/api/userApi";
 import {
   useLazyHandlePaymentSuccessQuery,
   useCreateCheckoutSessionMutation,
 } from "../../Redux/api/paymentsApi";
-import { Button } from "../../components/Common/Button";
+import Button from "../../components/Common/Button";
 import LoadingScreen from "../../components/Common/LoadingScreen";
+import { useGetProfileQuery } from "../../Redux/api/userApi";
 
 interface SubscriptionPlan {
   tier: string;

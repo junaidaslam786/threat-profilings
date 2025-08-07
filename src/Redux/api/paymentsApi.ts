@@ -104,6 +104,16 @@ export const paymentsApi = createApi({
         return response.data?.message || "Failed to fetch invoices";
       },
     }),
+
+    handlePaymentSuccess: builder.query<{ success: boolean; message: string; session?: object }, string>({
+      query: (session_id) => `/payments/success?session_id=${session_id}`,
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to handle payment success";
+      },
+    }),
   }),
 });
 
@@ -115,6 +125,7 @@ export const {
   useGetInvoicesQuery,
   useLazyGetPaymentStatusQuery,
   useLazyGetInvoicesQuery,
+  useLazyHandlePaymentSuccessQuery,
 } = paymentsApi;
 
 export const selectPaymentStatusByClient = (client_name: string) =>

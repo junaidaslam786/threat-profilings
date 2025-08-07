@@ -1,11 +1,17 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useGetProfileQuery } from "../../Redux/api/userApi";
 import { useGetInvoicesQuery } from "../../Redux/api/paymentsApi";
+import { Button } from "../../components/Common/Button";
 import LoadingSpinner from "../../components/Common/LoadingScreen";
 import ErrorMessage from "../../components/Common/ErrorMessage";
 
 const InvoicesPage: React.FC = () => {
-  const { client_name } = useParams<{ client_name: string }>();
+  const navigate = useNavigate();
+  
+  // Get user profile to use as client name
+  const { data: userProfile, isLoading: profileLoading } = useGetProfileQuery();
+  const clientName = userProfile?.name || userProfile?.email || '';
 
   const {
     data: invoices,
@@ -13,14 +19,28 @@ const InvoicesPage: React.FC = () => {
     isLoading,
     isFetching,
     refetch,
-  } = useGetInvoicesQuery(client_name || "", { skip: !client_name });
+  } = useGetInvoicesQuery(clientName, { 
+    skip: !clientName // Skip query if no client name
+  });
 
-  if (!client_name) {
+  if (profileLoading) {
     return (
-      <ErrorMessage
-        message="Client name is missing to fetch invoices."
-        onClose={() => window.history.back()}
-      />
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!clientName) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ErrorMessage
+            message="Unable to load user profile. Please try refreshing the page."
+            onClose={() => window.location.reload()}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -51,14 +71,41 @@ const InvoicesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Invoices for {client_name}</h1>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Payment Invoices</h1>
+              <p className="text-lg text-gray-600 mt-2">
+                Invoice history for {userProfile?.name || userProfile?.email}
+              </p>
+            </div>
+            <div className="flex space-x-4">
+              <Button onClick={() => navigate('/payments')}>
+                💳 Make Payment
+              </Button>
+              <Button onClick={() => navigate('/payment-dashboard')}>
+                📊 Payment Dashboard
+              </Button>
+              <Button onClick={() => navigate('/dashboard')}>
+                ← Back to Dashboard
+              </Button>
+            </div>
+          </div>
+        </div>
 
-      {!invoices || invoices.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No invoices found for this client.
-        </p>
-      ) : (
+        {!invoices || invoices.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-6xl mb-4">📄</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+            <p className="text-gray-600 mb-4">You haven't made any payments yet.</p>
+            <Button onClick={() => navigate('/payments')}>
+              Make Your First Payment
+            </Button>
+          </div>
+        ) : (
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -154,6 +201,7 @@ const InvoicesPage: React.FC = () => {
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 };

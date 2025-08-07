@@ -89,7 +89,11 @@ const PartnerCodeStatsPage = lazy(
 
 // Payments Pages
 const PaymentPage = lazy(() => import("../Pages/Payments/PaymentPage"));
+const PaymentDashboard = lazy(() => import("../Pages/Payments/PaymentDashboard"));
+const PaymentTestPage = lazy(() => import("../Pages/Payments/PaymentTestPage"));
 const InvoicesPage = lazy(() => import("../Pages/Payments/InvoicesPage"));
+const PaymentSuccessPage = lazy(() => import("../Pages/Payments/PaymentSuccessPage"));
+const PaymentCancelledPage = lazy(() => import("../Pages/Payments/PaymentCancelledPage"));
 
 
 const RoutesContent: React.FC = () => {
@@ -147,8 +151,13 @@ const RoutesContent: React.FC = () => {
         <Route path="/partners/:code/stats" element={<PartnerCodeStatsPage />} />
 
         {/* Payment Routes */}
-        <Route path="/payments/:client_name" element={<PaymentPage />} />
-        <Route path="/invoices/:client_name" element={<InvoicesPage />} />
+        <Route path="/payments" element={<PaymentPage />} />
+        <Route path="/payment-dashboard" element={<PaymentDashboard />} />
+        <Route path="/payment/success" element={<PaymentPage />} />
+        <Route path="/payment-test" element={<PaymentTestPage />} />
+        <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
+        <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
       </Routes>
     </Suspense>
   );

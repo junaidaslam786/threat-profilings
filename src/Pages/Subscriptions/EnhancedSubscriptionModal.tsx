@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation } from "../../Redux/api/subscriptionsApi";
 import Button from "../../components/Common/Button";
 import Modal from "../../components/Common/Modal";
+import PaymentSection from "../../components/Common/PaymentSection";
+import { useUser } from "../../hooks/useUser";
 import type { 
   CreateSubscriptionDto, 
   UpdateSubscriptionDto, 
@@ -28,6 +30,7 @@ export default function EnhancedSubscriptionModal({
 }: EnhancedSubscriptionModalProps) {
   const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation();
   const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation();
+  const { isLEAdmin } = useUser();
   
   const [fields, setFields] = useState({
     client_name: editingSubscription?.client_name || clientName,
@@ -172,8 +175,15 @@ export default function EnhancedSubscriptionModal({
       
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'data' in err) {
-        const errorData = err as { data?: { message?: string } };
-        setError(errorData.data?.message || `Failed to ${isEditing ? 'update' : 'create'} subscription`);
+        const errorData = err as { data?: { message?: string; statusCode?: number } };
+        let errorMessage = errorData.data?.message || `Failed to ${isEditing ? 'update' : 'create'} subscription`;
+        
+        // Handle LE restriction error
+        if (errorData.data?.statusCode === 403 && errorMessage.includes("LE users")) {
+          errorMessage = "Subscription creation is restricted to Law Enforcement users only. Please contact your administrator or use a Law Enforcement account.";
+        }
+        
+        setError(errorMessage);
       } else {
         setError(`Failed to ${isEditing ? 'update' : 'create'} subscription`);
       }
@@ -200,6 +210,19 @@ export default function EnhancedSubscriptionModal({
           {success && (
             <div className="bg-green-900/20 border border-green-500 text-green-400 px-4 py-3 rounded">
               {success}
+            </div>
+          )}
+
+          {!isEditing && !isLEAdmin && (
+            <div className="bg-yellow-900/20 border border-yellow-500 text-yellow-400 px-4 py-3 rounded">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <strong>Notice:</strong> Subscription creation is currently restricted to Law Enforcement users only. If you need to create a subscription, please contact your administrator or use a Law Enforcement account.
+                </div>
+              </div>
             </div>
           )}
 
@@ -522,7 +545,7 @@ export default function EnhancedSubscriptionModal({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || (!isEditing && !isLEAdmin)}
             >
               {isLoading 
                 ? (isEditing ? "Updating..." : "Creating...") 
@@ -530,8 +553,50 @@ export default function EnhancedSubscriptionModal({
               }
             </Button>
           </div>
+
+          {/* Payment Section */}
+          <div className="mt-6 border-t border-gray-700 pt-6">
+            <PaymentSection
+              paymentData={{
+                amount: getSubscriptionPrice(fields.subscription_level),
+                client_name: fields.client_name || "Client",
+                tier: fields.subscription_level,
+                payment_type: isEditing ? "upgrade" : "monthly",
+                partner_code: fields.partner_code || undefined,
+              }}
+              title={`Payment Required - ${fields.subscription_level} Subscription`}
+              description={`Complete your payment for ${fields.subscription_level} tier subscription. ${getSubscriptionDescription(fields.subscription_level)}`}
+              onPaymentSuccess={() => {
+                console.log(`Payment successful for ${fields.subscription_level} subscription`);
+                if (onSuccess) onSuccess();
+              }}
+              disabled={!fields.client_name}
+            />
+          </div>
         </form>
       </div>
     </Modal>
   );
+
+  function getSubscriptionPrice(level: SubscriptionLevel): number {
+    switch (level) {
+      case 'L0': return 99.99;
+      case 'L1': return 199.99;
+      case 'L2': return 399.99;
+      case 'L3': return 799.99;
+      case 'LE': return 1299.99;
+      default: return 99.99;
+    }
+  }
+
+  function getSubscriptionDescription(level: SubscriptionLevel): string {
+    switch (level) {
+      case 'L0': return 'Basic threat profiling features with limited assessments.';
+      case 'L1': return 'Standard threat profiling with security assessments and compliance reports.';
+      case 'L2': return 'Advanced threat profiling with detailed analytics and custom reporting.';
+      case 'L3': return 'Enterprise threat profiling with full customization and priority support.';
+      case 'LE': return 'Law enforcement tier with specialized threat intelligence and investigation tools.';
+      default: return 'Subscription tier access to threat profiling services.';
+    }
+  }
 }

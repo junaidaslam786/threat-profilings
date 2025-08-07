@@ -11,6 +11,9 @@ const ADMIN_AND_LE_ROUTES = [
   { label: "Roles", path: "/roles" },
   { label: "Subscriptions", path: "/subscriptions/create" },
   { label: "Tiers", path: "/tiers" },
+  { label: "💳 Payment Center", path: "/payments" },
+  { label: "📊 Payment Dashboard", path: "/payment-dashboard" },
+  { label: "📄 Invoices", path: "/invoices" },
 ];
 const USER_ROUTES = [
   { label: "Organization List", path: "/orgs" },
@@ -18,6 +21,8 @@ const USER_ROUTES = [
   { label: "Tiers", path: "/tiers" },
   { label: "Join Org Request", path: "/join-org-request" },
   { label: "Profile", path: "/profile" },
+  { label: "💳 Payment Center", path: "/payments" },
+  { label: "📄 My Invoices", path: "/invoices" },
 ];
 
 const Dashboard: React.FC = () => {

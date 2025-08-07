@@ -15,7 +15,7 @@ export interface StripeCheckoutDto {
 
 export interface StripeCheckoutResponse {
   session_id: string;
-  url: string;
+  checkout_url: string;
 }
 
 export interface StripePaymentDto {
