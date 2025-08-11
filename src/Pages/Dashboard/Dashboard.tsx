@@ -3,37 +3,49 @@ import Button from "../../components/Common/Button";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import LoadingScreen from "../../components/Common/LoadingScreen";
 
 const ADMIN_AND_LE_ROUTES = [
-  { label: "Pending Join Requests", path: "/admin/join-requests" },
-  { label: "Invite User", path: "/admin/invite-user" },
-  { label: "Organization List", path: "/orgs" },
-  { label: "Roles", path: "/roles" },
-  { label: "Subscriptions", path: "/subscriptions/create" },
-  { label: "Tiers", path: "/tiers" },
-  { label: "💳 Payment Center", path: "/payments" },
-  { label: "📊 Payment Dashboard", path: "/payment-dashboard" },
-  { label: "📄 Invoices", path: "/invoices" },
+  { label: "Pending Join Requests", path: "/admin/join-requests", roles: ["admin"] },
+  { label: "Invite User", path: "/admin/invite-user", roles: ["admin"] },
+  { label: "Organization List", path: "/orgs", roles: ["admin", "viewer", "runner"] },
+  { label: "Roles", path: "/roles", roles: ["admin", "viewer", "runner"] },
+  { label: "💳 Payment Center", path: "/payments", roles: ["admin", "viewer", "runner"] },
+  { label: "📄 Invoices", path: "/invoices", roles: ["admin", "viewer", "runner"] },
 ];
+
+const PLATFORM_ADMIN_ROUTES = [
+  { label: "Platform Dashboard", path: "/platform-admins", roles: ["platform_admin"] },
+  { label: "Platform Stats", path: "/platform-admins/stats", roles: ["platform_admin"] },
+  { label: "Activity Logs", path: "/platform-admins/activity-logs", roles: ["platform_admin"] },
+  { label: "User Management", path: "/platform-admins/users", roles: ["platform_admin"] },
+  { label: "Admin Management", path: "/platform-admins/admins", roles: ["platform_admin"] },
+  { label: "Grant Admin Access", path: "/platform-admins/grant-admin", roles: ["super_admin"] },
+  { label: "Subscription Management", path: "/subscriptions/create", roles: ["platform_admin"] },
+  { label: "Tier Management", path: "/tiers", roles: ["platform_admin"] },
+  { label: "Partner Management", path: "/partners", roles: ["platform_admin"] },
+  { label: "Payment Dashboard", path: "/payment-dashboard", roles: ["platform_admin"] },
+  { label: "Payment Test", path: "/payment-test", roles: ["platform_admin"] },
+];
+
 const USER_ROUTES = [
-  { label: "Organization List", path: "/orgs" },
-  { label: "Roles", path: "/roles" },
-  { label: "Tiers", path: "/tiers" },
-  { label: "Join Org Request", path: "/join-org-request" },
-  { label: "Profile", path: "/profile" },
-  { label: "💳 Payment Center", path: "/payments" },
-  { label: "📄 My Invoices", path: "/invoices" },
+  { label: "Organization List", path: "/orgs", roles: ["viewer"] },
+  { label: "Roles", path: "/roles", roles: ["viewer"] },
+  { label: "Tiers", path: "/tiers", roles: ["viewer"] },
+  { label: "Join Org Request", path: "/join-org-request", roles: ["viewer"] },
+  { label: "Profile", path: "/profile", roles: ["viewer"] },
+  { label: "💳 Payment Center", path: "/payments", roles: ["viewer"] },
+  { label: "📄 My Invoices", path: "/invoices", roles: ["viewer"] },
 ];
 
 const Dashboard: React.FC = () => {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, isAdmin, isLEAdmin, isPlatformAdmin, isSuperAdmin } = useUser();
   const navigate = useNavigate();
   const [signInUrl, setSignInUrl] = useState<string>("/");
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const role = user?.role?.toLowerCase();
-  const isAdmin = role === "admin";
-  const isLEAdmin = role === "le_admin";
-  const isActive = user?.status?.toLowerCase() === "active";
+  const isActive = user?.user_info?.status === "active";
+  const hasAuthToken = !!Cookies.get("id_token");
 
   useEffect(() => {
     const fetchAuthConfig = async () => {
@@ -51,29 +63,53 @@ const Dashboard: React.FC = () => {
         console.warn("Failed to fetch auth config:", error);
         // Continue with default sign-in URL
       }
+      setInitialLoad(false);
     };
 
     fetchAuthConfig();
   }, []);
 
-  const routes =
-    isAdmin || isLEAdmin
-      ? [
-          ...ADMIN_AND_LE_ROUTES,
-          { label: "Join Org Request", path: "/join-org-request" },
-          { label: "Profile", path: "/profile" },
-        ]
-      : USER_ROUTES;
+  // Determine available routes based on user role
+  const getAvailableRoutes = () => {
+    if (isPlatformAdmin || isSuperAdmin) {
+      const platformRoutes = PLATFORM_ADMIN_ROUTES.filter(route => {
+        if (route.roles.includes("super_admin")) {
+          return isSuperAdmin;
+        }
+        return true;
+      });
+      return [
+        ...ADMIN_AND_LE_ROUTES,
+        ...platformRoutes,
+        { label: "Join Org Request", path: "/join-org-request", roles: ["all"] },
+        { label: "Profile", path: "/profile", roles: ["all"] },
+      ];
+    }
 
-  if (isLoading) {
+    if (isAdmin || isLEAdmin) {
+      return [
+        ...ADMIN_AND_LE_ROUTES,
+        { label: "Join Org Request", path: "/join-org-request", roles: ["all"] },
+        { label: "Profile", path: "/profile", roles: ["all"] },
+      ];
+    }
+
+    return USER_ROUTES;
+  };
+
+  const routes = getAvailableRoutes();
+
+  // Show loading while initial config is loading or user data is loading
+  if (initialLoad || (hasAuthToken && isLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <p>Loading dashboard...</p>
+        <LoadingScreen />
       </div>
     );
   }
 
-  if (!user) {
+  // If no auth token, show sign in
+  if (!hasAuthToken || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 text-center">
@@ -108,20 +144,20 @@ const Dashboard: React.FC = () => {
             </h3>
             <div className="text-left">
               <div>
-                <b>Name:</b> {user.name}
+                <b>Name:</b> {user.user_info.name}
               </div>
               <div>
-                <b>Email:</b> {user.email}
+                <b>Email:</b> {user.user_info.email}
               </div>
               <div>
-                <b>Role:</b> {user.role}
+                <b>Role:</b> {user.roles_and_permissions.primary_role}
               </div>
               <div>
-                <b>Organization:</b> {user.client_name}
+                <b>Organization:</b> {user.user_info.client_name}
               </div>
               <div>
                 <b>Status:</b>{" "}
-                <span className="text-yellow-300">{user.status}</span>
+                <span className="text-yellow-300">{user.user_info.status}</span>
               </div>
             </div>
           </div>
@@ -135,7 +171,13 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-4xl font-bold text-blue-400">
-          Dashboard - {isAdmin ? "Admin" : isLEAdmin ? "LE Admin" : "Viewer"}
+          Dashboard - {
+            isPlatformAdmin ? "Platform Admin" : 
+            isSuperAdmin ? "Super Admin" :
+            isAdmin ? "Admin" : 
+            isLEAdmin ? "LE Admin" : 
+            "User"
+          }
         </h1>
         <div className="flex items-center gap-4">
           <Button
@@ -164,25 +206,37 @@ const Dashboard: React.FC = () => {
           User Profile
         </h3>
         <div className="mb-1">
-          <b>Name:</b> {user.name}
+          <b>Name:</b> {user.user_info.name}
         </div>
         <div className="mb-1">
-          <b>Email:</b> {user.email}
+          <b>Email:</b> {user.user_info.email}
         </div>
         <div className="mb-1">
-          <b>Role:</b> {user.role}
+          <b>Role:</b> {user.roles_and_permissions.primary_role}
         </div>
         <div className="mb-1">
-          <b>Organization:</b> {user.client_name}
+          <b>Organization:</b> {user.user_info.client_name}
         </div>
-        {user.partner_code && (
+        <div className="mb-1">
+          <b>User Type:</b> {user.user_info.user_type}
+        </div>
+        <div className="mb-1">
+          <b>Status:</b> <span className="text-green-400">{user.user_info.status}</span>
+        </div>
+        
+        {user.accessible_organizations.length > 1 && (
           <div className="mb-1">
-            <b>Partner Code:</b> {user.partner_code}
+            <b>Organizations:</b> 
+            <div className="ml-4 mt-1">
+              {user.accessible_organizations.map((org, index) => (
+                <div key={index} className="text-sm text-gray-300">
+                  • {org.organization_name} ({org.role})
+                </div>
+              ))}
+            </div>
           </div>
         )}
-        <div className="mb-1">
-          <b>Status:</b> <span className="text-green-400">{user.status}</span>
-        </div>
+        
         <div className="text-gray-400 text-xs mt-2">
           This information is fetched securely from the backend.
         </div>
@@ -190,7 +244,7 @@ const Dashboard: React.FC = () => {
 
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-3xl mx-auto">
         <h3 className="text-2xl font-semibold mb-5 text-blue-400">
-          {isAdmin || isLEAdmin ? "All Features" : "Your Features"}
+          {isAdmin || isLEAdmin || isPlatformAdmin || isSuperAdmin ? "Administrative Features" : "Available Features"}
         </h3>
         <ul className="grid gap-4 md:grid-cols-2">
           {routes.map((route) => (

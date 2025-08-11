@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { useCreateUserMutation } from "../../Redux/api/userApi";
+import { UserRegistrationType, OrgSize } from "../../Redux/slices/userSlice";
 import Button from "../../components/Common/Button";
 
 export default function RegisterPage() {
   const [createUser, { isLoading }] = useCreateUserMutation();
+  const [registrationType] = useState<UserRegistrationType>(UserRegistrationType.STANDARD);
   const [fields, setFields] = useState({
     name: "",
     email: "",
+    partnerCode: "",
+    
+    // Standard organization fields
     org_name: "",
     org_domain: "",
     industry: "",
-    org_size: "1-10" as const,
-    user_type: "standard" as const,
-    partnerCode: "",
+    org_size: OrgSize.SMALL,
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -27,39 +30,33 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (
-      !fields.name ||
-      !fields.email ||
-      !fields.org_name ||
-      !fields.org_domain ||
-      !fields.industry
-    ) {
-      setError(
-        "Name, email, organization name, domain, and industry are required."
-      );
+    
+    if (!fields.name || !fields.email || !fields.org_name || !fields.org_domain || !fields.industry) {
+      setError("Name, email, organization name, domain, and industry are required.");
       return;
     }
+    
     try {
       await createUser({
         name: fields.name,
         email: fields.email,
+        registration_type: registrationType,
         org_name: fields.org_name,
         org_domain: fields.org_domain,
         industry: fields.industry,
         org_size: fields.org_size,
-        user_type: fields.user_type,
         partnerCode: fields.partnerCode || undefined,
       }).unwrap();
+      
       setSuccess("Registration successful!");
       setFields({
         name: "",
         email: "",
+        partnerCode: "",
         org_name: "",
         org_domain: "",
         industry: "",
-        org_size: "1-10",
-        user_type: "standard",
-        partnerCode: "",
+        org_size: OrgSize.SMALL,
       });
     } catch (err: unknown) {
       if (
@@ -136,20 +133,11 @@ export default function RegisterPage() {
             onChange={handleChange}
             required
           >
-            <option value="1-10">1-10 employees</option>
-            <option value="11-50">11-50 employees</option>
-            <option value="51-100">51-100 employees</option>
-            <option value="101-500">101-500 employees</option>
-            <option value="500+">500+ employees</option>
-          </select>
-          <select
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-            name="user_type"
-            value={fields.user_type}
-            onChange={handleChange}
-          >
-            <option value="standard">Standard User</option>
-            <option value="LE">Law Enforcement</option>
+            <option value={OrgSize.SMALL}>1-10 employees</option>
+            <option value={OrgSize.MEDIUM}>11-50 employees</option>
+            <option value={OrgSize.LARGE}>51-100 employees</option>
+            <option value={OrgSize.XLARGE}>101-500 employees</option>
+            <option value={OrgSize.ENTERPRISE}>500+ employees</option>
           </select>
           <input
             className="w-full p-2 rounded bg-gray-700 border border-blue-900"
@@ -163,7 +151,7 @@ export default function RegisterPage() {
         {success && <div className="text-green-400 mt-2">{success}</div>}
         <div className="flex gap-2 mt-6">
           <Button type="submit" loading={isLoading}>
-            Register
+            Register Organization
           </Button>
         </div>
       </form>

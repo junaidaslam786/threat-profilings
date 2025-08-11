@@ -12,7 +12,7 @@ const PaymentDashboard: React.FC = () => {
 
   // Get user profile first
   const { data: userProfile, isLoading: profileLoading } = useGetProfileQuery();
-  const clientName = userProfile?.name || userProfile?.email || "";
+  const clientName = userProfile?.user_info.client_name || "";
 
   // Get payment data
   const {
@@ -65,7 +65,8 @@ const PaymentDashboard: React.FC = () => {
                 Payment Dashboard
               </h1>
               <p className="text-lg text-gray-600 mt-2">
-                Welcome, {userProfile?.name || userProfile?.email}
+                Welcome,{" "}
+                {userProfile?.user_info.name || userProfile?.user_info.email}
               </p>
             </div>
             <div className="flex space-x-4">

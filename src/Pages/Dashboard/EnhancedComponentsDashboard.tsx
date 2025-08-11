@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
 import Button from "../../components/Common/Button";
+import ProtectedRoute from "../../components/Auth/ProtectedRoute";
 import EnhancedOrganizationModal from "../Organizations/EnhancedOrganizationModal";
 import ThreatProfilingReportModal from "../Organizations/ThreatProfilingReportModal";
 import SecurityAssessmentModal from "../Organizations/SecurityAssessmentModal";
@@ -10,6 +12,7 @@ import EnhancedUserCreationModal from "../PlatformAdmins/EnhancedUserCreationMod
 
 export default function EnhancedComponentsDashboard() {
   const navigate = useNavigate();
+  const { isPlatformAdmin, isSuperAdmin, isAdmin } = useUser();
   
   // Modal states
   const [showOrgModal, setShowOrgModal] = useState(false);
@@ -19,66 +22,90 @@ export default function EnhancedComponentsDashboard() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const components = [
-    {
-      title: "Enhanced Organization Management",
-      description: "Comprehensive organization creation and editing with all optional fields including threat profiling and security assessments",
-      fields: "client_name, client_description, industry, size, headquarters, timezone, contact_info, legal_info, compliance_requirements, threat_profiling_report, security_assessment",
-      action: () => setShowOrgModal(true),
-      buttonText: "Open Organization Modal"
-    },
-    {
-      title: "Threat Profiling Report",
-      description: "Detailed threat profiling with executive summary, organization context, threat analysis, risk assessment, and compliance",
-      fields: "report_id, version, executive_summary, organization_context, threat_analysis, attack_surface, risk_assessment, controls_assessment, compliance_status",
-      action: () => setShowThreatModal(true),
-      buttonText: "Create Threat Report"
-    },
-    {
-      title: "Security Assessment",
-      description: "Comprehensive security assessment with methodology, findings, controls assessment, and remediation planning",
-      fields: "assessment_id, assessment_type, status, metadata, methodology, results, findings, action_plan, quality_assurance",
-      action: () => setShowAssessmentModal(true),
-      buttonText: "Create Security Assessment"
-    },
-    {
-      title: "Enhanced Partner Code Management",
-      description: "Advanced partner code creation with usage tracking, validation rules, and commission settings",
-      fields: "code, description, partner_name, contact_email, commission_percentage, usage_limit, valid_from, valid_until, is_active, auto_approve, usage_statistics",
-      action: () => setShowPartnerModal(true),
-      buttonText: "Manage Partner Codes"
-    },
-    {
-      title: "Enhanced Subscription Management",
-      description: "Complete subscription management with billing information, custom limits, and suspension settings",
-      fields: "tier_id, user_limits, billing_info, custom_limits, auto_renewal, payment_method, billing_cycle, suspension_settings, trial_period, promo_codes",
-      action: () => setShowSubscriptionModal(true),
-      buttonText: "Create Subscription"
-    },
-    {
-      title: "Enhanced User Creation",
-      description: "Comprehensive user account creation with profile details, security settings, permissions, and custom fields",
-      fields: "email, first_name, last_name, phone_number, job_title, timezone, permissions, security_settings, notification_preferences, custom_fields",
-      action: () => setShowUserModal(true),
-      buttonText: "Create User Account"
-    },
-    {
-      title: "Enhanced Tier Management",
-      description: "Advanced tier configuration with all optional fields and feature settings",
-      fields: "sub_level, price, description, features, limits, quotas, permissions, advanced_settings",
-      action: () => navigate("/tiers/create"),
-      buttonText: "Create Enhanced Tier"
+  const getAvailableComponents = () => {
+    const baseComponents = [
+      {
+        title: "Enhanced Organization Management",
+        description: "Comprehensive organization creation and editing with advanced configuration options",
+        action: () => setShowOrgModal(true),
+        buttonText: "Open Organization Modal",
+        requiredRole: ["admin", "platform_admin"]
+      },
+      {
+        title: "Threat Profiling Report",
+        description: "Detailed threat profiling with executive summary, organization context, and threat analysis",
+        action: () => setShowThreatModal(true),
+        buttonText: "Create Threat Report",
+        requiredRole: ["admin", "platform_admin", "viewer"]
+      },
+      {
+        title: "Security Assessment",
+        description: "Comprehensive security assessment with methodology, findings, and remediation planning",
+        action: () => setShowAssessmentModal(true),
+        buttonText: "Create Security Assessment",
+        requiredRole: ["admin", "platform_admin", "viewer"]
+      }
+    ];
+
+    const adminComponents = [
+      {
+        title: "Enhanced Partner Code Management",
+        description: "Advanced partner code creation with usage tracking and validation rules",
+        action: () => setShowPartnerModal(true),
+        buttonText: "Manage Partner Codes",
+        requiredRole: ["platform_admin"]
+      },
+      {
+        title: "Enhanced Subscription Management",
+        description: "Complete subscription management with billing information and custom limits",
+        action: () => setShowSubscriptionModal(true),
+        buttonText: "Create Subscription",
+        requiredRole: ["platform_admin"]
+      },
+      {
+        title: "Enhanced User Creation",
+        description: "Comprehensive user account creation with profile details and security settings",
+        action: () => setShowUserModal(true),
+        buttonText: "Create User Account",
+        requiredRole: ["platform_admin"]
+      },
+      {
+        title: "Enhanced Tier Management",
+        description: "Advanced tier configuration with comprehensive feature settings",
+        action: () => navigate("/tiers/create"),
+        buttonText: "Create Enhanced Tier",
+        requiredRole: ["platform_admin"]
+      }
+    ];
+
+    // Filter components based on user role
+    const availableComponents = [...baseComponents];
+    
+    if (isPlatformAdmin || isSuperAdmin) {
+      availableComponents.push(...adminComponents);
+    } else if (isAdmin) {
+      // Admins can access some partner and subscription features
+      availableComponents.push(
+        ...adminComponents.filter(comp => 
+          comp.title.includes("Subscription") || comp.title.includes("User")
+        )
+      );
     }
-  ];
+
+    return availableComponents;
+  };
+
+  const components = getAvailableComponents();
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-300 mb-2">
           Enhanced Components Dashboard
         </h1>
         <p className="text-gray-300 mb-8">
-          Comprehensive forms utilizing all Redux fields including optional parameters for complete data management.
+          Advanced forms and components with comprehensive functionality tailored to your role.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -87,16 +114,9 @@ export default function EnhancedComponentsDashboard() {
               <h2 className="text-xl font-semibold text-blue-300 mb-3">
                 {component.title}
               </h2>
-              <p className="text-gray-300 mb-4">
+              <p className="text-gray-300 mb-6">
                 {component.description}
               </p>
-              
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-400 mb-2">Key Fields Covered:</h3>
-                <div className="bg-gray-700 rounded p-3 text-sm text-gray-300 font-mono">
-                  {component.fields}
-                </div>
-              </div>
 
               <Button
                 onClick={component.action}
@@ -108,50 +128,13 @@ export default function EnhancedComponentsDashboard() {
           ))}
         </div>
 
-        <div className="mt-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-blue-300 mb-4">
-            Implementation Status
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-green-900/20 border border-green-500 rounded p-4">
-              <h3 className="text-green-300 font-medium mb-2">✅ Completed</h3>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>• Enhanced Organization Modal</li>
-                <li>• Threat Profiling Report</li>
-                <li>• Security Assessment</li>
-                <li>• Enhanced Partner Codes</li>
-                <li>• Enhanced Subscriptions</li>
-                <li>• Enhanced User Creation</li>
-                <li>• Enhanced Tier Creation</li>
-              </ul>
-            </div>
-            
-            <div className="bg-blue-900/20 border border-blue-500 rounded p-4">
-              <h3 className="text-blue-300 font-medium mb-2">🔧 Features</h3>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>• Multi-section tabbed forms</li>
-                <li>• All optional fields included</li>
-                <li>• Proper TypeScript typing</li>
-                <li>• Redux integration ready</li>
-                <li>• Responsive design</li>
-                <li>• Form validation</li>
-                <li>• Error handling</li>
-              </ul>
-            </div>
-            
-            <div className="bg-yellow-900/20 border border-yellow-500 rounded p-4">
-              <h3 className="text-yellow-300 font-medium mb-2">📋 Usage Notes</h3>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>• Forms use Redux types</li>
-                <li>• API integration placeholders</li>
-                <li>• Comprehensive field coverage</li>
-                <li>• Sectioned for large forms</li>
-                <li>• Navigation between sections</li>
-                <li>• Custom field support</li>
-                <li>• Proper error messaging</li>
-              </ul>
-            </div>
-          </div>
+        <div className="mt-8 text-center">
+          <Button 
+            onClick={() => navigate("/dashboard")}
+            className="bg-gray-600 hover:bg-gray-700"
+          >
+            Back to Main Dashboard
+          </Button>
         </div>
       </div>
 
@@ -201,6 +184,7 @@ export default function EnhancedComponentsDashboard() {
           setShowUserModal(false);
         }}
       />
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

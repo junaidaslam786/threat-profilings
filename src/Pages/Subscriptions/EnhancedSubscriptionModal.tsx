@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { useCreateSubscriptionMutation, useUpdateSubscriptionMutation } from "../../Redux/api/subscriptionsApi";
+import {
+  useCreateSubscriptionMutation,
+  useUpdateSubscriptionMutation,
+} from "../../Redux/api/subscriptionsApi";
 import Button from "../../components/Common/Button";
 import Modal from "../../components/Common/Modal";
 import PaymentSection from "../../components/Common/PaymentSection";
 import { useUser } from "../../hooks/useUser";
-import type { 
-  CreateSubscriptionDto, 
-  UpdateSubscriptionDto, 
-  ClientSubscriptionDto, 
+import type {
+  CreateSubscriptionDto,
+  UpdateSubscriptionDto,
+  ClientSubscriptionDto,
   SubscriptionLevel,
   CustomLimits,
-  BillingInfo 
+  BillingInfo,
 } from "../../Redux/slices/subscriptionsSlice";
 
 interface EnhancedSubscriptionModalProps {
@@ -21,21 +24,24 @@ interface EnhancedSubscriptionModalProps {
   clientName?: string;
 }
 
-export default function EnhancedSubscriptionModal({ 
-  isOpen, 
-  onClose, 
-  onSuccess, 
+export default function EnhancedSubscriptionModal({
+  isOpen,
+  onClose,
+  onSuccess,
   editingSubscription = null,
-  clientName = ""
+  clientName = "",
 }: EnhancedSubscriptionModalProps) {
-  const [createSubscription, { isLoading: isCreating }] = useCreateSubscriptionMutation();
-  const [updateSubscription, { isLoading: isUpdating }] = useUpdateSubscriptionMutation();
+  const [createSubscription, { isLoading: isCreating }] =
+    useCreateSubscriptionMutation();
+  const [updateSubscription, { isLoading: isUpdating }] =
+    useUpdateSubscriptionMutation();
   const { isLEAdmin } = useUser();
-  
+
   const [fields, setFields] = useState({
     client_name: editingSubscription?.client_name || clientName,
-    subscription_level: editingSubscription?.subscription_level || "L0" as SubscriptionLevel,
-    payment_method: "credit_card",
+    subscription_level:
+      editingSubscription?.subscription_level || ("L0" as SubscriptionLevel),
+    payment_method: "stripe",
     partner_code: "",
     auto_renewal: true,
     grace_period_days: "7",
@@ -60,7 +66,7 @@ export default function EnhancedSubscriptionModal({
     suspension_reason: "",
     is_suspended: false,
   });
-  
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -68,33 +74,35 @@ export default function EnhancedSubscriptionModal({
   const isEditing = !!editingSubscription;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value, type } = e.target;
-    
-    if (name.startsWith('custom_limits.')) {
-      const field = name.split('.')[1];
-      setFields(prev => ({
+
+    if (name.startsWith("custom_limits.")) {
+      const field = name.split(".")[1];
+      setFields((prev) => ({
         ...prev,
         custom_limits: {
           ...prev.custom_limits,
-          [field]: value
-        }
+          [field]: value,
+        },
       }));
-    } else if (name.startsWith('billing_info.')) {
-      const field = name.split('.')[1];
-      setFields(prev => ({
+    } else if (name.startsWith("billing_info.")) {
+      const field = name.split(".")[1];
+      setFields((prev) => ({
         ...prev,
         billing_info: {
           ...prev.billing_info,
-          [field]: value
-        }
+          [field]: value,
+        },
       }));
     } else if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
-      setFields(prev => ({ ...prev, [name]: checked }));
+      setFields((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFields(prev => ({ ...prev, [name]: value }));
+      setFields((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -102,7 +110,7 @@ export default function EnhancedSubscriptionModal({
     e.preventDefault();
     setError("");
     setSuccess("");
-    
+
     if (!fields.client_name || !fields.subscription_level) {
       setError("Client name and subscription level are required.");
       return;
@@ -111,19 +119,31 @@ export default function EnhancedSubscriptionModal({
     try {
       // Prepare custom limits
       const customLimits: CustomLimits = {};
-      if (fields.custom_limits.max_edits) customLimits.max_edits = parseInt(fields.custom_limits.max_edits);
-      if (fields.custom_limits.max_apps) customLimits.max_apps = parseInt(fields.custom_limits.max_apps);
-      if (fields.custom_limits.run_quota) customLimits.run_quota = parseInt(fields.custom_limits.run_quota);
-      if (fields.custom_limits.max_users) customLimits.max_users = parseInt(fields.custom_limits.max_users);
+      if (fields.custom_limits.max_edits)
+        customLimits.max_edits = parseInt(fields.custom_limits.max_edits);
+      if (fields.custom_limits.max_apps)
+        customLimits.max_apps = parseInt(fields.custom_limits.max_apps);
+      if (fields.custom_limits.run_quota)
+        customLimits.run_quota = parseInt(fields.custom_limits.run_quota);
+      if (fields.custom_limits.max_users)
+        customLimits.max_users = parseInt(fields.custom_limits.max_users);
 
       // Prepare billing info
       const billingInfo: BillingInfo = {};
-      if (fields.billing_info.company_name) billingInfo.company_name = fields.billing_info.company_name;
-      if (fields.billing_info.billing_email) billingInfo.billing_email = fields.billing_info.billing_email;
-      if (fields.billing_info.tax_id) billingInfo.tax_id = fields.billing_info.tax_id;
-      
-      if (fields.billing_info.street || fields.billing_info.city || fields.billing_info.state || 
-          fields.billing_info.country || fields.billing_info.postal_code) {
+      if (fields.billing_info.company_name)
+        billingInfo.company_name = fields.billing_info.company_name;
+      if (fields.billing_info.billing_email)
+        billingInfo.billing_email = fields.billing_info.billing_email;
+      if (fields.billing_info.tax_id)
+        billingInfo.tax_id = fields.billing_info.tax_id;
+
+      if (
+        fields.billing_info.street ||
+        fields.billing_info.city ||
+        fields.billing_info.state ||
+        fields.billing_info.country ||
+        fields.billing_info.postal_code
+      ) {
         billingInfo.billing_address = {
           street: fields.billing_info.street || undefined,
           city: fields.billing_info.city || undefined,
@@ -137,30 +157,38 @@ export default function EnhancedSubscriptionModal({
         // Update existing subscription
         const updateData: UpdateSubscriptionDto = {
           subscription_level: fields.subscription_level,
-          payment_status: fields.payment_status as "paid" | "unpaid" | "overdue" | "cancelled" | "pending",
+          payment_status: fields.payment_status as
+            | "paid"
+            | "unpaid"
+            | "overdue"
+            | "cancelled"
+            | "pending",
           auto_renewal: fields.auto_renewal,
           grace_period_days: parseInt(fields.grace_period_days),
-          custom_limits: Object.keys(customLimits).length > 0 ? customLimits : undefined,
+          custom_limits:
+            Object.keys(customLimits).length > 0 ? customLimits : undefined,
           suspension_reason: fields.suspension_reason || undefined,
           is_suspended: fields.is_suspended,
         };
 
         await updateSubscription({
           clientName: editingSubscription.client_name,
-          body: updateData
+          body: updateData,
         }).unwrap();
-        
+
         setSuccess("Subscription updated successfully!");
       } else {
         // Create new subscription
         const subscriptionData: CreateSubscriptionDto = {
           client_name: fields.client_name,
-          subscription_level: fields.subscription_level,
-          payment_method: fields.payment_method,
+          payment_method: fields.payment_method as
+            | "partner_code"
+            | "stripe"
+            | "invoice",
           billing_info: billingInfo,
           auto_renewal: fields.auto_renewal,
           partner_code: fields.partner_code || undefined,
-          custom_limits: Object.keys(customLimits).length > 0 ? customLimits : undefined,
+          tier: fields.subscription_level,
         };
 
         await createSubscription(subscriptionData).unwrap();
@@ -172,25 +200,33 @@ export default function EnhancedSubscriptionModal({
         onClose();
         setSuccess("");
       }, 1500);
-      
     } catch (err: unknown) {
-      if (typeof err === 'object' && err !== null && 'data' in err) {
-        const errorData = err as { data?: { message?: string; statusCode?: number } };
-        let errorMessage = errorData.data?.message || `Failed to ${isEditing ? 'update' : 'create'} subscription`;
-        
+      if (typeof err === "object" && err !== null && "data" in err) {
+        const errorData = err as {
+          data?: { message?: string; statusCode?: number };
+        };
+        let errorMessage =
+          errorData.data?.message ||
+          `Failed to ${isEditing ? "update" : "create"} subscription`;
+
         // Handle LE restriction error
-        if (errorData.data?.statusCode === 403 && errorMessage.includes("LE users")) {
-          errorMessage = "Subscription creation is restricted to Law Enforcement users only. Please contact your administrator or use a Law Enforcement account.";
+        if (
+          errorData.data?.statusCode === 403 &&
+          errorMessage.includes("LE users")
+        ) {
+          errorMessage =
+            "Subscription creation is restricted to Large Enterprise users only. Please contact your administrator or use a Large Enterprise account.";
         }
-        
+
         setError(errorMessage);
       } else {
-        setError(`Failed to ${isEditing ? 'update' : 'create'} subscription`);
+        setError(`Failed to ${isEditing ? "update" : "create"} subscription`);
       }
     }
   };
 
-  const inputClasses = "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const inputClasses =
+    "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelClasses = "block text-sm font-medium text-gray-300 mb-2";
 
   return (
@@ -199,14 +235,14 @@ export default function EnhancedSubscriptionModal({
         <h2 className="text-2xl font-bold text-blue-300 mb-6">
           {isEditing ? "Edit Subscription" : "Create Subscription"}
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="bg-green-900/20 border border-green-500 text-green-400 px-4 py-3 rounded">
               {success}
@@ -216,11 +252,22 @@ export default function EnhancedSubscriptionModal({
           {!isEditing && !isLEAdmin && (
             <div className="bg-yellow-900/20 border border-yellow-500 text-yellow-400 px-4 py-3 rounded">
               <div className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <div>
-                  <strong>Notice:</strong> Subscription creation is currently restricted to Law Enforcement users only. If you need to create a subscription, please contact your administrator or use a Law Enforcement account.
+                  <strong>Notice:</strong> Subscription creation is currently
+                  restricted to Large Enter users only. If you need to create a
+                  subscription, please contact your administrator or use a Large
+                  Enter account.
                 </div>
               </div>
             </div>
@@ -228,8 +275,10 @@ export default function EnhancedSubscriptionModal({
 
           {/* Basic Subscription Info */}
           <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-            <h3 className="text-lg font-semibold text-blue-300 mb-4">Basic Information</h3>
-            
+            <h3 className="text-lg font-semibold text-blue-300 mb-4">
+              Basic Information
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>Client Name *</label>
@@ -244,7 +293,7 @@ export default function EnhancedSubscriptionModal({
                   disabled={isEditing}
                 />
               </div>
-              
+
               <div>
                 <label className={labelClasses}>Subscription Level *</label>
                 <select
@@ -258,7 +307,7 @@ export default function EnhancedSubscriptionModal({
                   <option value="L1">L1 - Standard</option>
                   <option value="L2">L2 - Professional</option>
                   <option value="L3">L3 - Enterprise</option>
-                  <option value="LE">LE - Law Enforcement</option>
+                  <option value="LE">LE - Large Enter</option>
                 </select>
               </div>
             </div>
@@ -272,10 +321,9 @@ export default function EnhancedSubscriptionModal({
                   onChange={handleChange}
                   className={inputClasses}
                 >
-                  <option value="credit_card">Credit Card</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="paypal">PayPal</option>
-                  <option value="crypto">Cryptocurrency</option>
+                  <option value="stripe">Stripe</option>
+                  <option value="invoice">Invoice</option>
+                  <option value="partner_code">Partner Code</option>
                 </select>
               </div>
 
@@ -339,9 +387,13 @@ export default function EnhancedSubscriptionModal({
 
           {/* Custom Limits */}
           <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-            <h3 className="text-lg font-semibold text-blue-300 mb-4">Custom Limits</h3>
-            <p className="text-gray-400 text-sm mb-4">Leave empty to use tier defaults</p>
-            
+            <h3 className="text-lg font-semibold text-blue-300 mb-4">
+              Custom Limits
+            </h3>
+            <p className="text-gray-400 text-sm mb-4">
+              Leave empty to use tier defaults
+            </p>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>Max Edits</label>
@@ -400,8 +452,10 @@ export default function EnhancedSubscriptionModal({
           {/* Billing Information */}
           {!isEditing && (
             <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <h3 className="text-lg font-semibold text-blue-300 mb-4">Billing Information</h3>
-              
+              <h3 className="text-lg font-semibold text-blue-300 mb-4">
+                Billing Information
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClasses}>Company Name</label>
@@ -438,7 +492,9 @@ export default function EnhancedSubscriptionModal({
               </div>
 
               <div className="mt-4">
-                <h4 className="text-md font-medium text-blue-200 mb-3">Billing Address</h4>
+                <h4 className="text-md font-medium text-blue-200 mb-3">
+                  Billing Address
+                </h4>
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className={labelClasses}>Street Address</label>
@@ -504,8 +560,10 @@ export default function EnhancedSubscriptionModal({
           {/* Suspension Settings (for editing) */}
           {isEditing && (
             <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <h3 className="text-lg font-semibold text-blue-300 mb-4">Suspension Settings</h3>
-              
+              <h3 className="text-lg font-semibold text-blue-300 mb-4">
+                Suspension Settings
+              </h3>
+
               <div className="flex items-center space-x-2 mb-4">
                 <input
                   type="checkbox"
@@ -547,10 +605,13 @@ export default function EnhancedSubscriptionModal({
               type="submit"
               disabled={isLoading || (!isEditing && !isLEAdmin)}
             >
-              {isLoading 
-                ? (isEditing ? "Updating..." : "Creating...") 
-                : (isEditing ? "Update Subscription" : "Create Subscription")
-              }
+              {isLoading
+                ? isEditing
+                  ? "Updating..."
+                  : "Creating..."
+                : isEditing
+                ? "Update Subscription"
+                : "Create Subscription"}
             </Button>
           </div>
 
@@ -565,9 +626,15 @@ export default function EnhancedSubscriptionModal({
                 partner_code: fields.partner_code || undefined,
               }}
               title={`Payment Required - ${fields.subscription_level} Subscription`}
-              description={`Complete your payment for ${fields.subscription_level} tier subscription. ${getSubscriptionDescription(fields.subscription_level)}`}
+              description={`Complete your payment for ${
+                fields.subscription_level
+              } tier subscription. ${getSubscriptionDescription(
+                fields.subscription_level
+              )}`}
               onPaymentSuccess={() => {
-                console.log(`Payment successful for ${fields.subscription_level} subscription`);
+                console.log(
+                  `Payment successful for ${fields.subscription_level} subscription`
+                );
                 if (onSuccess) onSuccess();
               }}
               disabled={!fields.client_name}
@@ -580,23 +647,35 @@ export default function EnhancedSubscriptionModal({
 
   function getSubscriptionPrice(level: SubscriptionLevel): number {
     switch (level) {
-      case 'L0': return 99.99;
-      case 'L1': return 199.99;
-      case 'L2': return 399.99;
-      case 'L3': return 799.99;
-      case 'LE': return 1299.99;
-      default: return 99.99;
+      case "L0":
+        return 99.99;
+      case "L1":
+        return 199.99;
+      case "L2":
+        return 399.99;
+      case "L3":
+        return 799.99;
+      case "LE":
+        return 1299.99;
+      default:
+        return 99.99;
     }
   }
 
   function getSubscriptionDescription(level: SubscriptionLevel): string {
     switch (level) {
-      case 'L0': return 'Basic threat profiling features with limited assessments.';
-      case 'L1': return 'Standard threat profiling with security assessments and compliance reports.';
-      case 'L2': return 'Advanced threat profiling with detailed analytics and custom reporting.';
-      case 'L3': return 'Enterprise threat profiling with full customization and priority support.';
-      case 'LE': return 'Law enforcement tier with specialized threat intelligence and investigation tools.';
-      default: return 'Subscription tier access to threat profiling services.';
+      case "L0":
+        return "Basic threat profiling features with limited assessments.";
+      case "L1":
+        return "Standard threat profiling with security assessments and compliance reports.";
+      case "L2":
+        return "Advanced threat profiling with detailed analytics and custom reporting.";
+      case "L3":
+        return "Enterprise threat profiling with full customization and priority support.";
+      case "LE":
+        return "Large Enter tier with specialized threat intelligence and investigation tools.";
+      default:
+        return "Subscription tier access to threat profiling services.";
     }
   }
 }

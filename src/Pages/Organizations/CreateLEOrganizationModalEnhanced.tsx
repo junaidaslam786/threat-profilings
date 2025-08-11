@@ -15,15 +15,15 @@ export default function LEOrganizationCreateModalEnhanced({
   const [fields, setFields] = useState({
     orgName: "",
     orgDomain: "",
-    sector: "Law Enforcement", // Default for LE organizations
+    sector: "Large Enterprise",
     websiteUrl: "",
     countriesOfOperation: "",
     homeUrl: "",
     aboutUsUrl: "",
     additionalDetails: "",
-    jurisdictionLevel: "federal", // LE specific field
-    agencyType: "police", // LE specific field
-    specializations: "", // LE specific field
+    jurisdictionLevel: "federal",
+    agencyType: "police",
+    specializations: "",
   });
   const [error, setError] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
@@ -87,7 +87,7 @@ export default function LEOrganizationCreateModalEnhanced({
       fields: ["orgName", "orgDomain", "sector"] 
     },
     { 
-      title: "Law Enforcement Details", 
+      title: "Large Enterprise Details", 
       fields: ["jurisdictionLevel", "agencyType", "specializations"] 
     },
     { 
@@ -118,7 +118,7 @@ export default function LEOrganizationCreateModalEnhanced({
     <Modal show={isOpen} onClose={onClose} size="xl">
       <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
         <h2 className="text-xl font-bold text-blue-300 mb-4">
-          Create Law Enforcement Organization
+          Create Large Enterprise Organization
         </h2>
         
         {/* Section Navigation */}
@@ -177,7 +177,7 @@ export default function LEOrganizationCreateModalEnhanced({
                 switch (name) {
                   case 'orgName': return 'Enter LE organization name';
                   case 'orgDomain': return 'example-pd.gov';
-                  case 'sector': return 'Law Enforcement (default)';
+                  case 'sector': return 'Large Enterprise (default)';
                   case 'websiteUrl': return 'https://www.example-pd.gov';
                   case 'homeUrl': return 'https://www.example-pd.gov/home';
                   case 'aboutUsUrl': return 'https://www.example-pd.gov/about';
@@ -292,8 +292,8 @@ export default function LEOrganizationCreateModalEnhanced({
                   payment_type: "registration",
                   partner_code: "LE2024",
                 }}
-                title="Payment Required - Law Enforcement Organization Registration"
-                description="Complete your payment to register your law enforcement organization and access specialized threat profiling services. This includes advanced threat intelligence capabilities tailored for law enforcement agencies."
+                title="Payment Required - Large Enterprise Organization Registration"
+                description="Complete your payment to register your large Enterprise organization and access specialized threat profiling services. This includes advanced threat intelligence capabilities tailored for large Enterprise agencies."
                 onPaymentSuccess={() => {
                   console.log("Payment successful for LE organization registration");
                   // You could auto-submit the form here after successful payment

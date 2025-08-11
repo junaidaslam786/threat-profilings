@@ -1,7 +1,18 @@
+
 import { useGetProfileQuery } from "../../Redux/api/userApi";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
+import { extractErrorMessage } from "../../utils/errorHandling";
 
 export default function ProfilePage() {
   const { data, isLoading, error } = useGetProfileQuery();
+
+  useEffect(() => {
+    if (error) {
+      const msg = extractErrorMessage(error) || "Failed to load profile.";
+      toast.error(msg);
+    }
+  }, [error]);
 
   if (isLoading)
     return (
@@ -23,27 +34,27 @@ export default function ProfilePage() {
         {data ? (
           <div className="space-y-2">
             <div>
-              <span className="text-blue-400">Name:</span> {data.name}
+              <span className="text-blue-400">Name:</span> {data.user_info.name}
             </div>
             <div>
-              <span className="text-blue-400">Email:</span> {data.email}
+              <span className="text-blue-400">Email:</span> {data.user_info.email}
             </div>
             <div>
               <span className="text-blue-400">Organization:</span>{" "}
-              {data.client_name || "-"}
+              {data.user_info.client_name || "-"}
             </div>
             <div>
-              <span className="text-blue-400">Role:</span> {data.role}
+              <span className="text-blue-400">Role:</span> {data.roles_and_permissions.primary_role}
             </div>
             <div>
-              <span className="text-blue-400">Status:</span> {data.status}
+              <span className="text-blue-400">Status:</span> {data.user_info.status}
             </div>
             <div>
               <span className="text-blue-400">Partner Code:</span>{" "}
-              {data.partner_code || "-"}
+              {data.ui_config.sections.partner_codes || "-"}
             </div>
             <div>
-              <span className="text-blue-400">Created:</span> {data.created_at}
+              <span className="text-blue-400">Created:</span> {new Date(data.user_info.created_at).toDateString()}
             </div>
           </div>
         ) : (

@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "../components/Auth/ProtectedRoute";
 const LoadingScreen = lazy(() => import("../components/Common/LoadingScreen"));
 
 // Auth Pages
@@ -106,58 +107,293 @@ const RoutesContent: React.FC = () => {
       }
     >
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/enhanced" element={<EnhancedComponentsDashboard />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Public routes - no authentication required */}
         <Route
           path="/auth-redirect-handler"
           element={<AuthRedirectHandlerPage />}
         />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/user/organization/create" element={<RegisterPage />} />
+        
+        {/* Dashboard route - handles its own auth logic */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* Protected routes that require authentication */}
+        <Route 
+          path="/join-org-request" 
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={false}>
+              <JoinOrgRequestPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={false}>
+              <ProfilePage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Enhanced dashboard with basic auth check */}
+        <Route 
+          path="/enhanced" 
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <EnhancedComponentsDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Admin-only routes */}
         <Route
           path="/admin/join-requests"
-          element={<AdminPendingJoinRequests />}
+          element={
+            <ProtectedRoute requiredRoles={["admin"]}>
+              <AdminPendingJoinRequests />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/admin/invite-user" element={<AdminInviteUser />} />
-        <Route path="/orgs" element={<OrganizationListPage />} />
-        <Route path="/orgs/:client_name" element={<OrganizationDetailPage />} />
-        <Route path="/roles" element={<RoleListPage />} />
-        <Route path="/roles/:role_id" element={<RoleDetailPage />} />
+        <Route 
+          path="/admin/invite-user" 
+          element={
+            <ProtectedRoute requiredRoles={["admin"]}>
+              <AdminInviteUser />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Organization routes - authenticated users */}
+        <Route 
+          path="/orgs" 
+          element={
+            <ProtectedRoute>
+              <OrganizationListPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/orgs/:client_name" 
+          element={
+            <ProtectedRoute>
+              <OrganizationDetailPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Role routes - authenticated users */}
+        <Route 
+          path="/roles" 
+          element={
+            <ProtectedRoute>
+              <RoleListPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/roles/:role_id" 
+          element={
+            <ProtectedRoute>
+              <RoleDetailPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Subscription routes - admin only */}
         <Route
           path="/subscriptions/:client_name"
-          element={<SubscriptionDetailPage />}
+          element={
+            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+              <SubscriptionDetailPage />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/subscriptions/create" element={<SubscriptionCreate />} />
-        <Route path="/tiers" element={<TierListPage />} />
-        <Route path="/tiers/create" element={<TierCreateEnhanced />} />
-        <Route path="/tiers/:sub_level" element={<TierDetailPage />} />
-        <Route path="/user/organization/create" element={<RegisterPage />} />
-        <Route path="/join-org-request" element={<JoinOrgRequestPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route 
+          path="/subscriptions/create" 
+          element={
+            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+              <SubscriptionCreate />
+            </ProtectedRoute>
+          } 
+        />
 
-         {/* Platform Admin Routes */}
-        <Route path="/platform-admins" element={<PlatformAdminDashboard />} />
-        <Route path="/platform-admins/stats" element={<PlatformStats />} />
-        <Route path="/platform-admins/activity-logs" element={<ActivityLogs />} />
-        <Route path="/platform-admins/admins" element={<AdminManagement />} />
-        <Route path="/platform-admins/users" element={<UserManagement />} />
-        <Route path="/platform-admins/grant-admin" element={<GrantAdminAccess />} />
+        {/* Tier routes - platform admin only */}
+        <Route 
+          path="/tiers" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <TierListPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/tiers/create" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <TierCreateEnhanced />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/tiers/:sub_level" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <TierDetailPage />
+            </ProtectedRoute>
+          } 
+        />
 
-       {/* Partner Management Routes */}
-        <Route path="/partners" element={<PartnerCodeListPage />} />
-        <Route path="/partners/create" element={<PartnerCodeCreatePage />} />
-        <Route path="/partners/:code" element={<PartnerCodeDetailPage />} />
-        <Route path="/partners/:code/edit" element={<PartnerCodeEditPage />} />
-        <Route path="/partners/:code/stats" element={<PartnerCodeStatsPage />} />
+        {/* Platform Admin Routes - platform admin only */}
+        <Route 
+          path="/platform-admins" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PlatformAdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/stats" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PlatformStats />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/activity-logs" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <ActivityLogs />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/admins" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <AdminManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/users" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <UserManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/grant-admin" 
+          element={
+            <ProtectedRoute requiredRoles={["super_admin"]}>
+              <GrantAdminAccess />
+            </ProtectedRoute>
+          } 
+        />
 
-        {/* Payment Routes */}
-        <Route path="/payments" element={<PaymentPage />} />
-        <Route path="/payment-dashboard" element={<PaymentDashboard />} />
-        <Route path="/payment/success" element={<PaymentPage />} />
-        <Route path="/payment-test" element={<PaymentTestPage />} />
-        <Route path="/invoices" element={<InvoicesPage />} />
-        <Route path="/payment-success" element={<PaymentSuccessPage />} />
-        <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
+        {/* Partner Management Routes - platform admin only */}
+        <Route 
+          path="/partners" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerCodeListPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/partners/create" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerCodeCreatePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/partners/:code" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerCodeDetailPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/partners/:code/edit" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerCodeEditPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/partners/:code/stats" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerCodeStatsPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Payment Routes - authenticated users with admin access for dashboard */}
+        <Route 
+          path="/payments" 
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/payment-dashboard" 
+          element={
+            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+              <PaymentDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/payment/success" 
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/payment-test" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PaymentTestPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/invoices" 
+          element={
+            <ProtectedRoute>
+              <InvoicesPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/payment-success" 
+          element={
+            <ProtectedRoute>
+              <PaymentSuccessPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/payment-cancelled" 
+          element={
+            <ProtectedRoute>
+              <PaymentCancelledPage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Suspense>
   );

@@ -67,12 +67,12 @@ const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   },
   {
     tier: "LE",
-    name: "Law Enforcement",
+    name: "Large Enterprise",
     price: 1299.99,
-    description: "Specialized for law enforcement agencies",
+    description: "Specialized for Large Enterprise agencies",
     features: [
       "All Premium features",
-      "Law enforcement tools",
+      "Large Enterprise tools",
       "Compliance reporting",
       "Specialized training",
     ],
@@ -139,7 +139,7 @@ export const PaymentPage: React.FC = () => {
     try {
       const checkoutData = {
         amount: selectedPlan.price,
-        client_name: userProfile.name || userProfile.email,
+        client_name: userProfile.user_info.client_name,
         tier: selectedPlan.tier,
         payment_type: "monthly" as const,
         partner_code: selectedPlan.tier === "LE" ? "LE2024" : "CYBER20",
@@ -174,7 +174,7 @@ export const PaymentPage: React.FC = () => {
           </h1>
           {userProfile && (
             <p className="text-lg text-gray-600">
-              Welcome, {userProfile.name || userProfile.email}
+              Welcome, {userProfile.user_info.name || userProfile.user_info.email}
             </p>
           )}
           {paymentProcessed && (

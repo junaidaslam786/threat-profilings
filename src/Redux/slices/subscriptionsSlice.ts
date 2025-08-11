@@ -55,10 +55,10 @@ export interface BaseSubscription {
   payment_method: string;
   partner_code?: string;
   auto_renewal: boolean;
-  billing_info?: any;
+  billing_info?: BillingInfo;
   currency: string;
-  pricing_info?: any;
-  features: any;
+  pricing_info?: Record<string, unknown>;
+  features: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   apps_count: number;
@@ -102,18 +102,19 @@ export interface UpdateSubscriptionDto {
   storage_limit_gb?: number;
   features_access?: string[];
   compliance_frameworks?: string[];
-  features?: any;
+  features?: Record<string, unknown>;
   updated_at?: string;
 }
 
 export interface CreateSubscriptionDto {
   client_name: string;
-  subscription_level: SubscriptionLevel;
-  payment_method: string;
-  billing_info: BillingInfo;
-  auto_renewal?: boolean;
+  tier: "L0" | "L1" | "L2" | "L3" | "LE";
+  initial_run_number?: number;
+  payment_method?: "stripe" | "invoice" | "partner_code";
   partner_code?: string;
-  custom_limits?: CustomLimits;
+  auto_renewal?: boolean;
+  billing_info?: BillingInfo;
+  currency?: "USD" | "AUD" | "EUR" | "GBP";
 }
 
 interface SubscriptionsState {

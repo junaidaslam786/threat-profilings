@@ -26,6 +26,15 @@ export const userApi = createApi({
       }
       return headers;
     },
+    validateStatus: (response) => {
+      // Consider 401 as an error that should not be cached
+      if (response.status === 401) {
+        // Clear invalid token
+        Cookies.remove("id_token");
+        return false;
+      }
+      return response.status >= 200 && response.status <= 299;
+    },
   }),
   tagTypes: ['User', 'PendingJoins', 'AdminOrgs'],
   endpoints: (builder) => ({
