@@ -1,25 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import type { UserMeResponse } from '../Redux/slices/userSlice';
-
-interface AuthContextType {
-  user: UserMeResponse | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (token: string) => void;
-  logout: () => void;
-  refetchUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import type { UserMeResponse } from "../Redux/slices/userSlice";
+import {
+  getAuthCookieOptions,
+  removeAuthTokens,
+  getIdToken,
+} from "../utils/cookieHelpers";
+import { AuthContext } from "./AuthContextTypes";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -30,27 +17,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUser = async (): Promise<UserMeResponse | null> => {
-    const token = Cookies.get('id_token');
+    const token = getIdToken();
     if (!token) {
       return null;
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user');
+        throw new Error("Failed to fetch user");
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Error fetching user:', error);
-      Cookies.remove('id_token');
+      console.error("Error fetching user:", error);
+      Cookies.remove("id_token");
       return null;
     }
   };
@@ -66,16 +56,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = (token: string) => {
-    Cookies.set('id_token', token);
+    const options = getAuthCookieOptions();
+    Cookies.set("id_token", token, options);
     refetchUser();
   };
 
   const logout = () => {
-    Cookies.remove('id_token');
+    removeAuthTokens();
     setUser(null);
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = '/dashboard';
+    window.location.href = "/dashboard";
   };
 
   useEffect(() => {

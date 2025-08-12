@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { setAuthTokens } from "../../utils/cookieHelpers";
 
 const checkUserLevel = async (idToken: string): Promise<string | null> => {
   try {
@@ -47,18 +48,7 @@ const AuthRedirectHandler: React.FC = () => {
         const accessToken = params.get("access_token");
 
         if (idToken && accessToken) {
-          const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-          Cookies.set("id_token", idToken, {
-            expires,
-            secure: true,
-            sameSite: "Lax",
-          });
-          Cookies.set("access_token", accessToken, {
-            expires,
-            secure: true,
-            sameSite: "Lax",
-          });
+          setAuthTokens(idToken, accessToken);
 
           const userLevel = await checkUserLevel(idToken);
           
