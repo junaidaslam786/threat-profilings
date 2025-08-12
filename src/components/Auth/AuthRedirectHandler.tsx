@@ -2,10 +2,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
-// Helper function to make API call to check user level
 const checkUserLevel = async (idToken: string): Promise<string | null> => {
   try {
-    // First try the platform admin endpoint to check if user is a super admin
     const platformResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`, {
       headers: {
         'Authorization': `Bearer ${idToken}`,
@@ -18,7 +16,6 @@ const checkUserLevel = async (idToken: string): Promise<string | null> => {
       return data.level || null;
     }
     
-    // If platform admin endpoint fails, try the regular user endpoint
     const userResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
       headers: {
         'Authorization': `Bearer ${idToken}`,
@@ -48,12 +45,9 @@ const AuthRedirectHandler: React.FC = () => {
         const params = new URLSearchParams(hash.substring(1));
         const idToken = params.get("id_token");
         const accessToken = params.get("access_token");
-        const expiresIn = params.get("expires_in");
 
         if (idToken && accessToken) {
-          const expires = expiresIn
-            ? new Date(Date.now() + parseInt(expiresIn) * 100000)
-            : undefined;
+          const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
           Cookies.set("id_token", idToken, {
             expires,
@@ -66,7 +60,6 @@ const AuthRedirectHandler: React.FC = () => {
             sameSite: "Lax",
           });
 
-          // Check user level before redirecting
           const userLevel = await checkUserLevel(idToken);
           
           if (userLevel === "super") {
@@ -89,7 +82,6 @@ const AuthRedirectHandler: React.FC = () => {
           "No hash found in URL. This component should only be hit after Cognito redirect."
         );
         
-        // Even without hash, check if user is already authenticated and is a super admin
         const existingIdToken = Cookies.get("id_token");
         if (existingIdToken) {
           const userLevel = await checkUserLevel(existingIdToken);
