@@ -6,7 +6,7 @@ export const getAuthCookieOptions = () => {
   return {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     secure: isProduction,
-    sameSite: "None" as const,
+    sameSite: isProduction ? ("None" as const) : ("Lax" as const),
     path: "/",
     ...(isProduction && {
       // Uncomment and set your domain if needed
@@ -26,7 +26,7 @@ export const removeAuthTokens = () => {
   const isProduction = window.location.protocol === "https:";
   const options = {
     secure: isProduction,
-    sameSite: "None" as const,
+    sameSite: isProduction ? ("None" as const) : ("Lax" as const),
     path: "/",
   };
 
