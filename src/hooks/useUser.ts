@@ -20,11 +20,9 @@ export function useUser() {
   const dispatch = useAppDispatch();
   const { user, isLoading: userLoading } = useAppSelector((state: RootState) => state.user);
 
-  // Check if user has both auth tokens
   const hasAuthToken = !!Cookies.get("id_token");
   const hasBothTokens = hasAuthTokens();
 
-  // Only fetch profile if we have a token and don't have user data
   const shouldSkip = !hasAuthToken || !!user;
 
   const {
@@ -37,7 +35,6 @@ export function useUser() {
     skip: shouldSkip,
   });
 
-  // Hydrated means we've attempted to fetch user profile at least once
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     if (!hasAuthToken || user || (!queryLoading && !isFetching)) {
@@ -48,7 +45,6 @@ export function useUser() {
   const isLoading = userLoading || (hasAuthToken && queryLoading && !user);
 
   useEffect(() => {
-    // Set loading state when starting to fetch
     if (hasAuthToken && !user && !queryLoading) {
       dispatch(setLoading(true));
     }
@@ -64,12 +60,10 @@ export function useUser() {
     if (error) {
       const msg = extractErrorMessage(error) || "Failed to fetch user profile.";
       toast.error(msg);
-      console.error("Failed to fetch user profile:", error);
       dispatch(logoutUser());
     }
   }, [error, dispatch]);
 
-  // If no auth token, clear user data
   useEffect(() => {
     if (!hasAuthToken && user) {
       dispatch(logoutUser());

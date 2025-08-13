@@ -9,47 +9,44 @@ export const UserRegistrationType = {
   JOIN_EXISTING: "join_existing",
 } as const;
 
-export type UserRegistrationType = typeof UserRegistrationType[keyof typeof UserRegistrationType];
+export type UserRegistrationType =
+  (typeof UserRegistrationType)[keyof typeof UserRegistrationType];
 
 export const OrgSize = {
   SMALL: "1-10",
-  MEDIUM: "11-50", 
+  MEDIUM: "11-50",
   LARGE: "51-100",
   XLARGE: "101-500",
   ENTERPRISE: "500+",
 } as const;
 
-export type OrgSize = typeof OrgSize[keyof typeof OrgSize];
+export type OrgSize = (typeof OrgSize)[keyof typeof OrgSize];
 
 export interface RegisterUserDto {
   email: string;
   name: string;
   registration_type?: UserRegistrationType;
   partnerCode?: string;
-  
-  // Standard organization fields
   org_name?: string;
   org_domain?: string;
   industry?: string;
   org_size?: OrgSize;
-  
-  // LE admin specific fields
   sector?: string;
   website_url?: string;
   countries_of_operation?: string[];
   home_url?: string;
   about_us_url?: string;
   additional_details?: string;
-  
+
   // Platform admin specific fields
   platform_admin_level?: "super" | "admin" | "read-only";
   admin_justification?: string;
-  
+
   // Join existing organization fields
   target_org_domain?: string;
   join_message?: string;
   requested_role?: "viewer" | "admin";
-  
+
   // Legacy support
   user_type?: string;
 }
@@ -100,11 +97,14 @@ export interface UserMeResponse {
     };
     access_levels: {
       platform_admin: string | null;
-      organizations: Record<string, {
-        role: string;
-        organization_name: string;
-        permissions: string[];
-      }>;
+      organizations: Record<
+        string,
+        {
+          role: string;
+          organization_name: string;
+          permissions: string[];
+        }
+      >;
     };
   };
   accessible_organizations: Array<{

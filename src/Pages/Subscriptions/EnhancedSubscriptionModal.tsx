@@ -265,7 +265,7 @@ export default function EnhancedSubscriptionModal({
                 </svg>
                 <div>
                   <strong>Notice:</strong> Subscription creation is currently
-                  restricted to Large Enter users only. If you need to create a
+                  restricted to Large Enterprise users only. If you need to create a
                   subscription, please contact your administrator or use a Large
                   Enter account.
                 </div>
@@ -673,7 +673,7 @@ export default function EnhancedSubscriptionModal({
       case "L3":
         return "Enterprise threat profiling with full customization and priority support.";
       case "LE":
-        return "Large Enter tier with specialized threat intelligence and investigation tools.";
+        return "Large Enterprise tier with specialized threat intelligence and investigation tools.";
       default:
         return "Subscription tier access to threat profiling services.";
     }
