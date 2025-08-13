@@ -3,6 +3,7 @@ import Button from "../../components/Common/Button";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { performLogout } from "../../utils/cookieHelpers";
 import LoadingScreen from "../../components/Common/LoadingScreen";
 
 const ADMIN_AND_LE_ROUTES = [
@@ -188,12 +189,7 @@ const Dashboard: React.FC = () => {
             Enhanced
           </Button>
           <Button
-            onClick={() => {
-              Cookies.remove("id_token");
-              localStorage.clear();
-              sessionStorage.clear();
-              window.location.reload();
-            }}
+            onClick={() => performLogout("/dashboard")}
             className="bg-red-600 hover:bg-red-700 px-6 py-2"
           >
             Sign Out

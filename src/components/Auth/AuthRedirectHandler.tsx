@@ -3,36 +3,46 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { setAuthTokens } from "../../utils/cookieHelpers";
 
-const checkUserLevel = async (idToken: string): Promise<string | null> => {
+const checkUserLevel = async (idToken: string): Promise<{ level: string | null; userNotFound: boolean }> => {
   try {
-    const platformResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    
+    const platformResponse = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
     if (platformResponse.ok) {
       const data = await platformResponse.json();
-      return data.level || null;
+      return { level: data.level || null, userNotFound: false };
     }
-    
-    const userResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    
+
+    const userResponse = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/users/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
     if (userResponse.ok) {
       const data = await userResponse.json();
-      return data.level || null;
+      return { level: data.level || null, userNotFound: false };
     }
-    
-    return null;
+
+    // Check if both responses indicate user not found (404 or similar)
+    const userNotFound = (platformResponse.status === 404 || platformResponse.status === 401) && 
+                        (userResponse.status === 404 || userResponse.status === 401);
+
+    return { level: null, userNotFound };
   } catch (error) {
-    console.error('Error checking user level:', error);
-    return null;
+    console.error("Error checking user level:", error);
+    return { level: null, userNotFound: false };
   }
 };
 
@@ -50,9 +60,11 @@ const AuthRedirectHandler: React.FC = () => {
         if (idToken && accessToken) {
           setAuthTokens(idToken, accessToken);
 
-          const userLevel = await checkUserLevel(idToken);
-          
-          if (userLevel === "super") {
+          const userResult = await checkUserLevel(idToken);
+
+          if (userResult.userNotFound) {
+            navigate("/user/organization/create", { replace: true });
+          } else if (userResult.level === "super") {
             navigate("/platform-admins", { replace: true });
           } else {
             navigate("/dashboard", { replace: true });
@@ -71,16 +83,16 @@ const AuthRedirectHandler: React.FC = () => {
         console.log(
           "No hash found in URL. This component should only be hit after Cognito redirect."
         );
-        
+
         const existingIdToken = Cookies.get("id_token");
         if (existingIdToken) {
-          const userLevel = await checkUserLevel(existingIdToken);
-          if (userLevel === "super") {
+          const userResult = await checkUserLevel(existingIdToken);
+          if (userResult.level === "super") {
             navigate("/platform-admins", { replace: true });
             return;
           }
         }
-        
+
         navigate("/user/organization/create");
       }
     };

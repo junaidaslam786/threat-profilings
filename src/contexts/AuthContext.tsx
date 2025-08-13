@@ -5,6 +5,7 @@ import {
   getAuthCookieOptions,
   removeAuthTokens,
   getIdToken,
+  performLogout,
 } from "../utils/cookieHelpers";
 import { AuthContext } from "./AuthContextTypes";
 
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return await response.json();
     } catch (error) {
       console.error("Error fetching user:", error);
-      Cookies.remove("id_token");
+      removeAuthTokens();
       return null;
     }
   };
@@ -62,11 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    removeAuthTokens();
-    setUser(null);
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/dashboard";
+    performLogout("/dashboard");
   };
 
   useEffect(() => {

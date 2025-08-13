@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
+import { removeAuthTokens } from "../../utils/cookieHelpers";
 import type {
   RegisterUserDto,
   JoinOrgRequestDto,
@@ -30,7 +31,7 @@ export const userApi = createApi({
       // Consider 401 as an error that should not be cached
       if (response.status === 401) {
         // Clear invalid token
-        Cookies.remove("id_token");
+        removeAuthTokens();
         return false;
       }
       return response.status >= 200 && response.status <= 299;

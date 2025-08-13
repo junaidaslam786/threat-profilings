@@ -5,7 +5,7 @@ import {
   useGetCurrentAdminQuery,
   useGetPlatformStatsQuery,
 } from "../../Redux/api/platformAdminApi";
-import Cookies from "js-cookie";
+import { performLogout } from "../../utils/cookieHelpers";
 
 const PLATFORM_ADMIN_ROUTES = [
   { label: "Platform Statistics", path: "/platform-admins/stats" },
@@ -50,10 +50,7 @@ const PlatformAdminDashboard: React.FC = () => {
   }
 
   const handleSignOut = () => {
-    Cookies.remove("id_token");
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.reload();
+    performLogout("/dashboard");
   };
 
   return (
