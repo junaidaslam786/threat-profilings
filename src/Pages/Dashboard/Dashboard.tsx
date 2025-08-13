@@ -123,7 +123,6 @@ const Dashboard: React.FC = () => {
         }
       } catch (error) {
         console.warn("Failed to fetch auth config:", error);
-        // Continue with default sign-in URL
       }
       setInitialLoad(false);
     };
@@ -133,18 +132,10 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (!user && hasBothTokens && hydrated && !initialLoad && !isLoading) {
-      console.log("Debug - Redirecting to organization creation page", {
-        user: !!user,
-        hasBothTokens,
-        hydrated,
-        initialLoad,
-        isLoading,
-      });
       navigate("/user/organization/create", { replace: true });
     }
   }, [user, hasBothTokens, hydrated, initialLoad, isLoading, navigate]);
 
-  // Determine available routes based on user role
   const getAvailableRoutes = () => {
     if (isPlatformAdmin || isSuperAdmin) {
       const platformRoutes = PLATFORM_ADMIN_ROUTES.filter((route) => {
@@ -191,12 +182,6 @@ const Dashboard: React.FC = () => {
   }
 
   if (!user && hasBothTokens && hydrated && !isLoading) {
-    console.log("Debug - User not found but has tokens, showing loading", {
-      user: !!user,
-      hasBothTokens,
-      hydrated,
-      isLoading,
-    });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <LoadingScreen />

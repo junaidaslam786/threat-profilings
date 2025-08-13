@@ -10,6 +10,8 @@ import type {
   UserMeResponse,
   PendingJoinDto,
   AdminOrgResponse,
+  DetectFlowDto,
+  DetectFlowResponse,
 } from "../slices/userSlice";
 
 interface GenericSuccessResponse {
@@ -39,6 +41,14 @@ export const userApi = createApi({
   }),
   tagTypes: ['User', 'PendingJoins', 'AdminOrgs'],
   endpoints: (builder) => ({
+    detectRegistrationFlow: builder.mutation<DetectFlowResponse, DetectFlowDto>({
+      query: (body) => ({
+        url: "/users/register/detect-flow",
+        method: "POST",
+        body,
+      }),
+    }),
+
     createUser: builder.mutation<GenericSuccessResponse, RegisterUserDto>({
       query: (body) => ({
         url: "/users/register",
@@ -119,6 +129,7 @@ export const userApi = createApi({
 });
 
 export const {
+  useDetectRegistrationFlowMutation,
   useCreateUserMutation,
   useJoinOrgRequestMutation,
   useApproveJoinRequestMutation,

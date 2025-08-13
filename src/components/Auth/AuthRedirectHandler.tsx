@@ -86,21 +86,18 @@ const AuthRedirectHandler: React.FC = () => {
           "No hash found in URL. This component should only be hit after Cognito redirect."
         );
 
-        // Check if user has both tokens
         const existingIdToken = Cookies.get("id_token");
         const existingAccessToken = Cookies.get("access_token");
         
         if (existingIdToken && existingAccessToken) {
           const userResult = await checkUserLevel(existingIdToken);
           if (userResult.userNotFound) {
-            // User not found but has tokens - redirect to organization creation
             navigate("/user/organization/create", { replace: true });
             return;
           } else if (userResult.level === "super") {
             navigate("/platform-admins", { replace: true });
             return;
           } else {
-            // User found and has tokens - redirect to dashboard
             navigate("/dashboard", { replace: true });
             return;
           }

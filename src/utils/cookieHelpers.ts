@@ -21,7 +21,6 @@ export const getAuthCookieOptions = () => {
     sameSite: isProduction ? ("None" as const) : ("Lax" as const),
     path: "/",
     ...(isProduction && {
-      // Uncomment and set your domain if needed
       domain: "tp.cyorn.com",
     }),
   };
@@ -37,14 +36,12 @@ export const setAuthTokens = (idToken: string, accessToken: string) => {
 export const removeAuthTokens = () => {
   const { isProduction } = getEnvironmentInfo();
   
-  // Base options for cookie removal
   const baseOptions = {
     secure: isProduction,
     sameSite: isProduction ? ("None" as const) : ("Lax" as const),
     path: "/",
   };
 
-  // Options with domain for production
   const productionOptions = {
     ...baseOptions,
     ...(isProduction && {
@@ -52,21 +49,17 @@ export const removeAuthTokens = () => {
     }),
   };
 
-  // Remove cookies with the same options used when setting them
   Cookies.remove("id_token", productionOptions);
   Cookies.remove("access_token", productionOptions);
 
-  // Also try removing without domain (fallback for any cookies set without domain)
   if (isProduction) {
     Cookies.remove("id_token", baseOptions);
     Cookies.remove("access_token", baseOptions);
   }
 
-  // Additional cleanup for cookies that might have been set with different paths or domains
   Cookies.remove("id_token", { path: "/" });
   Cookies.remove("access_token", { path: "/" });
   
-  // Remove from root domain as well (for cases where cookies were set on parent domain)
   if (isProduction) {
     Cookies.remove("id_token", { path: "/", domain: ".cyorn.com" });
     Cookies.remove("access_token", { path: "/", domain: ".cyorn.com" });

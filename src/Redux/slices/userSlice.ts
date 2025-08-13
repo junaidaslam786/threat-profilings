@@ -22,6 +22,21 @@ export const OrgSize = {
 
 export type OrgSize = (typeof OrgSize)[keyof typeof OrgSize];
 
+export interface DetectFlowDto {
+  email: string;
+}
+
+export interface DetectFlowResponse {
+  registration_type: UserRegistrationType;
+  required_fields: string[];
+  user_type_detected: {
+    suggested_type: UserRegistrationType;
+    is_platform_admin: boolean;
+    org_exists: boolean;
+    can_create_le: boolean;
+  };
+}
+
 export interface RegisterUserDto {
   email: string;
   name: string;
