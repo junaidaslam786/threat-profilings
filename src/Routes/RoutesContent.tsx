@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/Auth/ProtectedRoute";
 const LoadingScreen = lazy(() => import("../components/Common/LoadingScreen"));
 
@@ -118,8 +118,6 @@ const RoutesContent: React.FC = () => {
         {/* Dashboard route - handles its own auth logic */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* Handle trailing slash redirect */}
-        <Route path="/dashboard/" element={<Navigate to="/dashboard" replace />} />
         
         {/* Protected routes that require authentication */}
         <Route 
