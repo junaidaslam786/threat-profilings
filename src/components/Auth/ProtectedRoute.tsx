@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { hasRequiredRole } from "../../utils/roleUtils";
 import LoadingScreen from "../Common/LoadingScreen";
-import Cookies from "js-cookie";
 import { toast } from "react-hot-toast";
 
 interface ProtectedRouteProps {
@@ -19,8 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requireActive = true,
 }) => {
-  const { user, isLoading, hydrated } = useUser();
-  const hasAuthToken = !!Cookies.get("id_token");
+  const { user, isLoading, hydrated, hasBothTokens } = useUser();
   const hasShownToast = useRef(false);
 
   useEffect(() => {
@@ -35,7 +33,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       !hasShownToast.current &&
       hydrated &&
       !isLoading &&
-      (!hasAuthToken || !user)
+      !hasBothTokens
     ) {
       toast.error("You must be logged in to access this page.");
       hasShownToast.current = true;
@@ -60,7 +58,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       toast.error("You do not have permission to access this page.");
       hasShownToast.current = true;
     }
-  }, [isLoading, hydrated, requireAuth, requireActive, hasAuthToken, user, requiredRoles]);
+  }, [isLoading, hydrated, requireAuth, requireActive, hasBothTokens, user, requiredRoles]);
 
   if (isLoading || !hydrated) {
     return (
@@ -70,9 +68,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (requireAuth && (!hasAuthToken || !user)) {
+  // If user not found but has both tokens, redirect to organization creation
+  if (requireAuth && !user && hasBothTokens) {
+    return <Navigate to="/user/organization/create" replace />;
+  }
+
+  // If user doesn't have both tokens, redirect to dashboard (which will show login)
+  if (requireAuth && !hasBothTokens) {
     return <Navigate to="/dashboard" replace />;
   }
+  
   if (requireActive && user && user.user_info.status !== "active") {
     return <Navigate to="/dashboard" replace />;
   }

@@ -81,6 +81,12 @@ export const getAccessToken = (): string | undefined => {
   return Cookies.get("access_token");
 };
 
+export const hasAuthTokens = (): boolean => {
+  const idToken = Cookies.get("id_token");
+  const accessToken = Cookies.get("access_token");
+  return !!(idToken && accessToken);
+};
+
 export const performLogout = (redirectPath: string = "/dashboard") => {
   // Remove all authentication tokens
   removeAuthTokens();

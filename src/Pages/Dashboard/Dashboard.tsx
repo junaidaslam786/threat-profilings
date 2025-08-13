@@ -40,7 +40,7 @@ const USER_ROUTES = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { user, isLoading, isAdmin, isLEAdmin, isPlatformAdmin, isSuperAdmin } = useUser();
+  const { user, isLoading, isAdmin, isLEAdmin, isPlatformAdmin, isSuperAdmin, hasBothTokens } = useUser();
   const navigate = useNavigate();
   const [signInUrl, setSignInUrl] = useState<string>("/");
   const [initialLoad, setInitialLoad] = useState(true);
@@ -109,8 +109,18 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // If no auth token, show sign in
-  if (!hasAuthToken || !user) {
+  // If user is not found but has both tokens, redirect to organization creation
+  if (!user && hasBothTokens) {
+    navigate("/user/organization/create", { replace: true });
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        <LoadingScreen />
+      </div>
+    );
+  }
+
+  // Only show login if user doesn't have both tokens
+  if (!hasBothTokens) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 text-center">
@@ -128,7 +138,8 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (!isActive) {
+  // Check if user exists and is not active
+  if (user && !isActive) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-yellow-700 text-center max-w-md">
@@ -164,6 +175,15 @@ const Dashboard: React.FC = () => {
           </div>
           <Button onClick={() => (window.location.href = "/")}>Sign Out</Button>
         </div>
+      </div>
+    );
+  }
+
+  // If we don't have a user but have tokens, we're still loading
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        <LoadingScreen />
       </div>
     );
   }

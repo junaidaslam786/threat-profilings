@@ -14,13 +14,15 @@ import {
 import Cookies from "js-cookie";
 import { toast } from "react-hot-toast";
 import { extractErrorMessage } from "../utils/errorHandling";
+import { hasAuthTokens } from "../utils/cookieHelpers";
 
 export function useUser() {
   const dispatch = useAppDispatch();
   const { user, isLoading: userLoading } = useAppSelector((state: RootState) => state.user);
 
-  // Check if user has auth token
+  // Check if user has both auth tokens
   const hasAuthToken = !!Cookies.get("id_token");
+  const hasBothTokens = hasAuthTokens();
 
   // Only fetch profile if we have a token and don't have user data
   const shouldSkip = !hasAuthToken || !!user;
@@ -85,5 +87,6 @@ export function useUser() {
     isPlatformAdmin: checkPlatformAdmin(user),
     isSuperAdmin: checkSuperAdmin(user),
     refetch,
+    hasBothTokens,
   };
 }

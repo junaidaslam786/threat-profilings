@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { setAuthTokens } from "../../utils/cookieHelpers";
 
-const checkUserLevel = async (idToken: string): Promise<{ level: string | null; userNotFound: boolean }> => {
+const checkUserLevel = async (
+  idToken: string
+): Promise<{ level: string | null; userNotFound: boolean }> => {
   try {
     const platformResponse = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`,
@@ -35,9 +37,9 @@ const checkUserLevel = async (idToken: string): Promise<{ level: string | null; 
       return { level: data.level || null, userNotFound: false };
     }
 
-    // Check if both responses indicate user not found (404 or similar)
-    const userNotFound = (platformResponse.status === 404 || platformResponse.status === 401) && 
-                        (userResponse.status === 404 || userResponse.status === 401);
+    const userNotFound =
+      (platformResponse.status === 404 || platformResponse.status === 401) &&
+      (userResponse.status === 404 || userResponse.status === 401);
 
     return { level: null, userNotFound };
   } catch (error) {
@@ -84,15 +86,27 @@ const AuthRedirectHandler: React.FC = () => {
           "No hash found in URL. This component should only be hit after Cognito redirect."
         );
 
+        // Check if user has both tokens
         const existingIdToken = Cookies.get("id_token");
-        if (existingIdToken) {
+        const existingAccessToken = Cookies.get("access_token");
+        
+        if (existingIdToken && existingAccessToken) {
           const userResult = await checkUserLevel(existingIdToken);
-          if (userResult.level === "super") {
+          if (userResult.userNotFound) {
+            // User not found but has tokens - redirect to organization creation
+            navigate("/user/organization/create", { replace: true });
+            return;
+          } else if (userResult.level === "super") {
             navigate("/platform-admins", { replace: true });
+            return;
+          } else {
+            // User found and has tokens - redirect to dashboard
+            navigate("/dashboard", { replace: true });
             return;
           }
         }
 
+        // No tokens found - redirect to organization creation as fallback
         navigate("/user/organization/create");
       }
     };
