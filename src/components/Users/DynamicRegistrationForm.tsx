@@ -36,7 +36,7 @@ export default function DynamicRegistrationForm({
     // Initialize all required fields with empty strings
     flowData.required_fields.forEach((field) => {
       if (field !== 'email') {
-        initialFields[field] = field === 'org_size' ? 'SMALL' : '';
+        initialFields[field] = field === 'org_size' ? '1-10' : '';
       }
     });
     
@@ -241,15 +241,15 @@ export default function DynamicRegistrationForm({
             key={fieldName}
             className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
             name={fieldName}
-            value={value as string || 'SMALL'}
+            value={value as string || '1-10'}
             onChange={handleChange}
             required
           >
-            <option value="SMALL">1-10 employees</option>
-            <option value="MEDIUM">11-50 employees</option>
-            <option value="LARGE">51-100 employees</option>
-            <option value="XLARGE">101-500 employees</option>
-            <option value="ENTERPRISE">500+ employees</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-100">51-100 employees</option>
+            <option value="101-500">101-500 employees</option>
+            <option value="500+">500+ employees</option>
           </select>
         );
         
