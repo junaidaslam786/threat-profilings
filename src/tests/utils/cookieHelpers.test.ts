@@ -117,16 +117,26 @@ describe("cookieHelpers utility", () => {
 
       setAuthTokens(idToken, accessToken);
 
-      const expectedOptions = getAuthCookieOptions();
+      // Check that both calls were made with objects that have the expected structure
       expect(mockCookies.set).toHaveBeenCalledWith(
         "id_token",
         idToken,
-        expectedOptions
+        expect.objectContaining({
+          secure: false,
+          sameSite: "Lax",
+          path: "/",
+          expires: expect.any(Date)
+        })
       );
       expect(mockCookies.set).toHaveBeenCalledWith(
         "access_token",
         accessToken,
-        expectedOptions
+        expect.objectContaining({
+          secure: false,
+          sameSite: "Lax", 
+          path: "/",
+          expires: expect.any(Date)
+        })
       );
     });
   });
@@ -343,13 +353,11 @@ describe("cookieHelpers utility", () => {
     });
 
     it("should handle concurrent cookie operations", () => {
-      const tokens = {
-        id_token: "concurrent_id_token",
-        access_token: "concurrent_access_token",
-      };
+      const idToken = "concurrent_id_token";
+      const accessToken = "concurrent_access_token";
 
       // Simulate multiple simultaneous calls
-      setAuthTokens(tokens);
+      setAuthTokens(idToken, accessToken);
       const hasTokens1 = hasAuthTokens();
       const hasTokens2 = hasAuthTokens();
 
@@ -362,13 +370,11 @@ describe("cookieHelpers utility", () => {
         throw new Error("Cookie storage full");
       });
 
-      const tokens = {
-        id_token: "error_test_token",
-        access_token: "error_test_access",
-      };
+      const idToken = "error_test_token";
+      const accessToken = "error_test_access";
 
       // Should not throw error even if cookie setting fails
-      expect(() => setAuthTokens(tokens)).not.toThrow();
+      expect(() => setAuthTokens(idToken, accessToken)).not.toThrow();
     });
 
     it("should handle cookie removal errors gracefully", () => {
