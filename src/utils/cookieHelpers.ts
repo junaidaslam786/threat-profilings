@@ -26,43 +26,63 @@ export const getAuthCookieOptions = () => {
   };
 };
 
-export const setAuthTokens = (idToken: string, accessToken: string) => {
-  const options = getAuthCookieOptions();
+export const setAuthTokens = (
+  idTokenOrTokens: string | { id_token: string; access_token: string },
+  accessToken?: string
+) => {
+  try {
+    const options = getAuthCookieOptions();
 
-  Cookies.set("id_token", idToken, options);
-  Cookies.set("access_token", accessToken, options);
+    if (typeof idTokenOrTokens === 'string' && accessToken) {
+      // Called with two separate parameters
+      Cookies.set("id_token", idTokenOrTokens, options);
+      Cookies.set("access_token", accessToken, options);
+    } else if (typeof idTokenOrTokens === 'object' && idTokenOrTokens.id_token && idTokenOrTokens.access_token) {
+      // Called with an object containing both tokens
+      Cookies.set("id_token", idTokenOrTokens.id_token, options);
+      Cookies.set("access_token", idTokenOrTokens.access_token, options);
+    } else {
+      throw new Error('Invalid parameters provided to setAuthTokens');
+    }
+  } catch (error) {
+    console.error("Failed to set auth tokens:", error);
+  }
 };
 
 export const removeAuthTokens = () => {
-  const { isProduction } = getEnvironmentInfo();
-  
-  const baseOptions = {
-    secure: isProduction,
-    sameSite: isProduction ? ("None" as const) : ("Lax" as const),
-    path: "/",
-  };
+  try {
+    const { isProduction } = getEnvironmentInfo();
+    
+    const baseOptions = {
+      secure: isProduction,
+      sameSite: isProduction ? ("None" as const) : ("Lax" as const),
+      path: "/",
+    };
 
-  const productionOptions = {
-    ...baseOptions,
-    ...(isProduction && {
-      domain: "tp.cyorn.com",
-    }),
-  };
+    const productionOptions = {
+      ...baseOptions,
+      ...(isProduction && {
+        domain: "tp.cyorn.com",
+      }),
+    };
 
-  Cookies.remove("id_token", productionOptions);
-  Cookies.remove("access_token", productionOptions);
+    Cookies.remove("id_token", productionOptions);
+    Cookies.remove("access_token", productionOptions);
 
-  if (isProduction) {
-    Cookies.remove("id_token", baseOptions);
-    Cookies.remove("access_token", baseOptions);
-  }
+    if (isProduction) {
+      Cookies.remove("id_token", baseOptions);
+      Cookies.remove("access_token", baseOptions);
+    }
 
-  Cookies.remove("id_token", { path: "/" });
-  Cookies.remove("access_token", { path: "/" });
-  
-  if (isProduction) {
-    Cookies.remove("id_token", { path: "/", domain: ".cyorn.com" });
-    Cookies.remove("access_token", { path: "/", domain: ".cyorn.com" });
+    Cookies.remove("id_token", { path: "/" });
+    Cookies.remove("access_token", { path: "/" });
+    
+    if (isProduction) {
+      Cookies.remove("id_token", { path: "/", domain: ".cyorn.com" });
+      Cookies.remove("access_token", { path: "/", domain: ".cyorn.com" });
+    }
+  } catch (error) {
+    console.error("Failed to remove auth tokens:", error);
   }
 };
 
