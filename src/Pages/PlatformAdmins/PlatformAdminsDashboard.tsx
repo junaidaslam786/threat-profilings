@@ -62,7 +62,7 @@ const PlatformAdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-4xl font-bold text-blue-400">
-          Platform Admin Dashboard - {currentAdmin.level}
+          Platform Admin Dashboard - {currentAdmin.permissions.level}
         </h1>
         <div className="flex gap-4">
           <Button
@@ -86,38 +86,38 @@ const PlatformAdminDashboard: React.FC = () => {
           Platform Admin Profile
         </h3>
         <div className="mb-1">
-          <b>Name:</b> {currentAdmin.name}
+          <b>Name:</b> {currentAdmin.admin_info.name}
         </div>
         <div className="mb-1">
-          <b>Email:</b> {currentAdmin.email}
+          <b>Email:</b> {currentAdmin.admin_info.email}
         </div>
         <div className="mb-1">
           <b>Admin Level:</b>
           <span
             className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-              currentAdmin.level === "super"
+              currentAdmin.permissions.level === "super"
                 ? "bg-purple-600 text-white"
-                : currentAdmin.level === "admin"
+                : currentAdmin.permissions.level === "admin"
                 ? "bg-blue-600 text-white"
                 : "bg-green-600 text-white"
             }`}
           >
-            {currentAdmin.level}
+            {currentAdmin.permissions.level}
           </span>
         </div>
         <div className="mb-1">
           <b>Permissions:</b>
           <div className="flex flex-wrap gap-2 mt-2">
-            {Array.isArray(currentAdmin.permissions)
-              ? currentAdmin.permissions.map((perm, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-gray-700 px-2 py-1 rounded text-xs"
-                  >
-                    {perm}
-                  </span>
-                ))
-              : null}
+            {Object.entries(currentAdmin.permissions.permissions)
+              .filter(([, value]) => value) // show only enabled permissions
+              .map(([key], idx) => (
+                <span
+                  key={idx}
+                  className="bg-gray-700 px-2 py-1 rounded text-xs"
+                >
+                  {key.replace(/_/g, " ")} {/* make it more readable */}
+                </span>
+              ))}
           </div>
         </div>
       </div>
