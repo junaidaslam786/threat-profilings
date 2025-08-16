@@ -70,6 +70,15 @@ const UserManagement = lazy(
 const GrantAdminAccess = lazy(
   () => import("../Pages/PlatformAdmins/GrantAdminAccess")
 );
+const TaxRules = lazy(
+  () => import("../Pages/PlatformAdmins/TaxRules")
+);
+const Invoices = lazy(
+  () => import("../Pages/PlatformAdmins/Invoices")
+);
+const ManualUpgrades = lazy(
+  () => import("../Pages/PlatformAdmins/ManualUpgrades")
+);
 
 // Partner Pages
 const PartnerCodeListPage = lazy(
@@ -291,6 +300,30 @@ const RoutesContent: React.FC = () => {
           element={
             <ProtectedRoute requiredRoles={["super_admin"]}>
               <GrantAdminAccess />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/tax-rules" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <TaxRules />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/invoices" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <Invoices />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/platform-admins/manual-upgrades" 
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <ManualUpgrades />
             </ProtectedRoute>
           } 
         />

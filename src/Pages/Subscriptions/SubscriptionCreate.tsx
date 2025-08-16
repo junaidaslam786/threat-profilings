@@ -4,17 +4,19 @@ import { useCreateSubscriptionMutation } from "../../Redux/api/subscriptionsApi"
 import type { CreateSubscriptionDto } from "../../Redux/slices/subscriptionsSlice";
 import Button from "../../components/Common/Button";
 import ProtectedRoute from "../../components/Auth/ProtectedRoute";
+import { useGetProfileQuery } from "../../Redux/api/userApi";
 
 export default function SubscriptionCreate() {
   const [createSubscription, { isLoading }] = useCreateSubscriptionMutation();
+  const { data: user } = useGetProfileQuery();
   const navigate = useNavigate();
-  const [fields, setFields] = useState({ 
-    client_name: "", 
-    tier: "L0" as "L0" | "L1" | "L2" | "L3" | "LE",
-    payment_method: "invoice" as "stripe" | "invoice" | "partner_code",
+  const [fields, setFields] = useState({
+    client_name: user?.user_info.client_name || "",
+    tier: "L1" as "L1" | "L2" | "L3" | "LE",
+    payment_method: "stripe" as "stripe" | "invoice" | "partner_code",
     partner_code: "",
     auto_renewal: false,
-    currency: "USD" as "USD" | "AUD" | "EUR" | "GBP"
+    currency: "AUD" as "USD" | "AUD" | "EUR" | "GBP",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -35,9 +37,9 @@ export default function SubscriptionCreate() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
-    if (!fields.client_name || !fields.tier) {
-      setError("Client name and tier are required.");
+
+    if (!fields.tier) {
+      setError("Tier is required.");
       return;
     }
 
@@ -47,7 +49,7 @@ export default function SubscriptionCreate() {
         tier: fields.tier,
         payment_method: fields.payment_method,
         auto_renewal: fields.auto_renewal,
-        currency: fields.currency
+        currency: fields.currency,
       };
 
       if (fields.partner_code && fields.payment_method === "partner_code") {
@@ -57,13 +59,13 @@ export default function SubscriptionCreate() {
       await createSubscription(payload).unwrap();
       setSuccess("Subscription created successfully.");
       navigate(`/subscriptions/${fields.client_name}`);
-      setFields({ 
-        client_name: "", 
-        tier: "L0",
+      setFields({
+        client_name: user?.user_info.client_name || "",
+        tier: "L1",
         payment_method: "invoice",
         partner_code: "",
         auto_renewal: false,
-        currency: "USD"
+        currency: "USD",
       });
     } catch (err: unknown) {
       if (
@@ -96,17 +98,6 @@ export default function SubscriptionCreate() {
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-blue-400 mb-1">Client Name *</label>
-              <input
-                className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-                name="client_name"
-                placeholder="Client Name"
-                value={fields.client_name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
               <label className="block text-blue-400 mb-1">Tier *</label>
               <select
                 name="tier"
@@ -115,14 +106,13 @@ export default function SubscriptionCreate() {
                 onChange={handleChange}
                 required
               >
-                <option value="L0">L0</option>
                 <option value="L1">L1</option>
                 <option value="L2">L2</option>
                 <option value="L3">L3</option>
                 <option value="LE">LE</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-blue-400 mb-1">Payment Method</label>
               <select
@@ -185,8 +175,8 @@ export default function SubscriptionCreate() {
             <Button type="submit" loading={isLoading}>
               Create Subscription
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={() => navigate("/dashboard")}
               className="bg-gray-600 hover:bg-gray-700"
             >

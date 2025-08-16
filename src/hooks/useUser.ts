@@ -6,10 +6,14 @@ import { setUserDetails, logoutUser, setLoading } from "../Redux/slices/userSlic
 import {
   isPlatformAdmin as checkPlatformAdmin,
   isSuperAdmin as checkSuperAdmin,
+  isOrgAdmin as checkOrgAdmin,
+  isLEMaster as checkLEMaster,
+  isOrgViewer as checkOrgViewer,
+  isRunner as checkRunner,
+  // Legacy compatibility
   isAdmin as checkAdmin,
   isLEAdmin as checkLEAdmin,
   isViewer as checkViewer,
-  isRunner as checkRunner,
 } from "../utils/roleUtils";
 import Cookies from "js-cookie";
 import { toast } from "react-hot-toast";
@@ -74,12 +78,17 @@ export function useUser() {
     user,
     isLoading,
     hydrated,
-    isAdmin: checkAdmin(user),
-    isLEAdmin: checkLEAdmin(user),
-    isViewer: checkViewer(user),
+    // New role functions with clear names
+    isOrgAdmin: checkOrgAdmin(user),
+    isLEMaster: checkLEMaster(user),
+    isOrgViewer: checkOrgViewer(user),
     isRunner: checkRunner(user),
     isPlatformAdmin: checkPlatformAdmin(user),
     isSuperAdmin: checkSuperAdmin(user),
+    // Legacy compatibility
+    isAdmin: checkAdmin(user),
+    isLEAdmin: checkLEAdmin(user),
+    isViewer: checkViewer(user),
     refetch,
     hasBothTokens,
   };

@@ -35,6 +35,7 @@ const ADMIN_AND_LE_ROUTES = [
   },
 ];
 
+// Restricted Platform Admin routes - only core platform functions
 const PLATFORM_ADMIN_ROUTES = [
   {
     label: "Platform Dashboard",
@@ -42,17 +43,12 @@ const PLATFORM_ADMIN_ROUTES = [
     roles: ["platform_admin"],
   },
   {
-    label: "Platform Stats",
+    label: "Platform Statistics",
     path: "/platform-admins/stats",
     roles: ["platform_admin"],
   },
   {
-    label: "Activity Logs",
-    path: "/platform-admins/activity-logs",
-    roles: ["platform_admin"],
-  },
-  {
-    label: "User Management",
+    label: "User Management (All Orgs)",
     path: "/platform-admins/users",
     roles: ["platform_admin"],
   },
@@ -66,19 +62,42 @@ const PLATFORM_ADMIN_ROUTES = [
     path: "/platform-admins/grant-admin",
     roles: ["super_admin"],
   },
+  // Core Platform Operations Only
   {
     label: "Subscription Management",
     path: "/subscriptions/create",
     roles: ["platform_admin"],
   },
-  { label: "Tier Management", path: "/tiers", roles: ["platform_admin"] },
-  { label: "Partner Management", path: "/partners", roles: ["platform_admin"] },
+  { 
+    label: "Tier Management", 
+    path: "/tiers", 
+    roles: ["platform_admin"] 
+  },
+  { 
+    label: "Partner Management", 
+    path: "/partners", 
+    roles: ["platform_admin"] 
+  },
   {
     label: "Payment Dashboard",
     path: "/payment-dashboard",
     roles: ["platform_admin"],
   },
-  { label: "Payment Test", path: "/payment-test", roles: ["platform_admin"] },
+  {
+    label: "Tax Rules",
+    path: "/platform-admins/tax-rules",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Invoice Management",
+    path: "/platform-admins/invoices",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Manual Upgrades",
+    path: "/platform-admins/manual-upgrades",
+    roles: ["platform_admin"],
+  },
 ];
 
 const USER_ROUTES = [
@@ -137,6 +156,7 @@ const Dashboard: React.FC = () => {
   }, [user, hasBothTokens, hydrated, initialLoad, isLoading, navigate]);
 
   const getAvailableRoutes = () => {
+    // Platform Admin has LIMITED access - only platform-level features, NO organization operations
     if (isPlatformAdmin || isSuperAdmin) {
       const platformRoutes = PLATFORM_ADMIN_ROUTES.filter((route) => {
         if (route.roles.includes("super_admin")) {
@@ -145,17 +165,16 @@ const Dashboard: React.FC = () => {
         return true;
       });
       return [
-        ...ADMIN_AND_LE_ROUTES,
         ...platformRoutes,
         {
-          label: "Join Org Request",
-          path: "/join-org-request",
+          label: "Profile",
+          path: "/profile",
           roles: ["all"],
         },
-        { label: "Profile", path: "/profile", roles: ["all"] },
       ];
     }
 
+    // Admin and LE Admin have full organizational access
     if (isAdmin || isLEAdmin) {
       return [
         ...ADMIN_AND_LE_ROUTES,
@@ -168,6 +187,7 @@ const Dashboard: React.FC = () => {
       ];
     }
 
+    // Regular users get basic routes
     return USER_ROUTES;
   };
 
@@ -208,9 +228,9 @@ const Dashboard: React.FC = () => {
   const getUserRoleDisplay = () => {
     if (isPlatformAdmin) return "Platform Admin";
     if (isSuperAdmin) return "Super Admin";
-    if (isAdmin) return "Admin";
-    if (isLEAdmin) return "LE Admin";
-    return "User";
+    if (isAdmin) return "Organization Admin";
+    if (isLEAdmin) return "LE Master";
+    return "Organization Viewer";
   };
 
   const handleEnhancedClick = () => {

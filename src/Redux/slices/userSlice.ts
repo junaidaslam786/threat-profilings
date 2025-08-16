@@ -4,7 +4,7 @@ export type UserRole = "admin" | "viewer" | "runner";
 
 export const UserRegistrationType = {
   STANDARD: "standard",
-  LE_ADMIN: "LE",
+  LE_MASTER: "LE", // LE Master (Enterprise Admin)
   PLATFORM_ADMIN: "platform_admin",
   JOIN_EXISTING: "join_existing",
 } as const;
@@ -91,24 +91,35 @@ export interface UserMeResponse {
     name: string;
     user_id: string;
     client_name: string;
-    user_type: "standard" | "LE";
+    user_type: "standard" | "LE"; // LE = LE Master
     status: "active" | "pending_approval";
     created_at: string;
   };
   roles_and_permissions: {
-    primary_role: "admin" | "viewer" | "runner";
+    primary_role: "admin" | "viewer" | "runner"; // Organization-level roles
     all_roles: string[];
     permissions: {
+      // Organization Management
       can_create_orgs: boolean;
       can_manage_users: boolean;
-      can_run_profiling: boolean;
       can_edit_org_data: boolean;
+      
+      // Profiling & Operations
+      can_run_profiling: boolean;
+      
+      // Billing & Subscriptions (org-level)
       can_view_billing: boolean;
       can_manage_subscriptions: boolean;
+      
+      // Platform Admin Permissions (restricted)
       can_access_platform_admin: boolean;
+      
+      // Partner Management (platform admin only)
       can_manage_partners: boolean;
+      
+      // LE Master Capabilities
       can_create_le_orgs: boolean;
-      is_multi_org_controller: boolean;
+      is_multi_org_controller: boolean; // LE Master flag
     };
     access_levels: {
       platform_admin: string | null;
@@ -136,22 +147,31 @@ export interface UserMeResponse {
     progress: number;
   }>;
   feature_access: {
+    // Platform Admin Features (restricted scope)
     platform_admin_panel: boolean;
     super_admin_functions: boolean;
+    
+    // Organization Features
     organization_creation: boolean;
-    le_organization_creation: boolean;
+    le_organization_creation: boolean; // LE Master feature
     user_management: boolean;
+    
+    // Core Features
     billing_access: boolean;
     threat_profiling: boolean;
     data_export: boolean;
+    
+    // Platform-level Features (platform admin only)
     partner_management: boolean;
+    
+    // LE Master Features
     organization_switching: boolean;
   };
   ui_config: {
     navigation: {
       show_admin_menu: boolean;
       show_platform_admin_menu: boolean;
-      show_le_controls: boolean;
+      show_le_controls: boolean; // LE Master controls
       show_billing_section: boolean;
     };
     buttons: {
@@ -159,11 +179,12 @@ export interface UserMeResponse {
       invite_users: boolean;
       run_profiling: boolean;
       manage_subscriptions: boolean;
-      switch_organizations: boolean;
+      switch_organizations: boolean; // LE Master feature
     };
     sections: {
       user_management: boolean;
       billing_dashboard: boolean;
+      // Platform admin sections (restricted)
       platform_statistics: boolean;
       partner_codes: boolean;
     };

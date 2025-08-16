@@ -9,10 +9,15 @@ import { performLogout } from "../../utils/cookieHelpers";
 
 const PLATFORM_ADMIN_ROUTES = [
   { label: "Platform Statistics", path: "/platform-admins/stats" },
-  { label: "Activity Logs", path: "/platform-admins/activity-logs" },
+  { label: "User Management (All Orgs)", path: "/platform-admins/users" },
   { label: "Admin Management", path: "/platform-admins/admins" },
-  { label: "User Management", path: "/platform-admins/users" },
-  { label: "Grant Admin Access", path: "/platform-admins/grant-admin" },
+  { label: "Subscription Management", path: "/subscriptions/create" },
+  { label: "Tier Management", path: "/tiers" },
+  { label: "Partner Management", path: "/partners" },
+  { label: "Invoice Management", path: "/platform-admins/invoices" },
+  { label: "Tax Configuration", path: "/platform-admins/tax-rules" },
+  { label: "Manual Upgrades", path: "/platform-admins/manual-upgrades" },
+  { label: "Payment Dashboard", path: "/payment-dashboard" },
 ];
 
 const PlatformAdminDashboard: React.FC = () => {
@@ -57,7 +62,7 @@ const PlatformAdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-4xl font-bold text-blue-400">
-          Platform Admin Dashboard - {currentAdmin.level.toUpperCase()}
+          Platform Admin Dashboard - {currentAdmin.level}
         </h1>
         <div className="flex gap-4">
           <Button
@@ -97,20 +102,22 @@ const PlatformAdminDashboard: React.FC = () => {
                 : "bg-green-600 text-white"
             }`}
           >
-            {currentAdmin.level.toUpperCase()}
+            {currentAdmin.level}
           </span>
         </div>
         <div className="mb-1">
           <b>Permissions:</b>
           <div className="flex flex-wrap gap-2 mt-2">
-            {currentAdmin.permissions.map((permission) => (
-              <span
-                key={permission}
-                className="bg-gray-700 text-blue-300 px-2 py-1 rounded text-sm"
-              >
-                {permission.replace(/_/g, " ")}
-              </span>
-            ))}
+            {Array.isArray(currentAdmin.permissions)
+              ? currentAdmin.permissions.map((perm, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-gray-700 px-2 py-1 rounded text-xs"
+                  >
+                    {perm}
+                  </span>
+                ))
+              : null}
           </div>
         </div>
       </div>
@@ -199,16 +206,16 @@ const PlatformAdminDashboard: React.FC = () => {
             Grant Admin Access
           </Button>
           <Button
-            onClick={() => navigate("/platform-admins/users?action=suspend")}
+            onClick={() => navigate("/platform-admins/manual-upgrades")}
             className="bg-orange-600 hover:bg-orange-700 w-full py-3"
           >
-            Suspend User
+            Manual Tier Upgrade
           </Button>
           <Button
-            onClick={() => navigate("/platform-admins/activity-logs")}
+            onClick={() => navigate("/partners")}
             className="bg-purple-600 hover:bg-purple-700 w-full py-3"
           >
-            View Recent Activity
+            Manage Partner Codes
           </Button>
         </div>
       </div>

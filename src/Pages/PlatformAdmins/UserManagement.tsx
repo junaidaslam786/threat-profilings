@@ -195,8 +195,7 @@ const UserManagement: React.FC = () => {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
                   >
                     Status (Placeholder)
-                  </th>{" "}
-                  {/* You'll need an actual status field */}
+                  </th>
                   <th
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
@@ -213,9 +212,6 @@ const UserManagement: React.FC = () => {
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
                 {users.map((user: PlatformAdminUser) => (
-                  // Here, you would iterate over your actual user list
-                  // The PlatformAdminUser type has fields like created_at, last_login
-                  // You'd also need a 'status' field in your actual User type.
                   <tr key={user.email}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                       {user.name}

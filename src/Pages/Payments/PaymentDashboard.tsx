@@ -33,10 +33,10 @@ const PaymentDashboard: React.FC = () => {
 
   if (profileLoading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" data-testid="loading-spinner"></div>
-          <p className="text-gray-600">Loading user profile...</p>
+          <p className="text-gray-300">Loading user profile...</p>
         </div>
       </div>
     );
@@ -44,9 +44,9 @@ const PaymentDashboard: React.FC = () => {
 
   if (!clientName) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-900 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-800 border border-red-600 text-red-300 px-4 py-3 rounded">
             Unable to load user profile. Please try refreshing the page.
           </div>
         </div>
@@ -55,7 +55,7 @@ const PaymentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -121,8 +121,8 @@ const PaymentDashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Current Status Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-blue-700">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center">
               <span className="text-2xl mr-2">📊</span>
               Current Payment Status
             </h2>
@@ -130,17 +130,17 @@ const PaymentDashboard: React.FC = () => {
             {statusLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <span className="ml-3">Loading status...</span>
+                <span className="ml-3 text-gray-300">Loading status...</span>
               </div>
             ) : statusError ? (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              <div className="bg-red-800 border border-red-600 text-red-300 px-4 py-3 rounded">
                 <p>Error loading payment status</p>
                 <p className="text-sm">{String(statusError)}</p>
               </div>
             ) : paymentStatus ? (
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <span className="font-medium">Payment Status:</span>
+                <div className="flex justify-between items-center p-3 bg-gray-700 rounded">
+                  <span className="font-medium text-gray-300">Payment Status:</span>
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
                       paymentStatus.payment_status === "paid"
@@ -154,15 +154,15 @@ const PaymentDashboard: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <span className="font-medium">Subscription Level:</span>
+                <div className="flex justify-between items-center p-3 bg-gray-700 rounded">
+                  <span className="font-medium text-gray-300">Subscription Level:</span>
                   <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     Tier {paymentStatus.subscription_level}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                  <span className="font-medium">Can Run Profiling:</span>
+                <div className="flex justify-between items-center p-3 bg-gray-700 rounded">
+                  <span className="font-medium text-gray-300">Can Run Profiling:</span>
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
                       paymentStatus.can_run_profiling
@@ -175,60 +175,60 @@ const PaymentDashboard: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-gray-500 text-center py-8">
+              <div className="text-gray-400 text-center py-8">
                 No payment status found for this client
               </div>
             )}
           </div>
 
           {/* Payment Models Info */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-blue-700">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center">
               <span className="text-2xl mr-2">🏗️</span>
               Payment Models Available
             </h2>
 
             <div className="space-y-4">
               <div className="border-l-4 border-blue-500 pl-4">
-                <h3 className="font-semibold text-gray-900">PaymentRecord</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-semibold text-white">PaymentRecord</h3>
+                <p className="text-sm text-gray-300">
                   Complete payment information with amounts, status, dates
                 </p>
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <code className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
                   useGetInvoicesQuery(clientName)
                 </code>
               </div>
 
               <div className="border-l-4 border-green-500 pl-4">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-white">
                   PaymentStatusResponse
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                   Current payment status and subscription level
                 </p>
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <code className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
                   useGetPaymentStatusQuery(clientName)
                 </code>
               </div>
 
               <div className="border-l-4 border-purple-500 pl-4">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-white">
                   StripeCheckoutDto
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                   For creating new payments
                 </p>
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <code className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
                   useCreateCheckoutSessionMutation()
                 </code>
               </div>
 
               <div className="border-l-4 border-orange-500 pl-4">
-                <h3 className="font-semibold text-gray-900">Redux State</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-semibold text-white">Redux State</h3>
+                <p className="text-sm text-gray-300">
                   Payment state management
                 </p>
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <code className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
                   useSelector(state =&gt; state.payments)
                 </code>
               </div>
@@ -237,8 +237,8 @@ const PaymentDashboard: React.FC = () => {
         </div>
 
         {/* Payment History Section */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+        <div className="mt-8 bg-gray-800 rounded-lg shadow-md p-6 border border-blue-700">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center">
             <span className="text-2xl mr-2">📜</span>
             Payment History
           </h2>
@@ -246,45 +246,45 @@ const PaymentDashboard: React.FC = () => {
           {invoicesLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <span className="ml-3">Loading payment history...</span>
+              <span className="ml-3 text-gray-300">Loading payment history...</span>
             </div>
           ) : invoicesError ? (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-800 border border-red-600 text-red-300 px-4 py-3 rounded">
               <p>Error loading payment history</p>
               <p className="text-sm">{String(invoicesError)}</p>
             </div>
           ) : invoices && invoices.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-600">
+                <thead className="bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Payment ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Tier
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Type
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-gray-800 divide-y divide-gray-600">
                   {invoices.map((invoice) => (
-                    <tr key={invoice.payment_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={invoice.payment_id} className="hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {invoice.payment_id}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         ${invoice.total_amount.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -300,13 +300,13 @@ const PaymentDashboard: React.FC = () => {
                           {invoice.payment_status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {new Date(invoice.created_at).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {invoice.tier || "N/A"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 capitalize">
                         {invoice.payment_type || "N/A"}
                       </td>
                     </tr>
@@ -317,10 +317,10 @@ const PaymentDashboard: React.FC = () => {
           ) : (
             <div className="text-center py-8">
               <div className="text-6xl mb-4">💳</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 No payment history found
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-300 mb-4">
                 You haven't made any payments yet.
               </p>
               <Button onClick={() => navigate("/payments")}>
@@ -331,63 +331,63 @@ const PaymentDashboard: React.FC = () => {
         </div>
 
         {/* API Documentation Section */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+        <div className="mt-8 bg-gray-800 rounded-lg shadow-md p-6 border border-blue-700">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center">
             <span className="text-2xl mr-2">📚</span>
             Available API Endpoints
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-semibold text-white mb-2">
                 Frontend Hooks
               </h3>
               <ul className="space-y-1 text-sm">
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     useGetPaymentStatusQuery()
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     useGetInvoicesQuery()
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     useCreateCheckoutSessionMutation()
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     useLazyHandlePaymentSuccessQuery()
                   </code>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-semibold text-white mb-2">
                 Backend Endpoints
               </h3>
               <ul className="space-y-1 text-sm">
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     GET /payments/status/{"{client_name}"}
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     GET /payments/invoices/{"{client_name}"}
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     POST /payments/create-checkout-session
                   </code>
                 </li>
                 <li>
-                  <code className="bg-white px-2 py-1 rounded">
+                  <code className="bg-gray-600 text-gray-300 px-2 py-1 rounded">
                     GET /payments/success?session_id=xxx
                   </code>
                 </li>

@@ -3,20 +3,20 @@ import { useState } from "react";
 import { useCreateRoleMutation } from "../../Redux/api/rolesApi";
 import Button from "../Common/Button";
 import Modal from "../Common/Modal";
+import type { CreateRoleDto } from "../../Redux/slices/rolesSlice";
 
-export default function RoleCreateModal({ 
-  onClose, 
-  isOpen = true 
-}: { 
+export default function RoleCreateModal({
+  onClose,
+  isOpen = true,
+}: {
   onClose: () => void;
   isOpen?: boolean;
 }) {
   const [createRole, { isLoading }] = useCreateRoleMutation();
-  const [fields, setFields] = useState({
-    role_id: "",
+  const [fields, setFields] = useState<CreateRoleDto>({
     name: "",
     description: "",
-    permissions: "",
+    permissions: [],
   });
   const [error, setError] = useState("");
 
@@ -29,19 +29,15 @@ export default function RoleCreateModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!fields.role_id || !fields.name) {
+    if (!fields.name) {
       setError("Role ID and Name are required.");
       return;
     }
     try {
       await createRole({
-        role_id: fields.role_id,
         name: fields.name,
         description: fields.description,
-        permissions: fields.permissions
-          .split(",")
-          .map((p) => p.trim())
-          .filter(Boolean),
+        permissions: fields.permissions,
       }).unwrap();
       onClose();
     } catch (err: unknown) {
@@ -74,36 +70,28 @@ export default function RoleCreateModal({
             </div>
           )}
           <div className="space-y-2">
-          <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-            name="role_id"
-            placeholder="Role ID *"
-            value={fields.role_id}
-            onChange={handleChange}
-            required
-          />
-          <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-            name="name"
-            placeholder="Name *"
-            value={fields.name}
-            onChange={handleChange}
-            required
-          />
-          <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-            name="description"
-            placeholder="Description"
-            value={fields.description}
-            onChange={handleChange}
-          />
-          <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-            name="permissions"
-            placeholder="Permissions (comma-separated)"
-            value={fields.permissions}
-            onChange={handleChange}
-          />
+            <input
+              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              name="name"
+              placeholder="Name *"
+              value={fields.name}
+              onChange={handleChange}
+              required
+            />
+            <input
+              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              name="description"
+              placeholder="Description"
+              value={fields.description}
+              onChange={handleChange}
+            />
+            <input
+              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              name="permissions"
+              placeholder="Permissions (comma-separated)"
+              value={fields.permissions}
+              onChange={handleChange}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button type="submit" loading={isLoading}>
