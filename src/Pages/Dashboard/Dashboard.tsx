@@ -8,6 +8,87 @@ import Navbar from "../../components/Common/Navbar";
 import UnauthenticatedView from "../../components/Dashboard/UnauthenticatedView";
 import PendingApprovalView from "../../components/Dashboard/PendingApprovalView";
 
+const ADMIN_AND_LE_ROUTES = [
+  {
+    label: "Pending Join Requests",
+    path: "/admin/join-requests",
+    roles: ["admin"],
+  },
+  { label: "Invite User", path: "/admin/invite-user", roles: ["admin"] },
+  {
+    label: "Organization List",
+    path: "/orgs",
+    roles: ["admin", "viewer", "runner"],
+  },
+  { label: "Roles", path: "/roles", roles: ["admin", "viewer", "runner"] },
+  {
+    label: "💳 Payment Center",
+    path: "/payments",
+    roles: ["admin", "viewer", "runner"],
+  },
+  {
+    label: "📄 Invoices",
+    path: "/invoices",
+    roles: ["admin", "viewer", "runner"],
+  },
+];
+
+const PLATFORM_ADMIN_ROUTES = [
+  {
+    label: "Platform Dashboard",
+    path: "/platform-admins",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Platform Stats",
+    path: "/platform-admins/stats",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Activity Logs",
+    path: "/platform-admins/activity-logs",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "User Management",
+    path: "/platform-admins/users",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Admin Management",
+    path: "/platform-admins/admins",
+    roles: ["platform_admin"],
+  },
+  {
+    label: "Grant Admin Access",
+    path: "/platform-admins/grant-admin",
+    roles: ["super_admin"],
+  },
+  {
+    label: "Subscription Management",
+    path: "/subscriptions/create",
+    roles: ["platform_admin"],
+  },
+  { label: "Tier Management", path: "/tiers", roles: ["platform_admin"] },
+  { label: "Partner Management", path: "/partners", roles: ["platform_admin"] },
+  {
+    label: "Payment Dashboard",
+    path: "/payment-dashboard",
+    roles: ["platform_admin"],
+  },
+  { label: "Payment Test", path: "/payment-test", roles: ["platform_admin"] },
+];
+
+const USER_ROUTES = [
+  { label: "Organization List", path: "/orgs", roles: ["viewer"] },
+  { label: "Roles", path: "/roles", roles: ["viewer"] },
+  { label: "Tiers", path: "/tiers", roles: ["viewer"] },
+  { label: "Join Org Request", path: "/join-org-request", roles: ["viewer"] },
+  { label: "Profile", path: "/profile", roles: ["viewer"] },
+  { label: "💳 Payment Center", path: "/payments", roles: ["viewer"] },
+  { label: "📄 My Invoices", path: "/invoices", roles: ["viewer"] },
+];
+
 const Dashboard: React.FC = () => {
   const {
     user,
@@ -53,6 +134,43 @@ const Dashboard: React.FC = () => {
     }
   }, [user, hasBothTokens, hydrated, initialLoad, isLoading, navigate]);
 
+  const getAvailableRoutes = () => {
+    if (isPlatformAdmin || isSuperAdmin) {
+      const platformRoutes = PLATFORM_ADMIN_ROUTES.filter((route) => {
+        if (route.roles.includes("super_admin")) {
+          return isSuperAdmin;
+        }
+        return true;
+      });
+      return [
+        ...ADMIN_AND_LE_ROUTES,
+        ...platformRoutes,
+        {
+          label: "Join Org Request",
+          path: "/join-org-request",
+          roles: ["all"],
+        },
+        { label: "Profile", path: "/profile", roles: ["all"] },
+      ];
+    }
+
+    if (isAdmin || isLEAdmin) {
+      return [
+        ...ADMIN_AND_LE_ROUTES,
+        {
+          label: "Join Org Request",
+          path: "/join-org-request",
+          roles: ["all"],
+        },
+        { label: "Profile", path: "/profile", roles: ["all"] },
+      ];
+    }
+
+    return USER_ROUTES;
+  };
+
+  const routes = getAvailableRoutes();
+
   if (initialLoad || (hasAuthToken && isLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary-900 text-white">
@@ -88,9 +206,9 @@ const Dashboard: React.FC = () => {
   const getUserRoleDisplay = () => {
     if (isPlatformAdmin) return "Platform Admin";
     if (isSuperAdmin) return "Super Admin";
-    if (isAdmin) return "Admin";
-    if (isLEAdmin) return "LE Admin";
-    return "User";
+    if (isAdmin) return "Organization Admin";
+    if (isLEAdmin) return "LE Master";
+    return "Organization Viewer";
   };
 
   return (

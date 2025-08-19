@@ -1,5 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+export interface CreateRoleDto {
+  name: string;
+  description?: string;
+  permissions: string[];
+}
+
 export interface RoleConfigDto {
   role_id: string;
   name: string;

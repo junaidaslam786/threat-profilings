@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import type { 
+  CreateRoleDto,
   RoleConfigDto, 
   RoleCreateResponse, 
   RoleDeleteResponse 
@@ -21,15 +22,14 @@ export const rolesApi = createApi({
   }),
   tagTypes: ["Role"],
   endpoints: (builder) => ({
-    createRole: builder.mutation<RoleCreateResponse, RoleConfigDto>({
+    createRole: builder.mutation<RoleCreateResponse, CreateRoleDto>({
       query: (body) => ({
         url: "/roles",
         method: "POST",
         body,
       }),
-      invalidatesTags: (_result, _error, arg) => [
+      invalidatesTags: () => [
         { type: "Role", id: "LIST" },
-        { type: "Role", id: arg.role_id },
       ],
       transformErrorResponse: (response: { status: number; data?: { message?: string } }): string => {
         return response.data?.message || 'Failed to create/update role';

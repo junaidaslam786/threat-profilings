@@ -165,21 +165,21 @@ export const PaymentPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-white mb-4">
             Choose Your Subscription Plan
           </h1>
           {userProfile && (
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-300">
               Welcome,{" "}
               {userProfile.user_info.name || userProfile.user_info.email}
             </p>
           )}
           {paymentProcessed && (
-            <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+            <div className="mt-4 p-4 bg-green-800 border border-green-600 text-green-300 rounded-md">
               ✅ Payment processed successfully! You can now select a new plan
               or manage your subscription.
             </div>
@@ -191,30 +191,30 @@ export const PaymentPage: React.FC = () => {
           {SUBSCRIPTION_PLANS.map((plan) => (
             <div
               key={plan.tier}
-              className={`bg-white rounded-lg shadow-md border-2 transition-all duration-200 cursor-pointer ${
+              className={`bg-gray-800 rounded-lg shadow-md border-2 transition-all duration-200 cursor-pointer ${
                 selectedPlan?.tier === plan.tier
                   ? "border-blue-500 shadow-lg transform scale-105"
-                  : "border-gray-200 hover:border-gray-300 hover:shadow-lg"
+                  : "border-gray-600 hover:border-gray-500 hover:shadow-lg"
               }`}
               onClick={() => handleSelectPlan(plan)}
             >
               <div className="p-6">
                 {/* Plan Header */}
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {plan.name}
                   </h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-1">
+                  <div className="text-3xl font-bold text-blue-400 mb-1">
                     ${plan.price}
                   </div>
-                  <div className="text-sm text-gray-500">per month</div>
-                  <div className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full inline-block mt-2">
+                  <div className="text-sm text-gray-400">per month</div>
+                  <div className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full inline-block mt-2">
                     Tier {plan.tier}
                   </div>
                 </div>
 
                 {/* Plan Description */}
-                <p className="text-gray-600 text-center mb-4 text-sm">
+                <p className="text-gray-300 text-center mb-4 text-sm">
                   {plan.description}
                 </p>
 
@@ -243,7 +243,7 @@ export const PaymentPage: React.FC = () => {
                 {/* Selection Indicator */}
                 {selectedPlan?.tier === plan.tier && (
                   <div className="mt-4 text-center">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white">
                       ✓ Selected
                     </span>
                   </div>
@@ -255,21 +255,21 @@ export const PaymentPage: React.FC = () => {
 
         {/* Payment Section */}
         {selectedPlan && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-blue-700">
+            <h2 className="text-xl font-bold text-white mb-4">
               Payment Summary
             </h2>
 
             <div className="border-l-4 border-blue-500 pl-4 mb-6">
-              <h3 className="font-semibold text-lg text-gray-900">
+              <h3 className="font-semibold text-lg text-white">
                 {selectedPlan.name} Plan
               </h3>
-              <p className="text-gray-600">{selectedPlan.description}</p>
+              <p className="text-gray-300">{selectedPlan.description}</p>
               <div className="mt-2">
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-2xl font-bold text-blue-400">
                   ${selectedPlan.price}
                 </span>
-                <span className="text-gray-500 ml-1">/month</span>
+                <span className="text-gray-400 ml-1">/month</span>
               </div>
             </div>
 
@@ -292,11 +292,11 @@ export const PaymentPage: React.FC = () => {
         )}
 
         {/* Additional Information */}
-        <div className="bg-gray-100 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">
+        <div className="bg-gray-800 rounded-lg p-6 border border-blue-700">
+          <h3 className="font-semibold text-white mb-3">
             Payment Information
           </h3>
-          <ul className="text-sm text-gray-600 space-y-2">
+          <ul className="text-sm text-gray-300 space-y-2">
             <li>• Secure payment processing powered by Stripe</li>
             <li>• Monthly billing cycle</li>
             <li>• Cancel anytime</li>

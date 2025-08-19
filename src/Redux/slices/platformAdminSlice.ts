@@ -190,11 +190,170 @@ export interface ActivityLogsResponse {
   total: number;
 }
 
-export interface CurrentAdminResponse {
+export interface AdminInfo {
   email: string;
   name: string;
+  user_id: string;
+  admin_level: string;
+  platform_admin: boolean;
+  granted_by: string;
+  granted_at: string; // ISO date string
+  last_login: string; // ISO date string
+  created_at: string; // ISO date string
+}
+
+export interface Permissions {
   level: string;
-  permissions: string[];
+  permissions: {
+    view_stats: boolean;
+    view_logs: boolean;
+    view_organizations: boolean;
+    view_users: boolean;
+    view_subscriptions: boolean;
+    export_data: boolean;
+    grant_admin: boolean;
+    revoke_admin: boolean;
+    suspend_users: boolean;
+    activate_users: boolean;
+    manage_partner_codes: boolean;
+    modify_subscriptions: boolean;
+    create_invoices: boolean;
+    delete_users: boolean;
+    delete_organizations: boolean;
+    manage_super_admins: boolean;
+    system_configuration: boolean;
+    emergency_controls: boolean;
+    backup_restore: boolean;
+  };
+  permission_count: number;
+  restrictions: string[];
+}
+
+export interface SystemOverview {
+  total_organizations: number;
+  total_users: number;
+  active_subscriptions: number;
+  monthly_revenue: number;
+  system_uptime: string; // e.g. "0h 34m"
+  error_rate: number;
+}
+
+export interface OrgBreakdown {
+  by_subscription: {
+    L0: number;
+    L1: number;
+    L2: number;
+    LE: number;
+  };
+  by_status: {
+    active: number;
+    suspended: number;
+    pending: number;
+  };
+  by_type: {
+    standard: number;
+    le_master: number;
+    le_client: number;
+  };
+}
+
+export interface RecentOrgActivity {
+  client_name: string;
+  organization_name: string;
+  last_activity: string; // ISO date string
+  subscription_level: string;
+  user_count: number;
+}
+
+export interface ManagedScope {
+  total_managed_orgs: number;
+  org_breakdown: OrgBreakdown;
+  recent_org_activity: RecentOrgActivity[];
+}
+
+export interface RecentActivity {
+  actions_count: number;
+  last_7_days: number;
+  recent_actions: string[];
+}
+
+export interface FeatureAccess {
+  can_delete_users: boolean;
+  can_manage_super_admins: boolean;
+  can_access_system_config: boolean;
+  can_manage_billing_settings: boolean;
+  can_suspend_users: boolean;
+  can_grant_admin_access: boolean;
+  can_manage_partner_codes: boolean;
+  can_modify_subscriptions: boolean;
+  can_access_invoicing: boolean;
+  can_view_statistics: boolean;
+  can_view_activity_logs: boolean;
+  can_view_organizations: boolean;
+  can_export_reports: boolean;
+}
+
+export interface DashboardNavigation {
+  show_user_management: boolean;
+  show_org_management: boolean;
+  show_billing_section: boolean;
+  show_partner_management: boolean;
+  show_system_config: boolean;
+  show_audit_logs: boolean;
+}
+
+export interface DashboardWidgets {
+  system_metrics: boolean;
+  revenue_dashboard: boolean;
+  user_activity: boolean;
+  org_growth: boolean;
+  security_alerts: boolean;
+}
+
+export interface DashboardActions {
+  bulk_user_operations: boolean;
+  emergency_suspend: boolean;
+  manual_billing: boolean;
+  system_maintenance: boolean;
+}
+
+export interface DashboardConfig {
+  navigation: DashboardNavigation;
+  widgets: DashboardWidgets;
+  actions: DashboardActions;
+}
+
+export interface QuickAction {
+  action: string;
+  label: string;
+  category: string;
+}
+
+export interface SessionPermissions {
+  session_level: string;
+  can_elevate: boolean;
+  session_timeout: string;
+  concurrent_sessions: string | number;
+  ip_restrictions: string;
+  mfa_required: boolean;
+}
+
+export interface SessionInfo {
+  login_method: string;
+  session_permissions: SessionPermissions;
+}
+
+export interface CurrentAdminResponse {
+  admin_info: AdminInfo;
+  permissions: Permissions;
+  system_overview: SystemOverview;
+  managed_scope: ManagedScope;
+  recent_activity: RecentActivity;
+  feature_access: FeatureAccess;
+  dashboard_config: DashboardConfig;
+  quick_actions: QuickAction[];
+  alerts: unknown[];
+  session_info: SessionInfo;
 }
 
 interface PlatformAdminState {

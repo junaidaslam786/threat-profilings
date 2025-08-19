@@ -6,22 +6,51 @@ import { useGetActivityLogsQuery } from "../../Redux/api/platformAdminApi";
 import Input from "../../components/Common/InputField"; // Assuming you have a reusable Input component
 import type { ActivityLog } from "../../Redux/slices/platformAdminSlice";
 
+
+// Utility functions for default dates
+const getFirstDayOfMonth = () => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+};
+const getToday = () => {
+  const now = new Date();
+  return now.toISOString().slice(0, 10);
+};
+
 const ActivityLogs: React.FC = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState({
     user_email: "",
     action: "",
-    start_date: "",
-    end_date: "",
+    start_date: getFirstDayOfMonth(),
+    end_date: getToday(),
   });
   const [pagination, setPagination] = useState({ limit: 10, offset: 0 });
+
+  // Always send ISO 8601 strings for start_date and end_date
+  const getISODate = (date: string, isEnd = false) => {
+    if (!date) return "";
+    // If end date, set to end of day
+    if (isEnd) {
+      return new Date(date + "T23:59:59.999Z").toISOString();
+    }
+    // Start of day
+    return new Date(date + "T00:00:00.000Z").toISOString();
+  };
+
+  const apiFilters = {
+    ...filters,
+    start_date: getISODate(filters.start_date),
+    end_date: getISODate(filters.end_date, true),
+    ...pagination,
+  };
 
   const {
     data: activityLogsResponse,
     isLoading,
     error,
     refetch,
-  } = useGetActivityLogsQuery({ ...filters, ...pagination });
+  } = useGetActivityLogsQuery(apiFilters);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -32,11 +61,11 @@ const ActivityLogs: React.FC = () => {
     setFilters({
       user_email: "",
       action: "",
-      start_date: "",
-      end_date: "",
+      start_date: getFirstDayOfMonth(),
+      end_date: getToday(),
     });
     setPagination({ limit: 10, offset: 0 });
-    refetch(); // Refetch data after clearing filters
+    refetch();
   };
 
   const handleNextPage = () => {

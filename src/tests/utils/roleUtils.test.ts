@@ -2,11 +2,15 @@ import { describe, it, expect } from 'vitest';
 import {
   isPlatformAdmin,
   isSuperAdmin,
+  isLEMaster,
+  isOrgAdmin,
+  isOrgViewer,
+  isRunner,
+  hasRequiredRole,
+  // Legacy compatibility
   isLEAdmin,
   isAdmin,
   isViewer,
-  isRunner,
-  hasRequiredRole,
 } from '../../utils/roleUtils';
 
 // Create proper mock data that matches UserMeResponse interface
@@ -137,7 +141,117 @@ describe('roleUtils', () => {
     });
   });
 
-  describe('isLEAdmin', () => {
+  describe('isLEMaster', () => {
+    it('should return false for null user', () => {
+      expect(isLEMaster(null)).toBe(false);
+    });
+
+    it('should return true for user with LE user type', () => {
+      const user = createMockUser({
+        user_info: {
+          ...createMockUser().user_info,
+          user_type: 'LE' as const,
+        },
+      });
+      expect(isLEMaster(user)).toBe(true);
+    });
+
+    it('should return true for user with can_create_le_orgs permission', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          permissions: {
+            ...createMockUser().roles_and_permissions.permissions,
+            can_create_le_orgs: true,
+          },
+        },
+      });
+      expect(isLEMaster(user)).toBe(true);
+    });
+
+    it('should return true for user with le_organization_creation feature access', () => {
+      const user = createMockUser({
+        feature_access: {
+          ...createMockUser().feature_access,
+          le_organization_creation: true,
+        },
+      });
+      expect(isLEMaster(user)).toBe(true);
+    });
+
+    it('should return true for user with is_multi_org_controller permission', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          permissions: {
+            ...createMockUser().roles_and_permissions.permissions,
+            is_multi_org_controller: true,
+          },
+        },
+      });
+      expect(isLEMaster(user)).toBe(true);
+    });
+
+    it('should return false for regular user', () => {
+      const user = createMockUser();
+      expect(isLEMaster(user)).toBe(false);
+    });
+  });
+
+  describe('isOrgAdmin', () => {
+    it('should return false for null user', () => {
+      expect(isOrgAdmin(null)).toBe(false);
+    });
+
+    it('should return true for user with admin role', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'admin' as const,
+        },
+      });
+      expect(isOrgAdmin(user)).toBe(true);
+    });
+
+    it('should return false for user with viewer role', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'viewer' as const,
+        },
+      });
+      expect(isOrgAdmin(user)).toBe(false);
+    });
+  });
+
+  describe('isOrgViewer', () => {
+    it('should return false for null user', () => {
+      expect(isOrgViewer(null)).toBe(false);
+    });
+
+    it('should return true for user with viewer role', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'viewer' as const,
+        },
+      });
+      expect(isOrgViewer(user)).toBe(true);
+    });
+
+    it('should return false for user with admin role', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'admin' as const,
+        },
+      });
+      expect(isOrgViewer(user)).toBe(false);
+    });
+  });
+
+  // Legacy compatibility tests
+  describe('isLEAdmin (legacy)', () => {
     it('should return false for null user', () => {
       expect(isLEAdmin(null)).toBe(false);
     });
@@ -312,6 +426,74 @@ describe('roleUtils', () => {
         },
       });
       expect(hasRequiredRole(user, ['admin', 'viewer'])).toBe(false);
+    });
+
+    it('should return true when user matches new role names', () => {
+      const orgAdmin = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'admin' as const,
+        },
+      });
+      expect(hasRequiredRole(orgAdmin, ['org_admin'])).toBe(true);
+
+      const orgViewer = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'viewer' as const,
+        },
+      });
+      expect(hasRequiredRole(orgViewer, ['org_viewer'])).toBe(true);
+
+      const leMaster = createMockUser({
+        user_info: {
+          ...createMockUser().user_info,
+          user_type: 'LE' as const,
+        },
+      });
+      expect(hasRequiredRole(leMaster, ['le_master'])).toBe(true);
+    });
+
+    it('should handle both legacy and new role names', () => {
+      const adminUser = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          primary_role: 'admin' as const,
+        },
+      });
+      
+      // Should work with both old and new role names
+      expect(hasRequiredRole(adminUser, ['admin'])).toBe(true);
+      expect(hasRequiredRole(adminUser, ['org_admin'])).toBe(true);
+    });
+  });
+});
+
+describe('Permission-based functions', () => {
+  describe('canManageMultipleOrgs', () => {
+    it('should return true for LE Master', () => {
+      const user = createMockUser({
+        user_info: {
+          ...createMockUser().user_info,
+          user_type: 'LE' as const,
+        },
+      });
+      expect(isLEMaster(user)).toBe(true);
+    });
+  });
+
+  describe('canAccessPlatformAdmin', () => {
+    it('should return true for Platform Admin', () => {
+      const user = createMockUser({
+        roles_and_permissions: {
+          ...createMockUser().roles_and_permissions,
+          permissions: {
+            ...createMockUser().roles_and_permissions.permissions,
+            can_access_platform_admin: true,
+          },
+        },
+      });
+      expect(isPlatformAdmin(user)).toBe(true);
     });
   });
 });
