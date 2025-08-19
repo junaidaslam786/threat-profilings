@@ -1,6 +1,10 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/Auth/ProtectedRoute";
+import TaxRules from "../Pages/PlatformAdmins/TaxRules";
+import PartnerManagement from "../Pages/PlatformAdmins/PartnerManagement";
+import Invoices from "../Pages/PlatformAdmins/Invoices";
+import ManualUpgrades from "../Pages/PlatformAdmins/ManualUpgrades";
 const LoadingScreen = lazy(() => import("../components/Common/LoadingScreen"));
 
 // Auth Pages

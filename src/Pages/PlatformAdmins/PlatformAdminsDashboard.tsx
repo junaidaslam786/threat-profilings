@@ -5,15 +5,7 @@ import {
   useGetCurrentAdminQuery,
   useGetPlatformStatsQuery,
 } from "../../Redux/api/platformAdminApi";
-import { performLogout } from "../../utils/cookieHelpers";
-
-const PLATFORM_ADMIN_ROUTES = [
-  { label: "Platform Statistics", path: "/platform-admins/stats" },
-  { label: "Activity Logs", path: "/platform-admins/activity-logs" },
-  { label: "Admin Management", path: "/platform-admins/admins" },
-  { label: "User Management", path: "/platform-admins/users" },
-  { label: "Grant Admin Access", path: "/platform-admins/grant-admin" },
-];
+import LoadingScreen from "../../components/Common/LoadingScreen";
 
 const PlatformAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -113,66 +105,69 @@ const PlatformAdminDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-bold text-blue-400">
-          Platform Admin Dashboard - {currentAdmin.level.toUpperCase()}
-        </h1>
-        <div className="flex gap-4">
-          <Button
-            onClick={() => navigate("/dashboard")}
-            className="bg-gray-600 hover:bg-gray-700 px-6 py-2"
-          >
-            Back to Dashboard
-          </Button>
-          <Button
-            onClick={handleSignOut}
-            className="bg-red-600 hover:bg-red-700 px-6 py-2"
-          >
-            Sign Out
-          </Button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
+      <Navbar />
 
-      {/* Admin Profile Card */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 mb-10">
-        <h3 className="text-2xl font-semibold mb-3 text-blue-300">
-          Platform Admin Profile
-        </h3>
-        <div className="mb-1">
-          <b>Name:</b> {currentAdmin.name}
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="mb-8">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
+            Platform Administration
+          </h1>
+          <p className="text-secondary-300 text-lg">
+            Manage platform operations, users, and system settings
+          </p>
         </div>
-        <div className="mb-1">
-          <b>Email:</b> {currentAdmin.email}
-        </div>
-        <div className="mb-1">
-          <b>Admin Level:</b>
-          <span
-            className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-              currentAdmin.level === "super"
-                ? "bg-purple-600 text-white"
-                : currentAdmin.level === "admin"
-                ? "bg-blue-600 text-white"
-                : "bg-green-600 text-white"
-            }`}
-          >
-            {currentAdmin.level.toUpperCase()}
-          </span>
-        </div>
-        <div className="mb-1">
-          <b>Permissions:</b>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {currentAdmin.permissions.map((permission) => (
-              <span
-                key={permission}
-                className="bg-gray-700 text-blue-300 px-2 py-1 rounded text-sm"
-              >
-                {permission.replace(/_/g, " ")}
-              </span>
-            ))}
+
+        {/* Admin Profile Card */}
+        <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-8 border border-secondary-700/50 mb-8">
+          <div className="flex items-center space-x-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+              {(currentAdmin?.admin_info.name || "A").charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {currentAdmin?.admin_info.name || "Platform Admin"}
+              </h3>
+              <p className="text-secondary-300 mb-3">
+                {currentAdmin?.admin_info.email || "admin@platform.com"}
+              </p>
+              <div className="flex items-center space-x-3">
+                <span
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    currentAdmin?.admin_info.admin_level === "super"
+                      ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                      : "bg-primary-500/20 text-primary-400 border border-primary-500/30"
+                  }`}
+                >
+                  {currentAdmin?.admin_info.admin_level?.toUpperCase() ||
+                    "ADMIN"}{" "}
+                  LEVEL
+                </span>
+                <span className="px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium border border-green-500/30">
+                  Active
+                </span>
+              </div>
+            </div>
           </div>
+          {currentAdmin?.permissions &&
+            Array.isArray(currentAdmin.permissions) && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-secondary-400 mb-3">
+                  Permissions
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {currentAdmin.permissions.map((permission) => (
+                    <span
+                      key={permission}
+                      className="px-3 py-1 bg-tertiary-600/20 text-tertiary-300 rounded-full text-sm border border-tertiary-500/30"
+                    >
+                      {permission.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
-      </div>
 
         {/* Platform Statistics */}
         {!statsLoading && platformStats && (
@@ -347,30 +342,143 @@ const PlatformAdminDashboard: React.FC = () => {
           </div>
         </div>
 
-      {/* Quick Actions */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-yellow-700 mt-10">
-        <h3 className="text-2xl font-semibold mb-5 text-yellow-400">
-          Quick Actions
-        </h3>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Button
-            onClick={() => navigate("/platform-admins/grant-admin")}
-            className="bg-green-600 hover:bg-green-700 w-full py-3"
-          >
-            Grant Admin Access
-          </Button>
-          <Button
-            onClick={() => navigate("/platform-admins/users?action=suspend")}
-            className="bg-orange-600 hover:bg-orange-700 w-full py-3"
-          >
-            Suspend User
-          </Button>
-          <Button
-            onClick={() => navigate("/platform-admins/activity-logs")}
-            className="bg-purple-600 hover:bg-purple-700 w-full py-3"
-          >
-            View Recent Activity
-          </Button>
+        {/* Quick Actions */}
+        <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-8 border border-secondary-700/50">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full"></div>
+            <h3 className="text-2xl font-bold text-white">Quick Actions</h3>
+          </div>
+          <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+            <button
+              onClick={() => navigate("/platform-admins/users")}
+              className="group p-6 bg-gradient-to-br from-orange-600/20 to-orange-700/20 rounded-xl border border-orange-500/30 hover:border-orange-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/20 cursor-pointer"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18 21l-5.197-5.197m0 0L5.636 5.636M13.803 15.803L18 21"
+                    />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-lg font-semibold text-white">
+                    Manage Users
+                  </h4>
+                  <p className="text-sm text-secondary-400">
+                    Suspend or activate users
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigate("/platform-admins/partners")}
+              className="group p-6 bg-gradient-to-br from-blue-600/20 to-blue-700/20 rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"
+                    />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-lg font-semibold text-white">
+                    Manage Partners
+                  </h4>
+                  <p className="text-sm text-secondary-400">
+                    Handle business partnerships
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigate("/platform-admins/partner-codes")}
+              className="group p-6 bg-gradient-to-br from-teal-600/20 to-teal-700/20 rounded-xl border border-teal-500/30 hover:border-teal-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-teal-500/20 cursor-pointer"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-lg font-semibold text-white">
+                    Partner Codes
+                  </h4>
+                  <p className="text-sm text-secondary-400">
+                    Manage discount codes
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigate("/platform-admins/activity-logs")}
+              className="group p-6 bg-gradient-to-br from-purple-600/20 to-purple-700/20 rounded-xl border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 cursor-pointer"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-lg font-semibold text-white">
+                    View Activity
+                  </h4>
+                  <p className="text-sm text-secondary-400">
+                    Monitor recent actions
+                  </p>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
