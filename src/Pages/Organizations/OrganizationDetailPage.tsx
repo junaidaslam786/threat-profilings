@@ -1,48 +1,50 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useGetOrgQuery, useUpdateOrgMutation } from "../../Redux/api/organizationsApi";
+import {
+  useGetOrgQuery,
+  useUpdateOrgMutation,
+} from "../../Redux/api/organizationsApi";
 import Button from "../../components/Common/Button";
-import type { ClientDataDto } from "../../Redux/slices/organizationsSlice";
+import type {
+  ClientDataDto,
+  UpdateOrgDto,
+} from "../../Redux/slices/organizationsSlice";
 
 export default function OrganizationDetailPage() {
   const { client_name } = useParams<{ client_name: string }>();
-  const { data: orgData, isLoading, error, refetch } = useGetOrgQuery(client_name!, {
-    skip: !client_name
+  const {
+    data: orgData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetOrgQuery(client_name!, {
+    skip: !client_name,
   });
 
   // Helper function to extract the actual organization data
   const getOrgData = (data: typeof orgData): ClientDataDto | null => {
     if (!data) return null;
-    
+
     // Check if it's a complex object with managed_org
-    if ('managed_org' in data && data.managed_org) {
+    if ("managed_org" in data && data.managed_org) {
       return data.managed_org;
     }
-    
+
     // Check if it's a direct ClientDataDto
-    if ('client_name' in data && 'organization_name' in data) {
+    if ("client_name" in data && "organization_name" in data) {
       return data as ClientDataDto;
     }
-    
+
     return null;
   };
 
   const org = getOrgData(orgData);
 
   const [editing, setEditing] = useState(false);
-  type OrgFields = {
-    sector: string;
-    websiteUrl: string;
-    countriesOfOperation: string;
-    homeUrl: string;
-    aboutUsUrl: string;
-    additionalDetails: string;
-  };
-
-  const [fields, setFields] = useState<OrgFields>({
+  const [fields, setFields] = useState<UpdateOrgDto>({
     sector: "",
     websiteUrl: "",
-    countriesOfOperation: "",
+    countriesOfOperation: [],
     homeUrl: "",
     aboutUsUrl: "",
     additionalDetails: "",
@@ -67,7 +69,7 @@ export default function OrganizationDetailPage() {
     setFields({
       sector: org.sector || "",
       websiteUrl: org.website_url || "",
-      countriesOfOperation: (org.countries_of_operation || []).join(", "),
+      countriesOfOperation: org.countries_of_operation || [],
       homeUrl: org.home_url || "",
       aboutUsUrl: org.about_us_url || "",
       additionalDetails: org.additional_details || "",
@@ -79,26 +81,31 @@ export default function OrganizationDetailPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFields((prev: OrgFields) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFields((prev: UpdateOrgDto) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrMsg("");
     try {
+      const payload = Object.entries(fields).reduce((acc, [key, value]) => {
+        if (
+          value !== "" &&
+          value !== null &&
+          value !== undefined &&
+          !(Array.isArray(value) && value.length === 0)
+        ) {
+          acc[key as keyof UpdateOrgDto] = value;
+        }
+        return acc;
+      }, {} as Partial<UpdateOrgDto>);
+
       await updateOrg({
         clientName: org.client_name,
-        body: {
-          sector: fields.sector,
-          websiteUrl: fields.websiteUrl,
-          countriesOfOperation: fields.countriesOfOperation
-            .split(",")
-            .map((c: string) => c.trim())
-            .filter(Boolean),
-          homeUrl: fields.homeUrl,
-          aboutUsUrl: fields.aboutUsUrl,
-          additionalDetails: fields.additionalDetails,
-        },
+        body: payload,
       }).unwrap();
       setEditing(false);
       refetch();

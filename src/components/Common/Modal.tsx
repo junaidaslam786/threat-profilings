@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface ModalProps {
   show: boolean;
@@ -9,6 +9,24 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ show, onClose, children, className = "", size = "lg" }) => {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (show) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [show, onClose]);
+
   if (!show) return null;
 
   const sizeClasses = {
@@ -20,16 +38,23 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children, className = "", 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className={`bg-gray-800 rounded-lg shadow-xl p-6 w-full ${sizeClasses[size]} mx-auto border border-blue-700 relative ${className}`}>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div 
+        className={`bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-2xl p-6 w-full ${sizeClasses[size]} mx-auto border border-secondary-700/50 relative animate-in zoom-in-95 duration-200 ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-200 text-2xl"
+          className="absolute top-4 right-4 p-2 text-secondary-400 hover:text-white hover:bg-secondary-700/50 rounded-lg transition-all duration-200 cursor-pointer"
           aria-label="Close modal"
         >
-          ✕
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
-        {children}
+        <div className="text-white">
+          {children}
+        </div>
       </div>
     </div>
   );

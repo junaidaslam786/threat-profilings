@@ -63,37 +63,25 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
       !fields.price_monthly ||
       !fields.price_onetime_registration
     ) {
-      setError(
-        "Please fill all required fields (sub_level, name, max_edits, max_apps, allowed_tabs, run_quota, price_monthly, price_onetime_registration)."
-      );
+      setError("Please fill all required fields.");
       return;
     }
     try {
       const complianceFrameworksArray = fields.compliance_frameworks
-        ? fields.compliance_frameworks
-            .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item)
+        ? fields.compliance_frameworks.split(",").map(item => item.trim()).filter(item => item)
         : [];
 
       await createTier({
         sub_level: fields.sub_level,
         name: fields.name,
-        description: fields.description,
-        max_edits: Number(fields.max_edits),
-        max_apps: Number(fields.max_apps),
-        allowed_tabs: fields.allowed_tabs
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-        run_quota: Number(fields.run_quota),
-        price_monthly: Number(fields.price_monthly),
-        price_onetime_registration: Number(fields.price_onetime_registration),
+        description: fields.description || undefined,
+        max_edits: parseInt(fields.max_edits),
+        max_apps: parseInt(fields.max_apps),
+        allowed_tabs: fields.allowed_tabs.split(",").map(tab => tab.trim()).filter(tab => tab),
+        run_quota: parseInt(fields.run_quota),
+        price_monthly: parseFloat(fields.price_monthly),
+        price_onetime_registration: parseFloat(fields.price_onetime_registration),
         features: {
-          max_users: Number(fields.max_users) || undefined,
-          storage_limit_gb: Number(fields.storage_limit_gb) || undefined,
-          discount_percent: Number(fields.discount_percent) || undefined,
-          promotion_code: fields.promotion_code || undefined,
           threat_detection: fields.threat_detection,
           compliance_reports: fields.compliance_reports,
           api_access: fields.api_access,
@@ -102,12 +90,16 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
           sso_integration: fields.sso_integration,
           audit_logs: fields.audit_logs,
           data_export: fields.data_export,
-          is_active: fields.is_active,
-          le_eligible: fields.le_eligible,
           compliance_frameworks: complianceFrameworksArray,
+          is_active: fields.is_active,
+          discount_percent: fields.discount_percent ? parseFloat(fields.discount_percent) : undefined,
+          promotion_code: fields.promotion_code || undefined,
+          max_users: fields.max_users ? parseInt(fields.max_users) : undefined,
+          storage_limit_gb: fields.storage_limit_gb ? parseFloat(fields.storage_limit_gb) : undefined,
+          le_eligible: fields.le_eligible,
         },
       }).unwrap();
-      setSuccess("Tier created!");
+      setSuccess("Tier created successfully!");
       setFields({
         sub_level: "",
         name: "",
@@ -136,260 +128,274 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
       });
       onSuccess?.();
     } catch (err: unknown) {
-      if (
-        typeof err === "object" &&
-        err !== null &&
-        "data" in err &&
-        typeof (err as { data?: unknown }).data === "object" &&
-        (err as { data?: unknown }).data !== null &&
-        "message" in (err as { data: { message?: string } }).data
-      ) {
-        setError(
-          (err as { data: { message?: string } }).data?.message ||
-            "Failed to create tier."
-        );
+      if (typeof err === 'object' && err !== null && 'message' in err) {
+        setError((err as { message: string }).message);
       } else {
-        setError("Failed to create tier.");
+        setError("Failed to create tier");
       }
     }
   };
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-gray-900 border border-blue-700 p-6 rounded-xl shadow-lg mb-8"
-    >
-      <h2 className="text-xl font-bold text-blue-300 mb-4">Create Tier</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="sub_level"
-          placeholder="Sub Level (L0, L1, ...)"
-          value={fields.sub_level}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="name"
-          placeholder="Name"
-          value={fields.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="max_edits"
-          type="number"
-          placeholder="Max Edits"
-          value={fields.max_edits}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="max_apps"
-          type="number"
-          placeholder="Max Apps"
-          value={fields.max_apps}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="allowed_tabs"
-          placeholder="Allowed Tabs (comma-separated)"
-          value={fields.allowed_tabs}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="run_quota"
-          type="number"
-          placeholder="Run Quota"
-          value={fields.run_quota}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="price_monthly"
-          type="number"
-          placeholder="Monthly Price"
-          value={fields.price_monthly}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="price_onetime_registration"
-          type="number"
-          placeholder="One-time Registration Price"
-          value={fields.price_onetime_registration}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="max_users"
-          type="number"
-          placeholder="Max Users (optional)"
-          value={fields.max_users}
-          onChange={handleChange}
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="storage_limit_gb"
-          type="number"
-          placeholder="Storage Limit (GB, optional)"
-          value={fields.storage_limit_gb}
-          onChange={handleChange}
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="discount_percent"
-          type="number"
-          placeholder="Discount Percent (optional)"
-          value={fields.discount_percent}
-          onChange={handleChange}
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="promotion_code"
-          placeholder="Promotion Code (optional)"
-          value={fields.promotion_code}
-          onChange={handleChange}
-        />
-        <input
-          className="p-2 rounded bg-gray-800 border border-blue-900"
-          name="compliance_frameworks"
-          placeholder="Compliance Frameworks (comma-separated)"
-          value={fields.compliance_frameworks}
-          onChange={handleChange}
-        />
-        <textarea
-          className="col-span-1 md:col-span-2 p-2 rounded bg-gray-800 border border-blue-900"
-          name="description"
-          placeholder="Description"
-          value={fields.description}
-          onChange={handleChange}
-        />
-      </div>
+  const inputClasses = "w-full px-3 py-2 bg-secondary-800 border border-secondary-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary-500";
+  const labelClasses = "block text-sm font-medium text-secondary-300 mb-2";
 
-      {/* Feature Checkboxes */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-blue-300 mb-4">Features</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="threat_detection"
-              checked={fields.threat_detection}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Threat Detection</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="compliance_reports"
-              checked={fields.compliance_reports}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Compliance Reports</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="api_access"
-              checked={fields.api_access}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>API Access</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="custom_branding"
-              checked={fields.custom_branding}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Custom Branding</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="priority_support"
-              checked={fields.priority_support}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Priority Support</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="sso_integration"
-              checked={fields.sso_integration}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>SSO Integration</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="audit_logs"
-              checked={fields.audit_logs}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Audit Logs</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="data_export"
-              checked={fields.data_export}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Data Export</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="is_active"
-              checked={fields.is_active}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>Is Active</span>
-          </label>
-          <label className="flex items-center space-x-2 text-gray-300">
-            <input
-              type="checkbox"
-              name="le_eligible"
-              checked={fields.le_eligible}
-              onChange={handleChange}
-              className="rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-            />
-            <span>LE Eligible</span>
-          </label>
+  return (
+    <div className="bg-secondary-800 rounded-lg p-6 border border-primary-600 mb-8">
+      <h2 className="text-xl font-bold text-primary-300 mb-6">Create New Tier</h2>
+      
+      {error && (
+        <div className="bg-danger-600 text-white px-4 py-3 rounded mb-4">
+          {error}
         </div>
-      </div>
-      {error && <div className="text-red-400 mt-2">{error}</div>}
-      {success && <div className="text-green-400 mt-2">{success}</div>}
-      <div className="flex gap-2 mt-6">
-        <Button type="submit" loading={isLoading}>
-          Create
-        </Button>
-      </div>
-    </form>
+      )}
+      
+      {success && (
+        <div className="bg-success-600 text-white px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="bg-secondary-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">Basic Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClasses}>Tier Level *</label>
+              <input
+                type="text"
+                name="sub_level"
+                value={fields.sub_level}
+                onChange={handleChange}
+                placeholder="L0, L1, L2, L3, LE"
+                className={inputClasses}
+                required
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>Tier Name *</label>
+              <input
+                type="text"
+                name="name"
+                value={fields.name}
+                onChange={handleChange}
+                placeholder="Basic, Pro, Enterprise"
+                className={inputClasses}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <label className={labelClasses}>Description</label>
+            <textarea
+              name="description"
+              value={fields.description}
+              onChange={handleChange}
+              placeholder="Describe this tier's purpose and benefits"
+              rows={3}
+              className={inputClasses}
+            />
+          </div>
+        </div>
+
+        {/* Limits and Quotas */}
+        <div className="bg-secondary-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">Limits & Quotas</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className={labelClasses}>Max Edits *</label>
+              <input
+                type="number"
+                name="max_edits"
+                value={fields.max_edits}
+                onChange={handleChange}
+                placeholder="10"
+                className={inputClasses}
+                required
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>Max Apps *</label>
+              <input
+                type="number"
+                name="max_apps"
+                value={fields.max_apps}
+                onChange={handleChange}
+                placeholder="5"
+                className={inputClasses}
+                required
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>Run Quota *</label>
+              <input
+                type="number"
+                name="run_quota"
+                value={fields.run_quota}
+                onChange={handleChange}
+                placeholder="100"
+                className={inputClasses}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label className={labelClasses}>Max Users</label>
+              <input
+                type="number"
+                name="max_users"
+                value={fields.max_users}
+                onChange={handleChange}
+                placeholder="Unlimited if not set"
+                className={inputClasses}
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>Storage Limit (GB)</label>
+              <input
+                type="number"
+                step="0.1"
+                name="storage_limit_gb"
+                value={fields.storage_limit_gb}
+                onChange={handleChange}
+                placeholder="10.5"
+                className={inputClasses}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <label className={labelClasses}>Allowed Tabs *</label>
+            <input
+              type="text"
+              name="allowed_tabs"
+              value={fields.allowed_tabs}
+              onChange={handleChange}
+              placeholder="dashboard,reports,settings (comma-separated)"
+              className={inputClasses}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Pricing */}
+        <div className="bg-secondary-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">Pricing</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClasses}>Monthly Price *</label>
+              <input
+                type="number"
+                step="0.01"
+                name="price_monthly"
+                value={fields.price_monthly}
+                onChange={handleChange}
+                placeholder="29.99"
+                className={inputClasses}
+                required
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>One-time Registration Price *</label>
+              <input
+                type="number"
+                step="0.01"
+                name="price_onetime_registration"
+                value={fields.price_onetime_registration}
+                onChange={handleChange}
+                placeholder="0.00"
+                className={inputClasses}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label className={labelClasses}>Discount Percent</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                name="discount_percent"
+                value={fields.discount_percent}
+                onChange={handleChange}
+                placeholder="10.00"
+                className={inputClasses}
+              />
+            </div>
+            
+            <div>
+              <label className={labelClasses}>Promotion Code</label>
+              <input
+                type="text"
+                name="promotion_code"
+                value={fields.promotion_code}
+                onChange={handleChange}
+                placeholder="SAVE20"
+                className={inputClasses}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="bg-secondary-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">Features</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { key: 'threat_detection', label: 'Threat Detection' },
+              { key: 'compliance_reports', label: 'Compliance Reports' },
+              { key: 'api_access', label: 'API Access' },
+              { key: 'custom_branding', label: 'Custom Branding' },
+              { key: 'priority_support', label: 'Priority Support' },
+              { key: 'sso_integration', label: 'SSO Integration' },
+              { key: 'audit_logs', label: 'Audit Logs' },
+              { key: 'data_export', label: 'Data Export' },
+              { key: 'is_active', label: 'Active' },
+              { key: 'le_eligible', label: 'LE Eligible' },
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name={key}
+                  checked={fields[key as keyof typeof fields] as boolean}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-primary-600 bg-secondary-700 border-secondary-600 rounded focus:ring-primary-500"
+                />
+                <span className="text-secondary-300">{label}</span>
+              </label>
+            ))}
+          </div>
+          
+          <div className="mt-4">
+            <label className={labelClasses}>Compliance Frameworks</label>
+            <input
+              type="text"
+              name="compliance_frameworks"
+              value={fields.compliance_frameworks}
+              onChange={handleChange}
+              placeholder="ISM,NIST,ISO27001,SOC2,GDPR,E8,ACSC_ESSENTIAL_EIGHT (comma-separated)"
+              className={inputClasses}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <Button type="submit" disabled={isLoading} className="bg-primary-600 hover:bg-primary-700">
+            {isLoading ? "Creating..." : "Create Tier"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

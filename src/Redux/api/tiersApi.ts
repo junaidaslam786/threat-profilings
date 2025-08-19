@@ -35,7 +35,6 @@ export const tiersApi = createApi({
         return response.data?.message || 'Failed to create/update tier';
       },
     }),
-
     getTiers: builder.query<TierConfigDto[], void>({
       query: () => "/tiers",
       providesTags: (result) => [
@@ -54,6 +53,21 @@ export const tiersApi = createApi({
       ],
       transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
         return response.data?.message || 'Failed to fetch tier';
+      },
+    }),
+
+    updateTier: builder.mutation<TierCreateResponse, { sub_level: string } & Partial<TierConfigDto>>({
+      query: ({ sub_level, ...body }) => ({
+        url: `/tiers/${encodeURIComponent(sub_level)}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Tier", id: "LIST" },
+        { type: "Tier", id: arg.sub_level },
+      ],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to update tier';
       },
     }),
 
@@ -77,6 +91,7 @@ export const {
   useCreateTierMutation,
   useGetTiersQuery,
   useGetTierQuery,
+  useUpdateTierMutation,
   useDeleteTierMutation,
   useLazyGetTierQuery,
   useLazyGetTiersQuery,

@@ -16,7 +16,8 @@ interface Tier {
 interface TierListProps {
   tiers: Tier[];
   onViewTier: (subLevel: string) => void;
-  onDeleteTier: (subLevel: string) => void;
+  onEditTier?: (tier: Tier) => void;
+  onDeleteTier?: (subLevel: string) => void;
   isDeleting: boolean;
   deleteTarget: string | null;
 }
@@ -24,18 +25,20 @@ interface TierListProps {
 const TierList: React.FC<TierListProps> = ({
   tiers,
   onViewTier,
+  onEditTier,
   onDeleteTier,
   isDeleting,
   deleteTarget
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
       {tiers.map((tier) => (
         <TierCard
           key={tier.sub_level}
           tier={tier}
           onView={onViewTier}
-          onDelete={onDeleteTier}
+          onEdit={onEditTier}
+          onDelete={onDeleteTier || (() => {})}
           isDeleting={isDeleting}
           deleteTarget={deleteTarget}
         />

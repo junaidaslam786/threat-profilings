@@ -6,9 +6,7 @@ import ProtectedRoute from "../../components/Auth/ProtectedRoute";
 import EnhancedOrganizationModal from "../Organizations/EnhancedOrganizationModal";
 import ThreatProfilingReportModal from "../Organizations/ThreatProfilingReportModal";
 import SecurityAssessmentModal from "../Organizations/SecurityAssessmentModal";
-import EnhancedPartnerCodeModal from "../Partners/EnhancedPartnerCodeModal";
-import EnhancedSubscriptionModal from "../Subscriptions/EnhancedSubscriptionModal";
-import EnhancedUserCreationModal from "../PlatformAdmins/EnhancedUserCreationModal";
+// Enhanced modals removed - using default enhanced versions
 
 export default function EnhancedComponentsDashboard() {
   const navigate = useNavigate();
@@ -18,9 +16,7 @@ export default function EnhancedComponentsDashboard() {
   const [showOrgModal, setShowOrgModal] = useState(false);
   const [showThreatModal, setShowThreatModal] = useState(false);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
-  const [showPartnerModal, setShowPartnerModal] = useState(false);
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
+
 
   const getAvailableComponents = () => {
     const baseComponents = [
@@ -51,28 +47,28 @@ export default function EnhancedComponentsDashboard() {
       {
         title: "Enhanced Partner Code Management",
         description: "Advanced partner code creation with usage tracking and validation rules",
-        action: () => setShowPartnerModal(true),
+        action: () => navigate('/partners'),
         buttonText: "Manage Partner Codes",
         requiredRole: ["platform_admin"]
       },
       {
         title: "Enhanced Subscription Management",
         description: "Complete subscription management with billing information and custom limits",
-        action: () => setShowSubscriptionModal(true),
+        action: () => navigate('/subscriptions/create'),
         buttonText: "Create Subscription",
         requiredRole: ["platform_admin"]
       },
       {
         title: "Enhanced User Creation",
         description: "Comprehensive user account creation with profile details and security settings",
-        action: () => setShowUserModal(true),
+        action: () => navigate('/platform-admins/users'),
         buttonText: "Create User Account",
         requiredRole: ["platform_admin"]
       },
       {
         title: "Enhanced Tier Management",
         description: "Advanced tier configuration with comprehensive feature settings",
-        action: () => navigate("/tiers/create"),
+        action: () => navigate("/tiers"),
         buttonText: "Create Enhanced Tier",
         requiredRole: ["platform_admin"]
       }
@@ -166,24 +162,7 @@ export default function EnhancedComponentsDashboard() {
         }}
       />
 
-      <EnhancedPartnerCodeModal
-        isOpen={showPartnerModal}
-        onClose={() => setShowPartnerModal(false)}
-      />
-
-      <EnhancedSubscriptionModal
-        isOpen={showSubscriptionModal}
-        onClose={() => setShowSubscriptionModal(false)}
-      />
-
-      <EnhancedUserCreationModal
-        isOpen={showUserModal}
-        onClose={() => setShowUserModal(false)}
-        onSuccess={() => {
-          console.log("User created successfully");
-          setShowUserModal(false);
-        }}
-      />
+      {/* Enhanced modals removed - using default enhanced versions */}
       </div>
     </ProtectedRoute>
   );

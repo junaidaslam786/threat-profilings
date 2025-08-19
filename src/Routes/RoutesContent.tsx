@@ -11,7 +11,9 @@ const AdminLogin = lazy(() => import("../Pages/Admin/AdminLogin"));
 
 // Dashboard
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
-const EnhancedComponentsDashboard = lazy(() => import("../Pages/Dashboard/EnhancedComponentsDashboard"));
+const EnhancedComponentsDashboard = lazy(
+  () => import("../Pages/Dashboard/EnhancedComponentsDashboard")
+);
 
 // Admin-specific Pages (non-platform admin)
 const AdminPendingJoinRequests = lazy(
@@ -25,6 +27,27 @@ const OrganizationListPage = lazy(
 );
 const OrganizationDetailPage = lazy(
   () => import("../Pages/Organizations/OrganizationDetailPage")
+);
+const OrganizationEditPage = lazy(
+  () => import("../Pages/Organizations/OrganizationEditPage")
+);
+const OrganizationSettingsPage = lazy(
+  () => import("../Pages/Organizations/OrganizationSettingsPage")
+);
+const SecurityAssessmentPage = lazy(
+  () => import("../Pages/Organizations/SecurityAssessmentPage")
+);
+const VulnerabilityScanPage = lazy(
+  () => import("../Pages/Organizations/VulnerabilityScanPage")
+);
+const ThreatReportsPage = lazy(
+  () => import("../Pages/Organizations/ThreatReportsPage")
+);
+const OrganizationAnalyticsPage = lazy(
+  () => import("../Pages/Organizations/OrganizationAnalyticsPage")
+);
+const ComplianceReportsPage = lazy(
+  () => import("../Pages/Organizations/ComplianceReportsPage")
 );
 
 // Role Pages
@@ -42,7 +65,7 @@ const SubscriptionCreate = lazy(
 // Tier Pages
 const TierListPage = lazy(() => import("../Pages/Tiers/TierListPage"));
 const TierDetailPage = lazy(() => import("../Pages/Tiers/TierDetailPage"));
-const TierCreateEnhanced = lazy(() => import("../Pages/Tiers/TierCreateEnhanced"));
+// TierCreateEnhanced removed - using default enhanced TierCreate
 
 // User Pages
 const RegisterPage = lazy(() => import("../Pages/Users/RegisterPage"));
@@ -58,9 +81,7 @@ const PlatformAdminDashboard = lazy(
 const PlatformStats = lazy(
   () => import("../Pages/PlatformAdmins/PlatformStats")
 );
-const ActivityLogs = lazy(
-  () => import("../Pages/PlatformAdmins/ActivityLogs")
-);
+const ActivityLogs = lazy(() => import("../Pages/PlatformAdmins/ActivityLogs"));
 const AdminManagement = lazy(
   () => import("../Pages/PlatformAdmins/AdminManagement")
 );
@@ -70,6 +91,9 @@ const UserManagement = lazy(
 const GrantAdminAccess = lazy(
   () => import("../Pages/PlatformAdmins/GrantAdminAccess")
 );
+const PartnerManagement = lazy(
+  () => import("../Pages/PlatformAdmins/PartnerManagement")
+);
 
 // Partner Pages
 const PartnerCodeListPage = lazy(
@@ -77,9 +101,6 @@ const PartnerCodeListPage = lazy(
 );
 const PartnerCodeCreatePage = lazy(
   () => import("../Pages/Partners/PartnerCodeCreatePage")
-);
-const PartnerCodeDetailPage = lazy(
-  () => import("../Pages/Partners/PartnerCodeDetailPage")
 );
 const PartnerCodeEditPage = lazy(
   () => import("../Pages/Partners/PartnerCodeEditPage")
@@ -90,12 +111,19 @@ const PartnerCodeStatsPage = lazy(
 
 // Payments Pages
 const PaymentPage = lazy(() => import("../Pages/Payments/PaymentPage"));
-const PaymentDashboard = lazy(() => import("../Pages/Payments/PaymentDashboard"));
+const PaymentDashboard = lazy(
+  () => import("../Pages/Payments/PaymentDashboard")
+);
 const PaymentTestPage = lazy(() => import("../Pages/Payments/PaymentTestPage"));
 const InvoicesPage = lazy(() => import("../Pages/Payments/InvoicesPage"));
-const PaymentSuccessPage = lazy(() => import("../Pages/Payments/PaymentSuccessPage"));
-const PaymentCancelledPage = lazy(() => import("../Pages/Payments/PaymentCancelledPage"));
-
+const PaymentSuccessPage = lazy(
+  () => import("../Pages/Payments/PaymentSuccessPage")
+);
+const PaymentCancelledPage = lazy(
+  () => import("../Pages/Payments/PaymentCancelledPage")
+);
+const SettingsPage = lazy(() => import("../Pages/Settings/SettingsPage"));
+const AnalyticsPage = lazy(() => import("../Pages/Analytics/AnalyticsPage"));
 
 const RoutesContent: React.FC = () => {
   return (
@@ -114,37 +142,37 @@ const RoutesContent: React.FC = () => {
         />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/user/organization/create" element={<RegisterPage />} />
-        
+
         {/* Dashboard route - handles its own auth logic */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        
+
         {/* Protected routes that require authentication */}
-        <Route 
-          path="/join-org-request" 
+        <Route
+          path="/join-org-request"
           element={
             <ProtectedRoute requireAuth={true} requireActive={false}>
               <JoinOrgRequestPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/profile" 
+        <Route
+          path="/profile"
           element={
             <ProtectedRoute requireAuth={true} requireActive={false}>
               <ProfilePage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Enhanced dashboard with basic auth check */}
-        <Route 
-          path="/enhanced" 
+        <Route
+          path="/enhanced"
           element={
             <ProtectedRoute requireAuth={true} requireActive={true}>
               <EnhancedComponentsDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Admin-only routes */}
@@ -156,49 +184,105 @@ const RoutesContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route 
-          path="/admin/invite-user" 
+        <Route
+          path="/admin/invite-user"
           element={
             <ProtectedRoute requiredRoles={["admin"]}>
               <AdminInviteUser />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Organization routes - authenticated users */}
-        <Route 
-          path="/orgs" 
+        <Route
+          path="/orgs"
           element={
             <ProtectedRoute>
               <OrganizationListPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/orgs/:client_name" 
+        <Route
+          path="/orgs/:client_name"
           element={
             <ProtectedRoute>
               <OrganizationDetailPage />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/orgs/:client_name/edit"
+          element={
+            <ProtectedRoute>
+              <OrganizationEditPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/settings"
+          element={
+            <ProtectedRoute>
+              <OrganizationSettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/security-assessment"
+          element={
+            <ProtectedRoute>
+              <SecurityAssessmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/vulnerability-scan"
+          element={
+            <ProtectedRoute>
+              <VulnerabilityScanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/threat-reports"
+          element={
+            <ProtectedRoute>
+              <ThreatReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/analytics"
+          element={
+            <ProtectedRoute>
+              <OrganizationAnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orgs/:client_name/compliance"
+          element={
+            <ProtectedRoute>
+              <ComplianceReportsPage />
+            </ProtectedRoute>
+          }
         />
 
         {/* Role routes - authenticated users */}
-        <Route 
-          path="/roles" 
+        <Route
+          path="/roles"
           element={
             <ProtectedRoute>
               <RoleListPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/roles/:role_id" 
+        <Route
+          path="/roles/:role_id"
           element={
             <ProtectedRoute>
               <RoleDetailPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Subscription routes - admin only */}
@@ -210,189 +294,198 @@ const RoutesContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route 
-          path="/subscriptions/create" 
+        <Route
+          path="/subscriptions/create"
           element={
             <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
               <SubscriptionCreate />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Tier routes - platform admin only */}
-        <Route 
-          path="/tiers" 
+        <Route
+          path="/tiers"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <TierListPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/tiers/create" 
-          element={
-            <ProtectedRoute requiredRoles={["platform_admin"]}>
-              <TierCreateEnhanced />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/tiers/:sub_level" 
+
+        <Route
+          path="/tiers/:sub_level"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <TierDetailPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Platform Admin Routes - platform admin only */}
-        <Route 
-          path="/platform-admins" 
+        <Route
+          path="/platform-admins"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PlatformAdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/stats" 
+        <Route
+          path="/platform-admins/stats"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PlatformStats />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/activity-logs" 
+        <Route
+          path="/platform-admins/activity-logs"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <ActivityLogs />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/admins" 
+        <Route
+          path="/platform-admins/admins"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <AdminManagement />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/users" 
+        <Route
+          path="/platform-admins/users"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <UserManagement />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/grant-admin" 
+        <Route
+          path="/platform-admins/partners"
           element={
-            <ProtectedRoute requiredRoles={["super_admin"]}>
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PartnerManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform-admins/grant-admin"
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
               <GrantAdminAccess />
             </ProtectedRoute>
-          } 
+          }
         />
 
-        {/* Partner Management Routes - platform admin only */}
-        <Route 
-          path="/partners" 
+        {/* Partner Code Management Routes - platform admin only */}
+        <Route
+          path="/platform-admins/partner-codes"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PartnerCodeListPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/partners/create" 
+        <Route
+          path="/platform-admins/partner-codes/create"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PartnerCodeCreatePage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/partners/:code" 
-          element={
-            <ProtectedRoute requiredRoles={["platform_admin"]}>
-              <PartnerCodeDetailPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/partners/:code/edit" 
+        <Route
+          path="/platform-admins/partner-codes/:code/edit"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PartnerCodeEditPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/partners/:code/stats" 
+        <Route
+          path="/platform-admins/partner-codes/:code/stats"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PartnerCodeStatsPage />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
         />
 
         {/* Payment Routes - authenticated users with admin access for dashboard */}
-        <Route 
-          path="/payments" 
+        <Route
+          path="/payments"
           element={
             <ProtectedRoute>
               <PaymentPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/payment-dashboard" 
+        <Route
+          path="/payment-dashboard"
           element={
             <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
               <PaymentDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/payment/success" 
+        <Route
+          path="/payment/success"
           element={
             <ProtectedRoute>
               <PaymentPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/payment-test" 
+        <Route
+          path="/payment-test"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <PaymentTestPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/invoices" 
+        <Route
+          path="/invoices"
           element={
             <ProtectedRoute>
               <InvoicesPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/payment-success" 
+        <Route
+          path="/payment-success"
           element={
             <ProtectedRoute>
               <PaymentSuccessPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/payment-cancelled" 
+        <Route
+          path="/payment-cancelled"
           element={
             <ProtectedRoute>
               <PaymentCancelledPage />
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
     </Suspense>

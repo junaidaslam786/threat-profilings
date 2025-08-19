@@ -1,21 +1,11 @@
-import React from 'react';
-import Button from '../Common/Button';
-
-interface Tier {
-  sub_level: string;
-  name: string;
-  description?: string;
-  max_edits: number;
-  max_apps: number;
-  run_quota: number;
-  allowed_tabs: string[];
-  price_monthly: number;
-  price_onetime_registration: number;
-}
+import React from "react";
+import { useUser } from "../../hooks/useUser";
+import type { TierConfigDto } from "../../Redux/slices/tiersSlice";
 
 interface TierCardProps {
-  tier: Tier;
+  tier: TierConfigDto;
   onView: (subLevel: string) => void;
+  onEdit?: (tier: TierConfigDto) => void;
   onDelete: (subLevel: string) => void;
   isDeleting: boolean;
   deleteTarget: string | null;
@@ -24,50 +14,111 @@ interface TierCardProps {
 const TierCard: React.FC<TierCardProps> = ({
   tier,
   onView,
+  onEdit,
   onDelete,
   isDeleting,
-  deleteTarget
+  deleteTarget,
 }) => {
+  const { isPlatformAdmin } = useUser();
+
   return (
-    <div className="bg-gray-800 rounded-lg shadow p-6 border border-blue-700 flex flex-col md:flex-row md:items-center md:justify-between">
-      <div>
-        <div className="text-lg font-semibold text-blue-300">
-          {tier.name}
+    <div className="group bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-xl p-6 border border-secondary-700/50 hover:border-primary-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-500/10">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
+              {tier.name}
+            </h3>
+            <span className="text-xs px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full font-medium">
+              {tier.sub_level}
+            </span>
+          </div>
+
+          <p className="text-secondary-300 mb-6 leading-relaxed">
+            {tier.description || "No description available"}
+          </p>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 p-4 rounded-lg border border-secondary-600/30 hover:border-primary-500/30 transition-colors">
+              <div className="text-xs text-secondary-400 uppercase tracking-wide">
+                Max Edits
+              </div>
+              <div className="text-2xl font-bold text-primary-300 mt-1">
+                {tier.max_edits}
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 p-4 rounded-lg border border-secondary-600/30 hover:border-primary-500/30 transition-colors">
+              <div className="text-xs text-secondary-400 uppercase tracking-wide">
+                Max Apps
+              </div>
+              <div className="text-2xl font-bold text-primary-300 mt-1">
+                {tier.max_apps}
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 p-4 rounded-lg border border-secondary-600/30 hover:border-primary-500/30 transition-colors">
+              <div className="text-xs text-secondary-400 uppercase tracking-wide">
+                Run Quota
+              </div>
+              <div className="text-2xl font-bold text-primary-300 mt-1">
+                {tier.run_quota}
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 p-4 rounded-lg border border-green-500/30">
+              <div className="text-xs text-green-300 uppercase tracking-wide">
+                Monthly Price
+              </div>
+              <div className="text-2xl font-bold text-green-400 mt-1">
+                ${tier.price_monthly}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <div className="text-sm text-secondary-400 mb-3 font-medium">
+              Available Features
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {tier.allowed_tabs.map((tab, index) => (
+                <span
+                  key={index}
+                  className="text-sm px-3 py-1 bg-gradient-to-r from-tertiary-600/20 to-tertiary-700/20 text-tertiary-300 rounded-full border border-tertiary-500/30 hover:border-tertiary-400/50 transition-colors"
+                >
+                  {tab}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="text-xs text-gray-400">{tier.sub_level}</div>
-        <div className="text-xs text-blue-300 mb-2">
-          {tier.description || "-"}
+
+        <div className="mt-6 lg:mt-0 lg:ml-6 flex flex-col gap-3 lg:min-w-[140px]">
+          <button
+            onClick={() => onView(tier.sub_level)}
+            className="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-500 hover:to-primary-600 transition-all duration-200 font-medium cursor-pointer shadow-lg hover:shadow-xl"
+          >
+            View Details
+          </button>
+
+          {isPlatformAdmin && onEdit && (
+            <button
+              onClick={() => onEdit(tier)}
+              className="px-4 py-2 bg-gradient-to-r from-tertiary-600 to-tertiary-700 text-white rounded-lg hover:from-tertiary-500 hover:to-tertiary-600 transition-all duration-200 font-medium cursor-pointer shadow-lg hover:shadow-xl"
+            >
+              Edit Tier
+            </button>
+          )}
+
+          {isPlatformAdmin && (
+            <button
+              onClick={() => onDelete(tier.sub_level)}
+              disabled={isDeleting && deleteTarget === tier.sub_level}
+              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-500 hover:to-red-600 transition-all duration-200 font-medium cursor-pointer shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isDeleting && deleteTarget === tier.sub_level
+                ? "Deleting..."
+                : "Delete"}
+            </button>
+          )}
         </div>
-        <div className="text-xs text-gray-400 mb-1">
-          <span className="text-blue-400">Max Edits:</span>{" "}
-          {tier.max_edits}{" "}
-          <span className="ml-3 text-blue-400">Max Apps:</span>{" "}
-          {tier.max_apps}{" "}
-          <span className="ml-3 text-blue-400">Run Quota:</span>{" "}
-          {tier.run_quota}
-        </div>
-        <div className="text-xs text-blue-400 mb-1">
-          Tabs: {tier.allowed_tabs.join(", ")}
-        </div>
-        <div className="text-xs text-gray-500 mb-1">
-          Monthly: ${tier.price_monthly} | Registration: $
-          {tier.price_onetime_registration}
-        </div>
-      </div>
-      <div className="mt-2 md:mt-0 flex gap-2">
-        <Button
-          variant="outline"
-          onClick={() => onView(tier.sub_level)}
-        >
-          View
-        </Button>
-        <Button
-          variant="danger"
-          loading={isDeleting && deleteTarget === tier.sub_level}
-          onClick={() => onDelete(tier.sub_level)}
-        >
-          Delete
-        </Button>
       </div>
     </div>
   );
