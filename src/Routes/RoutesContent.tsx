@@ -123,6 +123,9 @@ const PaymentSuccessPage = lazy(
 const PaymentCancelledPage = lazy(
   () => import("../Pages/Payments/PaymentCancelledPage")
 );
+const PaymentDetailsPage = lazy(
+  () => import("../Pages/PlatformAdmins/PaymentDetailsPage")
+);
 const SettingsPage = lazy(() => import("../Pages/Settings/SettingsPage"));
 const AnalyticsPage = lazy(() => import("../Pages/Analytics/AnalyticsPage"));
 
@@ -214,7 +217,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/orgs/:client_name/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={["admin", "LE_ADMIN"]}>
               <OrganizationEditPage />
             </ProtectedRoute>
           }
@@ -272,7 +275,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/roles"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
               <RoleListPage />
             </ProtectedRoute>
           }
@@ -280,7 +283,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/roles/:role_id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
               <RoleDetailPage />
             </ProtectedRoute>
           }
@@ -403,6 +406,14 @@ const RoutesContent: React.FC = () => {
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <ManualUpgrades />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform-admin/payments-details"
+          element={
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
+              <PaymentDetailsPage />
             </ProtectedRoute>
           }
         />

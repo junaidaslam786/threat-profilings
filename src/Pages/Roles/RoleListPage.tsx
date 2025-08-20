@@ -7,6 +7,7 @@ import RoleCreateModal from "../../components/Roles/CreateRoleModal";
 import RoleListHeader from "../../components/Roles/RoleListHeader";
 import RoleList from "../../components/Roles/RoleList";
 import DataState from "../../components/Common/DataState";
+import Navbar from "../../components/Common/Navbar";
 
 export default function RoleListPage() {
   const { data: roles, isLoading, error, refetch } = useGetRolesQuery();
@@ -39,15 +40,26 @@ export default function RoleListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
+      <Navbar />
+      
+      <div className="max-w-6xl mx-auto p-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
+            Roles
+          </h1>
+          <p className="text-secondary-300 text-lg">
+            Manage user roles and permissions
+          </p>
+        </div>
+
         <RoleListHeader onCreateRole={handleCreateRole} />
         
         <DataState
           isLoading={isLoading}
           error={error}
           hasNoData={hasNoRoles}
-          loadingMessage="Loading..."
+          loadingMessage="Loading roles..."
           errorMessage="Failed to load roles."
           noDataMessage="No roles found."
         />

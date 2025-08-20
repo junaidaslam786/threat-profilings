@@ -302,7 +302,7 @@ const Dashboard: React.FC = () => {
               </button>
 
               <button
-                onClick={() => navigate("/payments")}
+                onClick={() => navigate(isPlatformAdmin ? "/platform-admin/payments-details" : "/payments")}
                 className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-green-500/50 transition-all duration-300 cursor-pointer text-left"
               >
                 <div className="flex items-center space-x-3">
@@ -322,38 +322,40 @@ const Dashboard: React.FC = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">Payments</h3>
-                    <p className="text-xs text-secondary-400">Payment center</p>
+                    <h3 className="font-medium text-white">{isPlatformAdmin ? "Payment Details" : "Payments"}</h3>
+                    <p className="text-xs text-secondary-400">{isPlatformAdmin ? "All user payments" : "Payment center"}</p>
                   </div>
                 </div>
               </button>
 
-              <button
-                onClick={() => navigate("/invoices")}
-                className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer text-left"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-yellow-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+              {!isPlatformAdmin && (
+                <button
+                  onClick={() => navigate("/invoices")}
+                  className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer text-left"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-yellow-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-white">Invoices</h3>
+                      <p className="text-xs text-secondary-400">View invoices</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium text-white">Invoices</h3>
-                    <p className="text-xs text-secondary-400">View invoices</p>
-                  </div>
-                </div>
-              </button>
+                </button>
+              )}
 
               {/* Admin-only routes */}
               {(isAdmin || isLEAdmin) && (
@@ -426,7 +428,7 @@ const Dashboard: React.FC = () => {
 
       {/* Platform Admin Section */}
       {(isPlatformAdmin || isSuperAdmin) && (
-        <div className="mt-8">
+        <div className="mt-8 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="flex items-center space-x-4 mb-6">
             <div className="w-1 h-8 bg-gradient-to-b from-red-400 to-red-600 rounded-full"></div>
             <h2 className="text-2xl font-bold text-white">
