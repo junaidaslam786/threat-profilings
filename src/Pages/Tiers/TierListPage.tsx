@@ -34,7 +34,7 @@ export default function TierListPage() {
   };
 
   const handleViewTier = (subLevel: string) => {
-    const tier = tiers?.find(t => t.sub_level === subLevel);
+    const tier = tiers?.find((t) => t.sub_level === subLevel);
     if (tier) {
       setViewingTier(tier);
     }
@@ -62,32 +62,32 @@ export default function TierListPage() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
         <Navbar />
-        
+
         <div className="max-w-6xl mx-auto p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
               Subscription Tiers
             </h1>
             <p className="text-secondary-300 text-lg">
-              {isPlatformAdmin 
-                ? "Manage subscription tiers and pricing" 
+              {isPlatformAdmin
+                ? "Manage subscription tiers and pricing"
                 : "Available subscription plans"}
             </p>
           </div>
 
           {isPlatformAdmin && (
-            <TierListHeader 
+            <TierListHeader
               showCreate={showCreate}
               onToggleCreate={handleToggleCreate}
             />
           )}
-          
+
           {showCreate && isPlatformAdmin && (
             <div className="mb-8">
               <TierCreate onSuccess={handleCreateSuccess} />
             </div>
           )}
-          
+
           <DataState
             isLoading={isLoading}
             error={error}
@@ -96,7 +96,7 @@ export default function TierListPage() {
             errorMessage="Failed to load tiers."
             noDataMessage="No tiers available."
           />
-          
+
           {!isLoading && !error && tiers && tiers.length > 0 && (
             <TierList
               tiers={tiers}
@@ -107,7 +107,7 @@ export default function TierListPage() {
               deleteTarget={deleteTarget}
             />
           )}
-          
+
           {editingTier && (
             <TierEditModal
               tier={editingTier}
@@ -118,7 +118,7 @@ export default function TierListPage() {
           )}
         </div>
       </div>
-      
+
       <TierDetailSidebar
         tier={viewingTier}
         isOpen={!!viewingTier}

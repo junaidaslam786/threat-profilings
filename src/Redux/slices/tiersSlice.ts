@@ -19,14 +19,23 @@ export interface TierConfigDto {
     sso_integration?: boolean;
     audit_logs?: boolean;
     data_export?: boolean;
-    compliance_frameworks?: string[];
     is_active?: boolean;
-    discount_percent?: number;
     promotion_code?: string;
+    le_eligible?: boolean;
     max_users?: number;
     storage_limit_gb?: number;
-    le_eligible?: boolean;
+    compliance_frameworks?: string[];
+    discount_percent?: number;
   };
+  compliance_frameworks?: string[];
+  is_active?: boolean;
+  discount_percent?: number;
+  promotion_code?: string;
+  max_users?: number;
+  storage_limit_gb?: number;
+  le_eligible?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface TierCreateResponse {

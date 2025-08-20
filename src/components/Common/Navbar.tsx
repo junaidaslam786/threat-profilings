@@ -42,6 +42,15 @@ const Navbar: React.FC = () => {
 
   const getNavItems = (): NavItem[] => {
     if (isPlatformAdmin) return platformAdminNavItems;
+    
+    // Check if user has only L0 subscription (free tier) - restrict access
+    const subscriptions = user?.subscriptions || [];
+    const isL0User = subscriptions.length === 1 && subscriptions[0]?.subscription_level === "L0";
+    
+    if (isL0User && !isPlatformAdmin) {
+      return [{ label: 'Profile', path: '/profile' }];
+    }
+    
     if (isAdmin || isLEAdmin) return adminNavItems;
     return userNavItems;
   };

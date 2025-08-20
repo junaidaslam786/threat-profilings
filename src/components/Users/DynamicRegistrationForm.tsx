@@ -129,69 +129,59 @@ export default function DynamicRegistrationForm({
 
   const renderField = (fieldName: string) => {
     const value = fields[fieldName];
+    const baseInputClass = "w-full px-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:outline-none text-white placeholder-secondary-400 transition-all duration-200";
     
     switch (fieldName) {
       case 'email':
         return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            disabled
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+              </svg>
+            </div>
+            <input
+              key={fieldName}
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 text-white placeholder-secondary-400 opacity-75"
+              name={fieldName}
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              disabled
+            />
+          </div>
         );
         
       case 'name':
         return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Full Name"
-            value={value as string || ''}
-            onChange={handleChange}
-            required
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <input
+              key={fieldName}
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:outline-none text-white placeholder-secondary-400 transition-all duration-200"
+              name={fieldName}
+              placeholder="Full Name"
+              value={value as string || ''}
+              onChange={handleChange}
+              required
+            />
+          </div>
         );
         
-      case 'org_name':
+      case 'admin_justification':
         return (
-          <input
+          <textarea
             key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
+            className="w-full px-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:outline-none text-white placeholder-secondary-400 transition-all duration-200 resize-none"
             name={fieldName}
-            placeholder="Organization Name"
+            placeholder="Admin Justification"
             value={value as string || ''}
             onChange={handleChange}
-            required
-          />
-        );
-        
-      case 'org_domain':
-        return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Organization Domain (e.g., company.com)"
-            value={value as string || ''}
-            onChange={handleChange}
-            required
-          />
-        );
-        
-      case 'target_org_domain':
-        return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Target Organization Domain"
-            value={value as string || ''}
-            onChange={handleChange}
+            rows={4}
             required
           />
         );
@@ -200,7 +190,7 @@ export default function DynamicRegistrationForm({
         return (
           <textarea
             key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
+            className="w-full px-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:outline-none text-white placeholder-secondary-400 transition-all duration-200 resize-none"
             name={fieldName}
             placeholder="Message for organization admin (optional)"
             value={value as string || ''}
@@ -209,37 +199,11 @@ export default function DynamicRegistrationForm({
           />
         );
         
-      case 'industry':
-        return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Industry"
-            value={value as string || ''}
-            onChange={handleChange}
-            required
-          />
-        );
-        
-      case 'sector':
-        return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Sector"
-            value={value as string || ''}
-            onChange={handleChange}
-            required
-          />
-        );
-        
       case 'org_size':
         return (
           <select
             key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
+            className="w-full px-4 py-4 rounded-xl bg-secondary-700/50 border border-secondary-600/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:outline-none text-white transition-all duration-200"
             name={fieldName}
             value={value as string || '1-10'}
             onChange={handleChange}
@@ -253,42 +217,15 @@ export default function DynamicRegistrationForm({
           </select>
         );
         
-      case 'countries_of_operation':
-        return (
-          <input
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Countries of Operation (comma-separated)"
-            value={Array.isArray(value) ? value.join(', ') : ''}
-            onChange={handleCountriesChange}
-            required
-          />
-        );
-        
-      case 'admin_justification':
-        return (
-          <textarea
-            key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
-            name={fieldName}
-            placeholder="Admin Justification"
-            value={value as string || ''}
-            onChange={handleChange}
-            rows={4}
-            required
-          />
-        );
-        
       default:
         return (
           <input
             key={fieldName}
-            className="w-full p-3 rounded bg-gray-700 border border-blue-900 focus:border-blue-500 focus:outline-none"
+            className={baseInputClass}
             name={fieldName}
             placeholder={fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
             value={value as string || ''}
-            onChange={handleChange}
+            onChange={fieldName === 'countries_of_operation' ? handleCountriesChange : handleChange}
             required
           />
         );

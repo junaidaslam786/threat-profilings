@@ -1,6 +1,10 @@
 import { useState } from "react";
 import OrganizationCreateModal from "./CreateOrganizationModal";
-import { useGetOrgsQuery } from "../../Redux/api/organizationsApi";
+import {
+  useGetOrgsQuery,
+  useGetAllOrgsQuery,
+} from "../../Redux/api/organizationsApi";
+import { useGetProfileQuery } from "../../Redux/api/userApi";
 import OrganizationListHeader from "../../components/Organizations/OrganizationListHeader";
 import OrganizationListState from "../../components/Organizations/OrganizationListState";
 import OrganizationList from "../../components/Organizations/OrganizationList";
@@ -21,11 +25,65 @@ interface Organization {
 }
 
 export default function OrganizationListPage() {
-  const { data: orgs, isLoading, error, refetch } = useGetOrgsQuery();
+  const { data: userProfile } = useGetProfileQuery();
   const [showModal, setShowModal] = useState(false);
-  const [viewingOrganization, setViewingOrganization] = useState<Organization | null>(null);
+  const [viewingOrganization, setViewingOrganization] =
+    useState<Organization | null>(null);
 
-  const organizations = Array.isArray(orgs) ? orgs : orgs?.managed_orgs || [];
+  // Check if user is platform_admin or super_admin
+  const isPlatformAdmin =
+    userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
+      "admin" ||
+    userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
+      "super_admin";
+
+  // Check if user is LE_ADMIN (can create organizations)
+  const isLeAdmin = userProfile?.user_info?.user_type === "LE";
+
+  // Use getAllOrgs only for platform/super admins, otherwise use regular getOrgs
+  const {
+    data: allOrgs,
+    isLoading: isLoadingAll,
+    error: errorAll,
+    refetch: refetchAll,
+  } = useGetAllOrgsQuery(undefined, {
+    skip: !isPlatformAdmin,
+  });
+
+  const {
+    data: userOrgs,
+    isLoading: isLoadingUser,
+    error: errorUser,
+    refetch: refetchUser,
+  } = useGetOrgsQuery(undefined, {
+    skip: isPlatformAdmin,
+  });
+
+  // Determine which data to use
+  const isLoading = isPlatformAdmin ? isLoadingAll : isLoadingUser;
+  const error = isPlatformAdmin ? errorAll : errorUser;
+  const refetch = isPlatformAdmin ? refetchAll : refetchUser;
+
+  let organizations: Organization[] = [];
+  if (isPlatformAdmin && allOrgs) {
+    organizations = Array.isArray(allOrgs) ? allOrgs : [];
+  } else if (!isPlatformAdmin) {
+    if (userOrgs) {
+      organizations = Array.isArray(userOrgs)
+        ? userOrgs
+        : userOrgs?.managed_orgs || [];
+    }
+    // Always use accessible_organizations as fallback for LE users
+    if (organizations.length === 0 && userProfile?.accessible_organizations) {
+      organizations = userProfile.accessible_organizations.map((org) => ({
+        client_name: org.client_name,
+        organization_name: org.organization_name,
+        sector: undefined,
+        website_url: undefined,
+      }));
+    }
+  }
+
   const hasNoOrganizations = !isLoading && !error && organizations.length === 0;
 
   const handleAddOrganization = () => {
@@ -33,7 +91,9 @@ export default function OrganizationListPage() {
   };
 
   const handleViewOrganization = (clientName: string) => {
-    const org = organizations.find((o: Organization) => o.client_name === clientName);
+    const org = organizations.find(
+      (o: Organization) => o.client_name === clientName
+    );
     if (org) {
       setViewingOrganization(org);
     }
@@ -48,7 +108,7 @@ export default function OrganizationListPage() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
         <Navbar />
-        
+
         <div className="max-w-6xl mx-auto p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
@@ -58,33 +118,34 @@ export default function OrganizationListPage() {
               Manage and view your organizations
             </p>
           </div>
-          
-          <OrganizationListHeader onAddOrganization={handleAddOrganization} />
-          
-          <OrganizationListState 
+
+          {isLeAdmin && (
+            <OrganizationListHeader onAddOrganization={handleAddOrganization} />
+          )}
+
+          <OrganizationListState
             isLoading={isLoading}
             error={error}
             hasNoOrganizations={hasNoOrganizations}
           />
-          
+
           {!isLoading && !error && organizations.length > 0 && (
-            <OrganizationList 
+            <OrganizationList
               organizations={organizations}
               onViewOrganization={handleViewOrganization}
               onRefresh={refetch}
             />
           )}
         </div>
-        
-        {showModal && (
-          <OrganizationCreateModal onClose={handleCloseModal} />
-        )}
+
+        {showModal && <OrganizationCreateModal onClose={handleCloseModal} />}
       </div>
-      
+
       <OrganizationDetailSidebar
         organization={viewingOrganization}
         isOpen={!!viewingOrganization}
         onClose={() => setViewingOrganization(null)}
+        canEdit={!isPlatformAdmin}
       />
     </>
   );

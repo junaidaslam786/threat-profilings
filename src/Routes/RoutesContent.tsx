@@ -180,7 +180,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/admin/join-requests"
           element={
-            <ProtectedRoute requiredRoles={["admin"]}>
+            <ProtectedRoute requiredRoles={["admin", "LE_ADMIN"]}>
               <AdminPendingJoinRequests />
             </ProtectedRoute>
           }
@@ -188,7 +188,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/admin/invite-user"
           element={
-            <ProtectedRoute requiredRoles={["admin"]}>
+            <ProtectedRoute requiredRoles={["admin", "LE_ADMIN"]}>
               <AdminInviteUser />
             </ProtectedRoute>
           }
@@ -290,7 +290,9 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/subscriptions/:client_name"
           element={
-            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+            <ProtectedRoute
+              requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}
+            >
               <SubscriptionDetailPage />
             </ProtectedRoute>
           }
@@ -298,7 +300,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/subscriptions/create"
           element={
-            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+            <ProtectedRoute requiredRoles={["platform_admin"]}>
               <SubscriptionCreate />
             </ProtectedRoute>
           }
@@ -380,29 +382,29 @@ const RoutesContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route 
-          path="/platform-admins/tax-rules" 
+        <Route
+          path="/platform-admins/tax-rules"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <TaxRules />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/invoices" 
+        <Route
+          path="/platform-admins/invoices"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <Invoices />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/platform-admins/manual-upgrades" 
+        <Route
+          path="/platform-admins/manual-upgrades"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
               <ManualUpgrades />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Partner Code Management Routes - platform admin only */}
@@ -467,7 +469,9 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/payment-dashboard"
           element={
-            <ProtectedRoute requiredRoles={["admin", "platform_admin"]}>
+            <ProtectedRoute
+              requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}
+            >
               <PaymentDashboard />
             </ProtectedRoute>
           }

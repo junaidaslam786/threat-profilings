@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface OrganizationListHeaderProps {
-  onAddOrganization: () => void;
+  onAddOrganization?: () => void;
 }
 
 const OrganizationListHeader: React.FC<OrganizationListHeaderProps> = ({ onAddOrganization }) => {
