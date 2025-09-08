@@ -281,6 +281,30 @@ export interface PaymentAnalytics {
   };
 }
 
+// Permissions Types
+export interface Permission {
+  name: string;
+  description: string;
+  required_level: string;
+  scope: string;
+}
+
+export interface PermissionCategory {
+  category: string;
+  permissions: Record<string, Permission>;
+}
+
+export interface PermissionLevel {
+  name: string;
+  description: string;
+  level: number;
+}
+
+export interface SystemPermissionsResponse {
+  permissions: Record<string, PermissionCategory>;
+  permission_levels: Record<string, PermissionLevel>;
+}
+
 export const platformAdminApi = createApi({
   reducerPath: "platformAdminApi",
   baseQuery: fetchBaseQuery({
@@ -631,6 +655,16 @@ export const platformAdminApi = createApi({
         return response.data?.message || "Failed to fetch partner performance";
       },
     }),
+
+    getAllSystemPermissions: builder.query<SystemPermissionsResponse, void>({
+      query: () => "/permissions/all",
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch system permissions";
+      },
+    }),
   }),
 });
 
@@ -652,6 +686,7 @@ export const {
   useBulkUpdateUserStatusMutation,
   useGetPartnerAnalyticsQuery,
   useGetPartnerPerformanceQuery,
+  useGetAllSystemPermissionsQuery,
   useLazyGetPlatformStatsQuery,
   useLazyGetActivityLogsQuery,
   useLazyListPlatformAdminsQuery,
@@ -662,6 +697,7 @@ export const {
   useLazyGetPaymentAnalyticsQuery,
   useLazyGetPartnerAnalyticsQuery,
   useLazyGetPartnerPerformanceQuery,
+  useLazyGetAllSystemPermissionsQuery,
 } = platformAdminApi;
 
 export const selectPlatformStats =

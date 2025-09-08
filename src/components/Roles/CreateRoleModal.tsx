@@ -1,8 +1,10 @@
 // pages/roles/RoleCreateModal.tsx
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCreateRoleMutation } from "../../Redux/api/rolesApi";
+import { useGetAllSystemPermissionsQuery } from "../../Redux/api/platformAdminApi";
 import Button from "../Common/Button";
 import Modal from "../Common/Modal";
+import MultiSelect, { type Option } from "../Common/MultiSelect";
 import type { CreateRoleDto } from "../../Redux/slices/rolesSlice";
 
 export default function RoleCreateModal({
@@ -13,6 +15,8 @@ export default function RoleCreateModal({
   isOpen?: boolean;
 }) {
   const [createRole, { isLoading }] = useCreateRoleMutation();
+  const { data: permissionsData, isLoading: permissionsLoading } = useGetAllSystemPermissionsQuery();
+  
   const [fields, setFields] = useState<CreateRoleDto>({
     name: "",
     description: "",
@@ -20,17 +24,43 @@ export default function RoleCreateModal({
   });
   const [error, setError] = useState("");
 
+  // Transform permissions data into options for the multiselect
+  const permissionOptions: Option[] = useMemo(() => {
+    if (!permissionsData?.permissions) return [];
+
+    const options: Option[] = [];
+    
+    Object.entries(permissionsData.permissions).forEach(([categoryKey, category]) => {
+      Object.entries(category.permissions).forEach(([permissionKey, permission]) => {
+        options.push({
+          value: `${categoryKey}.${permissionKey}`,
+          label: `${category.category}: ${permission.name}`,
+        });
+      });
+    });
+
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  }, [permissionsData]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handlePermissionsChange = (selectedPermissions: string[]) => {
+    setFields((prev) => ({ ...prev, permissions: selectedPermissions }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!fields.name) {
-      setError("Role ID and Name are required.");
+      setError("Role name is required.");
+      return;
+    }
+    if (fields.permissions.length === 0) {
+      setError("At least one permission must be selected.");
       return;
     }
     try {
@@ -60,8 +90,8 @@ export default function RoleCreateModal({
   };
 
   return (
-    <Modal show={isOpen} onClose={onClose} size="lg">
-      <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
+    <Modal show={isOpen} onClose={onClose} size="xl">
+      <div className="text-white max-h-[80vh] overflow-visible">
         <h2 className="text-xl font-bold text-blue-300 mb-4">Create Role</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -69,33 +99,47 @@ export default function RoleCreateModal({
               {error}
             </div>
           )}
-          <div className="space-y-2">
+          <div className="space-y-4 overflow-visible">
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-blue-900 text-white placeholder-gray-400"
               name="name"
-              placeholder="Name *"
+              placeholder="Role Name *"
               value={fields.name}
               onChange={handleChange}
               required
             />
-            <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            <textarea
+              className="w-full p-2 rounded bg-gray-700 border border-blue-900 text-white placeholder-gray-400"
               name="description"
               placeholder="Description"
               value={fields.description}
               onChange={handleChange}
+              rows={3}
             />
-            <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
-              name="permissions"
-              placeholder="Permissions (comma-separated)"
-              value={fields.permissions}
-              onChange={handleChange}
-            />
+            
+            {permissionsLoading ? (
+              <div className="text-center py-4">
+                <div className="text-gray-400">Loading permissions...</div>
+              </div>
+            ) : (
+              <div className="relative z-50">
+                <MultiSelect
+                  id="permissions"
+                  label="Permissions *"
+                  options={permissionOptions}
+                  values={fields.permissions}
+                  onChange={handlePermissionsChange}
+                  searchable={true}
+                  placeholder="Select permissions..."
+                  error={fields.permissions.length === 0 && error ? "At least one permission is required" : undefined}
+                  required={true}
+                />
+              </div>
+            )}
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-6 pt-4">
             <Button type="submit" loading={isLoading}>
-              Create
+              Create Role
             </Button>
             <Button variant="ghost" type="button" onClick={onClose}>
               Cancel
