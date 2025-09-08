@@ -30,8 +30,19 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Tier level options
+  const tierLevelOptions = [
+    { value: "L0", label: "L0 - Free Tier" },
+    { value: "L1", label: "L1 - Basic" },
+    { value: "L2", label: "L2 - Professional" },
+    { value: "L3", label: "L3 - Enterprise" },
+    { value: "LE", label: "LE - Large Enterprise" },
+  ];
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
@@ -143,15 +154,20 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClasses}>Tier Level *</label>
-              <input
-                type="text"
+              <select
                 name="sub_level"
                 value={fields.sub_level}
                 onChange={handleChange}
-                placeholder="L0, L1, L2, L3, LE"
                 className={inputClasses}
                 required
-              />
+              >
+                <option value="">Select tier level...</option>
+                {tierLevelOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
