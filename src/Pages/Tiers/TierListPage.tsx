@@ -12,15 +12,17 @@ import TierDetailSidebar from "../../components/Tiers/TierDetailSidebar";
 import DataState from "../../components/Common/DataState";
 import Navbar from "../../components/Common/Navbar";
 import type { TierConfigDto } from "../../Redux/slices/tiersSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function TierListPage() {
   const { data: tiers, isLoading, error, refetch } = useGetTiersQuery();
   const [deleteTier, { isLoading: isDeleting }] = useDeleteTierMutation();
-  const { isPlatformAdmin } = useUser();
   const [showCreate, setShowCreate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editingTier, setEditingTier] = useState<TierConfigDto | null>(null);
   const [viewingTier, setViewingTier] = useState<TierConfigDto | null>(null);
+  const { isPlatformAdmin } = useUser();
+  const navigate = useNavigate();
 
   const hasNoTiers = !isLoading && !error && (!tiers || tiers.length === 0);
 
@@ -64,15 +66,23 @@ export default function TierListPage() {
         <Navbar />
 
         <div className="max-w-6xl mx-auto p-8">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
-              Subscription Tiers
-            </h1>
-            <p className="text-secondary-300 text-lg">
-              {isPlatformAdmin
-                ? "Manage subscription tiers and pricing"
-                : "Available subscription plans"}
-            </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
+                Subscription Tiers
+              </h1>
+              <p className="text-secondary-300 text-lg">
+                {isPlatformAdmin
+                  ? "Manage subscription tiers and pricing"
+                  : "Available subscription plans"}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-secondary-700/50 hover:bg-secondary-600/50 text-white border border-secondary-600/50 hover:border-secondary-500/50 font-semibold py-3 px-6 rounded-lg transition-all duration-200 cursor-pointer"
+            >
+              ← Go Back
+            </button>
           </div>
 
           {isPlatformAdmin && (

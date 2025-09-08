@@ -72,22 +72,6 @@ const TierCard: React.FC<TierCardProps> = ({
               </div>
             </div>
           </div>
-
-          <div className="mb-6">
-            <div className="text-sm text-secondary-400 mb-3 font-medium">
-              Available Features
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {tier.allowed_tabs.map((tab, index) => (
-                <span
-                  key={index}
-                  className="text-sm px-3 py-1 bg-gradient-to-r from-tertiary-600/20 to-tertiary-700/20 text-tertiary-300 rounded-full border border-tertiary-500/30 hover:border-tertiary-400/50 transition-colors"
-                >
-                  {tab}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="mt-6 lg:mt-0 lg:ml-6 flex flex-col gap-3 lg:min-w-[140px]">

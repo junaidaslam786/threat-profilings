@@ -3,7 +3,6 @@ import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import LoadingScreen from "../../components/Common/LoadingScreen";
-import UserProfileCard from "../../components/Dashboard/UserProfileCard";
 import Navbar from "../../components/Common/Navbar";
 import UnauthenticatedView from "../../components/Dashboard/UnauthenticatedView";
 import PendingApprovalView from "../../components/Dashboard/PendingApprovalView";
@@ -129,9 +128,6 @@ const Dashboard: React.FC = () => {
               platform access.
             </p>
           </div>
-
-          <UserProfileCard user={user} />
-
           <div className="mt-8 bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-8 border border-secondary-700/50 text-center">
             <h2 className="text-2xl font-bold text-primary-300 mb-4">
               Unlock Premium Features
@@ -165,11 +161,8 @@ const Dashboard: React.FC = () => {
             {getUserRoleDisplay()} Dashboard
           </p>
         </div>
-
-        <UserProfileCard user={user} />
-
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {!isL0User && (
+          {(isAdmin || isLEAdmin) && (
             <button
               onClick={() => navigate("/orgs")}
               className="group bg-gradient-to-br from-secondary-800 to-secondary-900 p-6 rounded-xl border border-secondary-700/50 hover:border-primary-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-500/10 cursor-pointer text-left"
@@ -202,7 +195,7 @@ const Dashboard: React.FC = () => {
             </button>
           )}
 
-          {(isPlatformAdmin || isSuperAdmin) && (
+          {(isAdmin || isLEAdmin) && (
             <button
               onClick={() => navigate("/analytics")}
               className="group bg-gradient-to-br from-secondary-800 to-secondary-900 p-6 rounded-xl border border-secondary-700/50 hover:border-green-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10 cursor-pointer text-left"
@@ -232,35 +225,6 @@ const Dashboard: React.FC = () => {
               </div>
             </button>
           )}
-
-          <button
-            onClick={() => navigate("/profile")}
-            className="group bg-gradient-to-br from-secondary-800 to-secondary-900 p-6 rounded-xl border border-secondary-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 cursor-pointer text-left"
-          >
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-4 group-hover:from-blue-400 group-hover:to-blue-500 transition-all duration-300">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
-                  Profile
-                </h3>
-                <p className="text-secondary-400">Manage your profile</p>
-              </div>
-            </div>
-          </button>
         </div>
 
         {/* Role-based Quick Actions */}
@@ -302,7 +266,13 @@ const Dashboard: React.FC = () => {
               </button>
 
               <button
-                onClick={() => navigate(isPlatformAdmin ? "/platform-admin/payments-details" : "/payments")}
+                onClick={() =>
+                  navigate(
+                    isPlatformAdmin
+                      ? "/platform-admin/payments-details"
+                      : "/payments"
+                  )
+                }
                 className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-green-500/50 transition-all duration-300 cursor-pointer text-left"
               >
                 <div className="flex items-center space-x-3">
@@ -322,8 +292,12 @@ const Dashboard: React.FC = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">{isPlatformAdmin ? "Payment Details" : "Payments"}</h3>
-                    <p className="text-xs text-secondary-400">{isPlatformAdmin ? "All user payments" : "Payment center"}</p>
+                    <h3 className="font-medium text-white">
+                      {isPlatformAdmin ? "Payment Details" : "Payments"}
+                    </h3>
+                    <p className="text-xs text-secondary-400">
+                      {isPlatformAdmin ? "All user payments" : "Payment center"}
+                    </p>
                   </div>
                 </div>
               </button>
@@ -351,7 +325,9 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-medium text-white">Invoices</h3>
-                      <p className="text-xs text-secondary-400">View invoices</p>
+                      <p className="text-xs text-secondary-400">
+                        View invoices
+                      </p>
                     </div>
                   </div>
                 </button>
@@ -542,33 +518,6 @@ const Dashboard: React.FC = () => {
                   <p className="text-xs text-secondary-400">
                     Partner management
                   </p>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => navigate("/settings")}
-              className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-purple-500/50 transition-all duration-300 cursor-pointer text-left"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-purple-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-white">Settings</h3>
-                  <p className="text-xs text-secondary-400">System settings</p>
                 </div>
               </div>
             </button>

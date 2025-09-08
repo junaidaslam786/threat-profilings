@@ -6,7 +6,7 @@ export interface TierConfigDto {
   description?: string;
   max_edits: number;
   max_apps: number;
-  allowed_tabs: string[];
+  allowed_tabs?: string[];
   run_quota: number;
   price_monthly: number;
   price_onetime_registration: number;

@@ -33,10 +33,6 @@ export default function TierDetailPage() {
         <div className="mb-3 text-xs text-gray-300">{tier.max_edits}</div>
         <div className="mb-3 text-blue-400 font-semibold">Max Apps</div>
         <div className="mb-3 text-xs text-gray-300">{tier.max_apps}</div>
-        <div className="mb-3 text-blue-400 font-semibold">Allowed Tabs</div>
-        <div className="mb-3 text-xs text-gray-300">
-          {tier.allowed_tabs.join(", ")}
-        </div>
         <div className="mb-3 text-blue-400 font-semibold">Run Quota</div>
         <div className="mb-3 text-xs text-gray-300">{tier.run_quota}</div>
         <div className="mb-3 text-blue-400 font-semibold">Monthly Price</div>

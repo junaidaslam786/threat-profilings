@@ -101,13 +101,8 @@ export const hasAuthTokens = (): boolean => {
 };
 
 export const performLogout = (redirectPath: string = "/dashboard") => {
-  // Remove all authentication tokens
   removeAuthTokens();
-  
-  // Clear all local storage and session storage
   localStorage.clear();
   sessionStorage.clear();
-  
-  // Redirect to the specified path
   window.location.href = redirectPath;
 };

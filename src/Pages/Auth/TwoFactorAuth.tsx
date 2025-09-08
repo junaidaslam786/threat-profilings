@@ -62,7 +62,7 @@ const TwoFactorAuth: React.FC<{ onViewChange: (view: string) => void }> = ({
       <p className="text-center text-gray-400 text-sm mt-4">
         <button
           onClick={() => onViewChange("signIn")}
-          className="text-blue-500 hover:underline"
+          className="text-primary-500 hover:underline"
         >
           Return to Sign In
         </button>

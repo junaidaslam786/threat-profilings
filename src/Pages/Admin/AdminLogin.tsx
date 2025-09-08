@@ -47,7 +47,7 @@ const AdminLogin: React.FC = () => {
       />
       <Button onClick={handleAdminSignIn}>Login as Admin</Button>
       <p className="text-center text-gray-400 text-sm mt-4">
-        <button className="text-blue-500 hover:underline">
+        <button className="text-primary-500 hover:underline">
           Return to Client Sign In
         </button>
       </p>

@@ -45,17 +45,11 @@ const PaymentDashboard: React.FC = () => {
     if (tier.max_apps > 0) features.push(`${tier.max_apps} applications`);
     if (tier.max_edits > 0) features.push(`${tier.max_edits} edits/month`);
     if (tier.run_quota > 0) features.push(`${tier.run_quota} runs/month`);
-    if (tier.features?.storage_limit_gb) features.push(`${tier.features.storage_limit_gb}GB storage`);
-    if (tier.features?.threat_detection) features.push('Threat detection');
     if (tier.features?.compliance_reports) features.push('Compliance reports');
-    if (tier.features?.api_access) features.push('API access');
-    if (tier.features?.custom_branding) features.push('Custom branding');
     if (tier.features?.priority_support) features.push('Priority support');
     if (tier.features?.sso_integration) features.push('SSO integration');
     if (tier.features?.audit_logs) features.push('Audit logs');
     if (tier.features?.data_export) features.push('Data export');
-    if (tier.features?.le_eligible) features.push('LE eligible');
-    if (tier.allowed_tabs?.length > 0) features.push(`${tier.allowed_tabs.length} modules`);
     return features;
   };
 

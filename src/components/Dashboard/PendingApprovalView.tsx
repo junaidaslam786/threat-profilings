@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../Common/Button';
+import { performLogout } from '../../utils/cookieHelpers';
 
 interface PendingApprovalViewProps {
   user: {
@@ -16,6 +17,10 @@ interface PendingApprovalViewProps {
 }
 
 const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({ user }) => {
+  const handleSignOut = () => {
+    performLogout("/");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-yellow-700 text-center max-w-md">
@@ -49,7 +54,7 @@ const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({ user }) => {
             </div>
           </div>
         </div>
-        <Button onClick={() => (window.location.href = "/")}>Sign Out</Button>
+        <Button onClick={handleSignOut}>Sign Out</Button>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useCreateTierMutation } from "../../Redux/api/tiersApi";
 import Button from "../../components/Common/Button";
+import MultiSelect from "../../components/Common/MultiSelect";
+import { COMPLIANCE_FRAMEWORKS } from "../../constants/complianceFrameworks";
 
 interface TierCreateProps {
   onSuccess?: () => void;
@@ -14,25 +16,16 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
     description: "",
     max_edits: "",
     max_apps: "",
-    allowed_tabs: "",
     run_quota: "",
     price_monthly: "",
     price_onetime_registration: "",
-    max_users: "",
-    storage_limit_gb: "",
-    discount_percent: "",
-    promotion_code: "",
-    threat_detection: false,
     compliance_reports: false,
     api_access: false,
-    custom_branding: false,
     priority_support: false,
     sso_integration: false,
-    audit_logs: false,
     data_export: false,
     is_active: true,
-    le_eligible: false,
-    compliance_frameworks: "",
+    compliance_frameworks: [] as string[],
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -49,6 +42,10 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
     }
   };
 
+  const handleComplianceFrameworksChange = (values: string[]) => {
+    setFields((prev) => ({ ...prev, compliance_frameworks: values }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -58,7 +55,6 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
       !fields.name ||
       !fields.max_edits ||
       !fields.max_apps ||
-      !fields.allowed_tabs ||
       !fields.run_quota ||
       !fields.price_monthly ||
       !fields.price_onetime_registration
@@ -67,36 +63,25 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
       return;
     }
     try {
-      const complianceFrameworksArray = fields.compliance_frameworks
-        ? fields.compliance_frameworks.split(",").map(item => item.trim()).filter(item => item)
-        : [];
-
       await createTier({
         sub_level: fields.sub_level,
         name: fields.name,
         description: fields.description || undefined,
         max_edits: parseInt(fields.max_edits),
         max_apps: parseInt(fields.max_apps),
-        allowed_tabs: fields.allowed_tabs.split(",").map(tab => tab.trim()).filter(tab => tab),
         run_quota: parseInt(fields.run_quota),
         price_monthly: parseFloat(fields.price_monthly),
-        price_onetime_registration: parseFloat(fields.price_onetime_registration),
+        price_onetime_registration: parseFloat(
+          fields.price_onetime_registration
+        ),
         features: {
-          threat_detection: fields.threat_detection,
           compliance_reports: fields.compliance_reports,
           api_access: fields.api_access,
-          custom_branding: fields.custom_branding,
           priority_support: fields.priority_support,
           sso_integration: fields.sso_integration,
-          audit_logs: fields.audit_logs,
           data_export: fields.data_export,
-          compliance_frameworks: complianceFrameworksArray,
+          compliance_frameworks: fields.compliance_frameworks,
           is_active: fields.is_active,
-          discount_percent: fields.discount_percent ? parseFloat(fields.discount_percent) : undefined,
-          promotion_code: fields.promotion_code || undefined,
-          max_users: fields.max_users ? parseInt(fields.max_users) : undefined,
-          storage_limit_gb: fields.storage_limit_gb ? parseFloat(fields.storage_limit_gb) : undefined,
-          le_eligible: fields.le_eligible,
         },
       }).unwrap();
       setSuccess("Tier created successfully!");
@@ -106,29 +91,20 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
         description: "",
         max_edits: "",
         max_apps: "",
-        allowed_tabs: "",
         run_quota: "",
         price_monthly: "",
         price_onetime_registration: "",
-        max_users: "",
-        storage_limit_gb: "",
-        discount_percent: "",
-        promotion_code: "",
-        threat_detection: false,
-        compliance_reports: false,
-        api_access: false,
-        custom_branding: false,
-        priority_support: false,
-        sso_integration: false,
-        audit_logs: false,
-        data_export: false,
+        compliance_reports: true,
+        api_access: true,
+        priority_support: true,
+        sso_integration: true,
+        data_export: true,
         is_active: true,
-        le_eligible: false,
-        compliance_frameworks: "",
+        compliance_frameworks: [],
       });
       onSuccess?.();
     } catch (err: unknown) {
-      if (typeof err === 'object' && err !== null && 'message' in err) {
+      if (typeof err === "object" && err !== null && "message" in err) {
         setError((err as { message: string }).message);
       } else {
         setError("Failed to create tier");
@@ -136,19 +112,22 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
     }
   };
 
-  const inputClasses = "w-full px-3 py-2 bg-secondary-800 border border-secondary-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary-500";
+  const inputClasses =
+    "w-full px-3 py-2 bg-secondary-800 border border-secondary-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary-500";
   const labelClasses = "block text-sm font-medium text-secondary-300 mb-2";
 
   return (
     <div className="bg-secondary-800 rounded-lg p-6 border border-primary-600 mb-8">
-      <h2 className="text-xl font-bold text-primary-300 mb-6">Create New Tier</h2>
-      
+      <h2 className="text-xl font-bold text-primary-300 mb-6">
+        Create New Tier
+      </h2>
+
       {error && (
         <div className="bg-danger-600 text-white px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
-      
+
       {success && (
         <div className="bg-success-600 text-white px-4 py-3 rounded mb-4">
           {success}
@@ -158,7 +137,9 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <div className="bg-secondary-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-primary-300 mb-4">Basic Information</h3>
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">
+            Basic Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClasses}>Tier Level *</label>
@@ -172,7 +153,7 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
                 required
               />
             </div>
-            
+
             <div>
               <label className={labelClasses}>Tier Name *</label>
               <input
@@ -186,7 +167,7 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
               />
             </div>
           </div>
-          
+
           <div className="mt-4">
             <label className={labelClasses}>Description</label>
             <textarea
@@ -202,7 +183,9 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
 
         {/* Limits and Quotas */}
         <div className="bg-secondary-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-primary-300 mb-4">Limits & Quotas</h3>
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">
+            Limits & Quotas
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className={labelClasses}>Max Edits *</label>
@@ -216,7 +199,7 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
                 required
               />
             </div>
-            
+
             <div>
               <label className={labelClasses}>Max Apps *</label>
               <input
@@ -229,7 +212,7 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
                 required
               />
             </div>
-            
+
             <div>
               <label className={labelClasses}>Run Quota *</label>
               <input
@@ -243,51 +226,13 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
               />
             </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <label className={labelClasses}>Max Users</label>
-              <input
-                type="number"
-                name="max_users"
-                value={fields.max_users}
-                onChange={handleChange}
-                placeholder="Unlimited if not set"
-                className={inputClasses}
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Storage Limit (GB)</label>
-              <input
-                type="number"
-                step="0.1"
-                name="storage_limit_gb"
-                value={fields.storage_limit_gb}
-                onChange={handleChange}
-                placeholder="10.5"
-                className={inputClasses}
-              />
-            </div>
-          </div>
-          
-          <div className="mt-4">
-            <label className={labelClasses}>Allowed Tabs *</label>
-            <input
-              type="text"
-              name="allowed_tabs"
-              value={fields.allowed_tabs}
-              onChange={handleChange}
-              placeholder="dashboard,reports,settings (comma-separated)"
-              className={inputClasses}
-              required
-            />
-          </div>
         </div>
 
         {/* Pricing */}
         <div className="bg-secondary-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-primary-300 mb-4">Pricing</h3>
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">
+            Pricing
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelClasses}>Monthly Price *</label>
@@ -302,9 +247,11 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
                 required
               />
             </div>
-            
+
             <div>
-              <label className={labelClasses}>One-time Registration Price *</label>
+              <label className={labelClasses}>
+                One-time Registration Price *
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -317,54 +264,26 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
               />
             </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <label className={labelClasses}>Discount Percent</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="100"
-                name="discount_percent"
-                value={fields.discount_percent}
-                onChange={handleChange}
-                placeholder="10.00"
-                className={inputClasses}
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Promotion Code</label>
-              <input
-                type="text"
-                name="promotion_code"
-                value={fields.promotion_code}
-                onChange={handleChange}
-                placeholder="SAVE20"
-                className={inputClasses}
-              />
-            </div>
-          </div>
         </div>
 
         {/* Features */}
         <div className="bg-secondary-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-primary-300 mb-4">Features</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">
+            Features
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {[
-              { key: 'threat_detection', label: 'Threat Detection' },
-              { key: 'compliance_reports', label: 'Compliance Reports' },
-              { key: 'api_access', label: 'API Access' },
-              { key: 'custom_branding', label: 'Custom Branding' },
-              { key: 'priority_support', label: 'Priority Support' },
-              { key: 'sso_integration', label: 'SSO Integration' },
-              { key: 'audit_logs', label: 'Audit Logs' },
-              { key: 'data_export', label: 'Data Export' },
-              { key: 'is_active', label: 'Active' },
-              { key: 'le_eligible', label: 'LE Eligible' },
+              { key: "compliance_reports", label: "Compliance Reports" },
+              { key: "api_access", label: "API Access" },
+              { key: "priority_support", label: "Priority Support" },
+              { key: "sso_integration", label: "SSO Integration" },
+              { key: "data_export", label: "Data Export" },
+              { key: "is_active", label: "Active" },
             ].map(({ key, label }) => (
-              <label key={key} className="flex items-center space-x-2 cursor-pointer">
+              <label
+                key={key}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   name={key}
@@ -376,22 +295,27 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
               </label>
             ))}
           </div>
-          
+
           <div className="mt-4">
-            <label className={labelClasses}>Compliance Frameworks</label>
-            <input
-              type="text"
-              name="compliance_frameworks"
-              value={fields.compliance_frameworks}
-              onChange={handleChange}
-              placeholder="ISM,NIST,ISO27001,SOC2,GDPR,E8,ACSC_ESSENTIAL_EIGHT (comma-separated)"
-              className={inputClasses}
+            <MultiSelect
+              id="compliance_frameworks"
+              label="Compliance Frameworks"
+              options={COMPLIANCE_FRAMEWORKS}
+              values={fields.compliance_frameworks}
+              onChange={handleComplianceFrameworksChange}
+              placeholder="Select compliance frameworks..."
+              searchable={true}
+              className="mt-2"
             />
           </div>
         </div>
 
         <div className="flex justify-end space-x-4">
-          <Button type="submit" disabled={isLoading} className="bg-primary-600 hover:bg-primary-700">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-primary-600 hover:bg-primary-700"
+          >
             {isLoading ? "Creating..." : "Create Tier"}
           </Button>
         </div>

@@ -1,5 +1,5 @@
-import React from 'react';
-import TierCard from './TierCard';
+import React from "react";
+import TierCard from "./TierCard";
 
 interface Tier {
   sub_level: string;
@@ -8,7 +8,6 @@ interface Tier {
   max_edits: number;
   max_apps: number;
   run_quota: number;
-  allowed_tabs: string[];
   price_monthly: number;
   price_onetime_registration: number;
 }
@@ -28,7 +27,7 @@ const TierList: React.FC<TierListProps> = ({
   onEditTier,
   onDeleteTier,
   isDeleting,
-  deleteTarget
+  deleteTarget,
 }) => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">

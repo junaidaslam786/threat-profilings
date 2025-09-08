@@ -73,9 +73,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/user/organization/create" replace />;
   }
 
-  // If user doesn't have both tokens, redirect to dashboard (which will show login)
+  // If user doesn't have both tokens, redirect to custom auth page
   if (requireAuth && !hasBothTokens) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/auth" replace />;
   }
   
   if (requireActive && user && user.user_info.status !== "active") {

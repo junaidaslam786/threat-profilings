@@ -172,7 +172,10 @@ const PlatformAdminDashboard: React.FC = () => {
         {/* Platform Statistics */}
         {!statsLoading && platformStats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-primary-500/30 transition-all duration-300">
+            <div 
+              onClick={() => navigate("/platform-admins/users")}
+              className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-primary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary-500/10"
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <svg
@@ -189,6 +192,19 @@ const PlatformAdminDashboard: React.FC = () => {
                     />
                   </svg>
                 </div>
+                <svg
+                  className="w-5 h-5 text-secondary-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </div>
               <h4 className="text-lg font-semibold text-white mb-2">
                 Total Users
@@ -232,7 +248,9 @@ const PlatformAdminDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-yellow-500/30 transition-all duration-300">
+            <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-yellow-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/10"
+              onClick={() => navigate("/platform-admin/payments-details")}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center">
                   <svg
@@ -262,7 +280,10 @@ const PlatformAdminDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-purple-500/30 transition-all duration-300">
+            <div 
+              onClick={() => navigate("/platform-admins/admins")}
+              className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-purple-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-purple-500/10"
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <svg
@@ -279,6 +300,19 @@ const PlatformAdminDashboard: React.FC = () => {
                     />
                   </svg>
                 </div>
+                <svg
+                  className="w-5 h-5 text-secondary-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </div>
               <h4 className="text-lg font-semibold text-white mb-2">
                 Platform Admins

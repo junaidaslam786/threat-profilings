@@ -4,13 +4,13 @@ import ProtectedRoute from "../components/Auth/ProtectedRoute";
 import TaxRules from "../Pages/PlatformAdmins/TaxRules";
 import PartnerManagement from "../Pages/PlatformAdmins/PartnerManagement";
 import Invoices from "../Pages/PlatformAdmins/Invoices";
-import ManualUpgrades from "../Pages/PlatformAdmins/ManualUpgrades";
 const LoadingScreen = lazy(() => import("../components/Common/LoadingScreen"));
 
 // Auth Pages
 const AuthRedirectHandlerPage = lazy(
   () => import("../Pages/Auth/AuthRedirectHandlerPage")
 );
+const CustomAuthPage = lazy(() => import("../Pages/Auth/CustomAuthPage"));
 const AdminLogin = lazy(() => import("../Pages/Admin/AdminLogin"));
 
 // Dashboard
@@ -144,6 +144,7 @@ const RoutesContent: React.FC = () => {
           path="/auth-redirect-handler"
           element={<AuthRedirectHandlerPage />}
         />
+        <Route path="/auth" element={<CustomAuthPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/user/organization/create" element={<RegisterPage />} />
 
@@ -402,14 +403,6 @@ const RoutesContent: React.FC = () => {
           }
         />
         <Route
-          path="/platform-admins/manual-upgrades"
-          element={
-            <ProtectedRoute requiredRoles={["platform_admin"]}>
-              <ManualUpgrades />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/platform-admin/payments-details"
           element={
             <ProtectedRoute requiredRoles={["platform_admin"]}>
@@ -462,7 +455,7 @@ const RoutesContent: React.FC = () => {
         <Route
           path="/analytics"
           element={
-            <ProtectedRoute requiredRoles={["platform_admin"]}>
+            <ProtectedRoute requiredRoles={["admin", "LE_ADMIN"]}>
               <AnalyticsPage />
             </ProtectedRoute>
           }
@@ -491,7 +484,7 @@ const RoutesContent: React.FC = () => {
           path="/payment/success"
           element={
             <ProtectedRoute>
-              <PaymentPage />
+              <PaymentSuccessPage />
             </ProtectedRoute>
           }
         />

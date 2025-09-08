@@ -19,8 +19,6 @@ export default function RegisterPage() {
     const autoDetectFlow = async () => {
       try {
         setLoadingPhase('extracting');
-        
-        // Try to get email from JWT token
         const idToken = getIdToken();
         if (idToken) {
           const extractedEmail = getEmailFromToken(idToken);

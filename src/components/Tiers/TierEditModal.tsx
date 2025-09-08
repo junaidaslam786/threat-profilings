@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useUpdateTierMutation } from "../../Redux/api/tiersApi";
 import Modal from "../Common/Modal";
+import MultiSelect from "../Common/MultiSelect";
+import { COMPLIANCE_FRAMEWORKS } from "../../constants/complianceFrameworks";
 import type { TierConfigDto } from "../../Redux/slices/tiersSlice";
 
 interface TierEditModalProps {
@@ -21,11 +23,9 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
     description: tier.description || "",
     max_edits: tier.max_edits.toString(),
     max_apps: tier.max_apps.toString(),
-    allowed_tabs: tier.allowed_tabs.join(", "),
     run_quota: tier.run_quota.toString(),
     price_monthly: tier.price_monthly.toString(),
     price_onetime_registration: tier.price_onetime_registration.toString(),
-    threat_detection: tier.features?.threat_detection || false,
     compliance_reports: tier.features?.compliance_reports || false,
     api_access: tier.features?.api_access || false,
     custom_branding: tier.features?.custom_branding || false,
@@ -33,15 +33,14 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
     sso_integration: tier.features?.sso_integration || false,
     audit_logs: tier.features?.audit_logs || false,
     data_export: tier.features?.data_export || false,
-    compliance_frameworks:
-      tier.features?.compliance_frameworks?.join(", ") || "",
+    compliance_frameworks: tier.features?.compliance_frameworks || [],
     is_active: tier.features?.is_active || false,
-    discount_percent: tier.features?.discount_percent?.toString() || "0",
-    promotion_code: tier.features?.promotion_code || "",
-    max_users: tier.features?.max_users?.toString() || "0",
-    storage_limit_gb: tier.features?.storage_limit_gb?.toString() || "0",
     le_eligible: tier.features?.le_eligible || false,
   });
+
+  const handleComplianceFrameworksChange = (values: string[]) => {
+    setFormData((prev) => ({ ...prev, compliance_frameworks: values }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,16 +51,12 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
         description: formData.description,
         max_edits: parseInt(formData.max_edits),
         max_apps: parseInt(formData.max_apps),
-        allowed_tabs: formData.allowed_tabs
-          .split(", ")
-          .map((tab) => tab.trim()),
         run_quota: parseInt(formData.run_quota),
         price_monthly: parseFloat(formData.price_monthly),
         price_onetime_registration: parseFloat(
           formData.price_onetime_registration
         ),
         features: {
-          threat_detection: formData.threat_detection,
           compliance_reports: formData.compliance_reports,
           api_access: formData.api_access,
           custom_branding: formData.custom_branding,
@@ -69,14 +64,8 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
           sso_integration: formData.sso_integration,
           audit_logs: formData.audit_logs,
           data_export: formData.data_export,
-          compliance_frameworks: formData.compliance_frameworks
-            ? formData.compliance_frameworks.split(", ").map((f) => f.trim())
-            : [],
+          compliance_frameworks: formData.compliance_frameworks,
           is_active: formData.is_active,
-          discount_percent: parseFloat(formData.discount_percent),
-          promotion_code: formData.promotion_code,
-          max_users: parseInt(formData.max_users),
-          storage_limit_gb: parseInt(formData.storage_limit_gb),
           le_eligible: formData.le_eligible,
         },
       }).unwrap();
@@ -153,21 +142,6 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Allowed Tabs (Previous: {tier.allowed_tabs.join(", ")})
-            </label>
-            <input
-              type="text"
-              value={formData.allowed_tabs}
-              onChange={(e) =>
-                setFormData({ ...formData, allowed_tabs: e.target.value })
-              }
-              className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              placeholder="Comma separated values"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-300 mb-1">
@@ -220,20 +194,6 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
           </div>
 
           <div className="grid grid-cols-4 gap-4">
-            <label className="flex items-center text-white">
-              <input
-                type="checkbox"
-                checked={formData.threat_detection}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    threat_detection: e.target.checked,
-                  })
-                }
-                className="mr-2"
-              />
-              Threat Detection
-            </label>
             <label className="flex items-center text-white">
               <input
                 type="checkbox"
@@ -354,78 +314,20 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Compliance Frameworks (Previous:{" "}
-              {tier.features?.compliance_frameworks?.join(", ") || "None"})
-            </label>
-            <input
-              type="text"
-              value={formData.compliance_frameworks}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  compliance_frameworks: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              placeholder="Comma separated values"
+            <MultiSelect
+              id="compliance_frameworks"
+              label="Compliance Frameworks"
+              options={COMPLIANCE_FRAMEWORKS}
+              values={formData.compliance_frameworks}
+              onChange={handleComplianceFrameworksChange}
+              placeholder="Select compliance frameworks..."
+              searchable={true}
+              className="mt-2"
             />
-          </div>
-
-          <div className="grid grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Discount % (Previous: {tier.features?.discount_percent || 0})
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.discount_percent}
-                onChange={(e) =>
-                  setFormData({ ...formData, discount_percent: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Max Users (Previous: {tier.features?.max_users || 0})
-              </label>
-              <input
-                type="number"
-                value={formData.max_users}
-                onChange={(e) =>
-                  setFormData({ ...formData, max_users: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Storage GB (Previous: {tier.features?.storage_limit_gb || 0})
-              </label>
-              <input
-                type="number"
-                value={formData.storage_limit_gb}
-                onChange={(e) =>
-                  setFormData({ ...formData, storage_limit_gb: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Promo Code (Previous: {tier.features?.promotion_code || "None"})
-              </label>
-              <input
-                type="text"
-                value={formData.promotion_code}
-                onChange={(e) =>
-                  setFormData({ ...formData, promotion_code: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-              />
-            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Previous:{" "}
+              {tier.features?.compliance_frameworks?.join(", ") || "None"}
+            </p>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
