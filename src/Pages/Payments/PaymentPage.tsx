@@ -86,7 +86,6 @@ export const PaymentPage: React.FC = () => {
         client_name: userProfile.user_info.client_name,
         tier: selectedPlan.sub_level,
         payment_type: "monthly" as const,
-        partner_code: selectedPlan.sub_level === "LE" ? "LE2024" : "CYBER20",
       };
 
       const response = await createCheckoutSession(checkoutData).unwrap();
