@@ -1,8 +1,16 @@
+interface JWTPayload {
+  email?: string;
+  sub?: string;
+  exp?: number;
+  iat?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Decode JWT token without verification (client-side only)
  * This is safe for reading claims from trusted tokens
  */
-export const decodeJWT = (token: string): any => {
+export const decodeJWT = (token: string): JWTPayload | null => {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');

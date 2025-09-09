@@ -193,7 +193,7 @@ export interface SecurityAssessment {
       | "technical_review"
       | "hybrid";
     evidence_requirements: string[];
-    scoring_criteria: Record<string, any>;
+    scoring_criteria: Record<string, unknown>;
   };
   results: {
     overall_score: number;
@@ -294,7 +294,7 @@ export interface OrgAppsInfo {
   total_apps: number;
   apps_limit: number;
   apps_remaining: number | string;
-  recent_apps: any[];
+  recent_apps: Record<string, unknown>[];
   has_apps_table: boolean;
 }
 
