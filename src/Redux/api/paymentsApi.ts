@@ -114,6 +114,29 @@ export const paymentsApi = createApi({
         return response.data?.message || "Failed to handle payment success";
       },
     }),
+
+    getCheckoutSession: builder.query<Record<string, unknown>, string>({
+      query: (sessionId) => `/payments/checkout-session/${sessionId}`,
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch checkout session";
+      },
+    }),
+
+    testWebhookProcessing: builder.mutation<{ success: boolean; message: string; session_id: string }, string>({
+      query: (sessionId) => ({
+        url: `/payments/test-webhook-processing/${sessionId}`,
+        method: "POST",
+      }),
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to test webhook processing";
+      },
+    }),
   }),
 });
 
@@ -126,6 +149,9 @@ export const {
   useLazyGetPaymentStatusQuery,
   useLazyGetInvoicesQuery,
   useLazyHandlePaymentSuccessQuery,
+  useGetCheckoutSessionQuery,
+  useLazyGetCheckoutSessionQuery,
+  useTestWebhookProcessingMutation,
 } = paymentsApi;
 
 export const selectPaymentStatusByClient = (client_name: string) =>

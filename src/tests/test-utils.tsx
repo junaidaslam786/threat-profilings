@@ -6,13 +6,62 @@ import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import type { ReactElement } from 'react';
 
-// Basic store setup for testing
+// Import the actual store structure
+import organizationsReducer from '../Redux/slices/organizationsSlice';
+import partnersReducer from '../Redux/slices/partnersSlice';
+import paymentsReducer from '../Redux/slices/paymentsSlice';
+import platformAdminReducer from '../Redux/slices/platformAdminSlice';
+import rolesReducer from '../Redux/slices/rolesSlice';
+import subscriptionsReducer from '../Redux/slices/subscriptionsSlice';
+import tiersReducer from '../Redux/slices/tiersSlice';
+import userReducer from '../Redux/slices/userSlice';
+import { organizationsApi } from '../Redux/api/organizationsApi';
+import { partnersApi } from '../Redux/api/partnersApi';
+import { paymentsApi } from '../Redux/api/paymentsApi';
+import { platformAdminApi } from '../Redux/api/platformAdminApi';
+import { tiersApi } from '../Redux/api/tiersApi';
+import { rolesApi } from '../Redux/api/rolesApi';
+import { subscriptionsApi } from '../Redux/api/subscriptionsApi';
+import { userApi } from '../Redux/api/userApi';
+import { authApi } from '../Redux/api/authApi';
+import { threatProfilingApi } from '../Redux/api/threatProfilingApi';
+
+// Create test store matching the production structure
 const createTestStore = (preloadedState = {}) =>
   configureStore({
     reducer: {
-      // Basic reducer for testing
-      test: (state = {}) => state,
+      organizations: organizationsReducer,
+      partners: partnersReducer,
+      payments: paymentsReducer,
+      platformAdmin: platformAdminReducer,
+      roles: rolesReducer,
+      subscriptions: subscriptionsReducer,
+      tiers: tiersReducer,
+      user: userReducer,
+      [organizationsApi.reducerPath]: organizationsApi.reducer,
+      [partnersApi.reducerPath]: partnersApi.reducer,
+      [paymentsApi.reducerPath]: paymentsApi.reducer,
+      [platformAdminApi.reducerPath]: platformAdminApi.reducer,
+      [rolesApi.reducerPath]: rolesApi.reducer,
+      [subscriptionsApi.reducerPath]: subscriptionsApi.reducer,
+      [tiersApi.reducerPath]: tiersApi.reducer,
+      [userApi.reducerPath]: userApi.reducer,
+      [authApi.reducerPath]: authApi.reducer,
+      [threatProfilingApi.reducerPath]: threatProfilingApi.reducer,
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(
+        organizationsApi.middleware,
+        partnersApi.middleware,
+        paymentsApi.middleware,
+        platformAdminApi.middleware,
+        rolesApi.middleware,
+        subscriptionsApi.middleware,
+        tiersApi.middleware,
+        userApi.middleware,
+        authApi.middleware,
+        threatProfilingApi.middleware
+      ),
     preloadedState,
   });
 

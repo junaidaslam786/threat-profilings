@@ -72,6 +72,109 @@ export const subscriptionsApi = createApi({
         return response.data?.message || "Failed to update subscription";
       },
     }),
+
+    checkFeatureAllowed: builder.query<{ feature: string; allowed: boolean }, { clientName: string; feature: string }>({
+      query: ({ clientName, feature }) => `/subscriptions/${encodeURIComponent(clientName)}/features/${encodeURIComponent(feature)}`,
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to check feature availability";
+      },
+    }),
+
+    incrementRuns: builder.mutation<ClientSubscriptionDto, string>({
+      query: (clientName) => ({
+        url: `/subscriptions/${encodeURIComponent(clientName)}/usage/runs`,
+        method: "PUT",
+      }),
+      invalidatesTags: (_result, _error, clientName) => [
+        { type: "Subscription", id: clientName },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to increment runs";
+      },
+    }),
+
+    incrementUsageCounter: builder.mutation<
+      ClientSubscriptionDto,
+      { clientName: string; counter: 'apps_count' | 'edits_count' | 'users_count' }
+    >({
+      query: ({ clientName, counter }) => ({
+        url: `/subscriptions/${encodeURIComponent(clientName)}/usage/${counter}`,
+        method: "PUT",
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Subscription", id: arg.clientName },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to increment usage counter";
+      },
+    }),
+
+    updateStorageUsage: builder.mutation<
+      ClientSubscriptionDto,
+      { clientName: string; storageUsedGb: number }
+    >({
+      query: ({ clientName, storageUsedGb }) => ({
+        url: `/subscriptions/${encodeURIComponent(clientName)}/storage`,
+        method: "PUT",
+        body: { storage_used_gb: storageUsedGb },
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Subscription", id: arg.clientName },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to update storage usage";
+      },
+    }),
+
+    suspendSubscription: builder.mutation<
+      ClientSubscriptionDto,
+      { clientName: string; reason: string }
+    >({
+      query: ({ clientName, reason }) => ({
+        url: `/subscriptions/${encodeURIComponent(clientName)}/suspend`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "Subscription", id: arg.clientName },
+        { type: "Subscription", id: "LIST" },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to suspend subscription";
+      },
+    }),
+
+    reactivateSubscription: builder.mutation<ClientSubscriptionDto, string>({
+      query: (clientName) => ({
+        url: `/subscriptions/${encodeURIComponent(clientName)}/reactivate`,
+        method: "POST",
+      }),
+      invalidatesTags: (_result, _error, clientName) => [
+        { type: "Subscription", id: clientName },
+        { type: "Subscription", id: "LIST" },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to reactivate subscription";
+      },
+    }),
   }),
 });
 
@@ -80,4 +183,11 @@ export const {
   useGetSubscriptionQuery,
   useUpdateSubscriptionMutation,
   useLazyGetSubscriptionQuery,
+  useCheckFeatureAllowedQuery,
+  useLazyCheckFeatureAllowedQuery,
+  useIncrementRunsMutation,
+  useIncrementUsageCounterMutation,
+  useUpdateStorageUsageMutation,
+  useSuspendSubscriptionMutation,
+  useReactivateSubscriptionMutation,
 } = subscriptionsApi;

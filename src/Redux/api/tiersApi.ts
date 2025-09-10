@@ -84,6 +84,27 @@ export const tiersApi = createApi({
         return response.data?.message || 'Failed to delete tier';
       },
     }),
+
+    getTierPricing: builder.query<
+      { price: number; discount_price?: number; partner_discount?: number },
+      { sub_level: string; partner_code?: string }
+    >({
+      query: ({ sub_level, partner_code }) => {
+        const params = partner_code ? `?partner_code=${encodeURIComponent(partner_code)}` : '';
+        return `/tiers/pricing/${encodeURIComponent(sub_level)}${params}`;
+      },
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to fetch tier pricing';
+      },
+    }),
+
+    getLeEligibleTiers: builder.query<TierConfigDto[], void>({
+      query: () => "/tiers/le-eligible",
+      providesTags: [{ type: "Tier", id: "LE_ELIGIBLE" }],
+      transformErrorResponse: (response: { status: number; data?: { message?: string } }) => {
+        return response.data?.message || 'Failed to fetch LE eligible tiers';
+      },
+    }),
   }),
 });
 
@@ -95,6 +116,10 @@ export const {
   useDeleteTierMutation,
   useLazyGetTierQuery,
   useLazyGetTiersQuery,
+  useGetTierPricingQuery,
+  useLazyGetTierPricingQuery,
+  useGetLeEligibleTiersQuery,
+  useLazyGetLeEligibleTiersQuery,
 } = tiersApi;
 
 export const selectTierById = (sub_level: string) => 

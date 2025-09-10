@@ -1,35 +1,30 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useProcessPaymentMutation } from "../../Redux/api/paymentsApi";
+import { useLazyHandlePaymentSuccessQuery } from "../../Redux/api/paymentsApi";
 import Button from "../../components/Common/Button";
-import type { PaymentRecord } from "../../Redux/slices/paymentsSlice";
 
 export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [processPayment] = useProcessPaymentMutation();
+  const [handlePaymentSuccess] = useLazyHandlePaymentSuccessQuery();
   const [isProcessing, setIsProcessing] = useState(true);
   const [paymentResult, setPaymentResult] = useState<{
     success: boolean;
     message: string;
-    details?: PaymentRecord;
+    sessionId?: string;
   } | null>(null);
 
-  const handlePaymentCompletion = useCallback(async (sessionId: string, clientName: string) => {
+  const handlePaymentCompletion = useCallback(async (sessionId: string) => {
     try {
       setIsProcessing(true);
       
-      // Process the payment with the session ID
-      const result = await processPayment({
-        payment_method_id: sessionId,
-        amount: 0, // Will be determined by backend from session
-        client_name: clientName,
-      }).unwrap();
+      // Use the success endpoint to handle payment completion
+      const result = await handlePaymentSuccess(sessionId).unwrap();
 
       setPaymentResult({
-        success: true,
-        message: "Payment processed successfully!",
-        details: result
+        success: result.success,
+        message: result.message || "Payment processed successfully!",
+        sessionId: sessionId
       });
     } catch (error: unknown) {
       console.error("Payment processing failed:", error);
@@ -46,14 +41,13 @@ export default function PaymentSuccessPage() {
     } finally {
       setIsProcessing(false);
     }
-  }, [processPayment]);
+  }, [handlePaymentSuccess]);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
-    const clientName = searchParams.get("client_name") || "admin";
     
     if (sessionId) {
-      handlePaymentCompletion(sessionId, clientName);
+      handlePaymentCompletion(sessionId);
     } else {
       setPaymentResult({
         success: false,
@@ -114,7 +108,7 @@ export default function PaymentSuccessPage() {
             }
           </p>
 
-          {paymentResult?.success && paymentResult.details && (
+          {paymentResult?.success && paymentResult.sessionId && (
             <div className="bg-secondary-700/50 rounded-xl p-6 mb-8 text-left border border-secondary-600">
               <h3 className="text-xl font-semibold text-primary-300 mb-4 flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,12 +118,8 @@ export default function PaymentSuccessPage() {
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center p-3 bg-secondary-800/50 rounded-lg">
-                  <span className="text-secondary-300">Payment ID:</span>
-                  <span className="font-mono text-white bg-secondary-700 px-2 py-1 rounded text-xs">{paymentResult.details.payment_id}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-secondary-800/50 rounded-lg">
-                  <span className="text-secondary-300">Amount:</span>
-                  <span className="font-bold text-green-400 text-lg">${paymentResult.details.total_amount?.toFixed(2)}</span>
+                  <span className="text-secondary-300">Session ID:</span>
+                  <span className="font-mono text-white bg-secondary-700 px-2 py-1 rounded text-xs">{paymentResult.sessionId}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-secondary-800/50 rounded-lg">
                   <span className="text-secondary-300">Status:</span>
@@ -137,15 +127,9 @@ export default function PaymentSuccessPage() {
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    {paymentResult.details.payment_status}
+                    completed
                   </span>
                 </div>
-                {paymentResult.details.tier && (
-                  <div className="flex justify-between items-center p-3 bg-secondary-800/50 rounded-lg">
-                    <span className="text-secondary-300">Tier:</span>
-                    <span className="font-semibold text-primary-400 bg-primary-600/20 px-3 py-1 rounded-full">{paymentResult.details.tier}</span>
-                  </div>
-                )}
               </div>
             </div>
           )}

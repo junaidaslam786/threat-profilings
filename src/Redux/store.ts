@@ -20,6 +20,8 @@ import { tiersApi } from "./api/tiersApi";
 import { rolesApi } from "./api/rolesApi";
 import { subscriptionsApi } from "./api/subscriptionsApi";
 import { userApi } from "./api/userApi";
+import { authApi } from "./api/authApi";
+import { threatProfilingApi } from "./api/threatProfilingApi";
 
 const rootReducer = combineReducers({
   organizations: organizationsReducer,
@@ -38,6 +40,8 @@ const rootReducer = combineReducers({
   [subscriptionsApi.reducerPath]: subscriptionsApi.reducer,
   [tiersApi.reducerPath]: tiersApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [threatProfilingApi.reducerPath]: threatProfilingApi.reducer,
 });
 
 const store = configureStore({
@@ -51,7 +55,9 @@ const store = configureStore({
       rolesApi.middleware,
       subscriptionsApi.middleware,
       tiersApi.middleware,
-      userApi.middleware
+      userApi.middleware,
+      authApi.middleware,
+      threatProfilingApi.middleware
     ),
 });
 

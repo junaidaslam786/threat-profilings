@@ -125,6 +125,11 @@ export const userApi = createApi({
       query: () => "/users/admin-orgs",
       providesTags: ['AdminOrgs'],
     }),
+
+    getUserRoles: builder.query<UserMeResponse, void>({
+      query: () => "/users/me/roles",
+      providesTags: ['User'],
+    }),
   }),
 });
 
@@ -139,4 +144,5 @@ export const {
   useGetPendingJoinRequestsQuery,
   useGetProfileQuery,
   useGetAdminOrganizationsQuery,
+  useGetUserRolesQuery,
 } = userApi;

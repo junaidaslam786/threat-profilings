@@ -665,6 +665,119 @@ export const platformAdminApi = createApi({
         return response.data?.message || "Failed to fetch system permissions";
       },
     }),
+
+    getUserStatusHistory: builder.query<
+      { status_history: Array<{ status: string; changed_at: string; changed_by: string; reason?: string }> },
+      string
+    >({
+      query: (email) => `/users/${encodeURIComponent(email)}/status-history`,
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch user status history";
+      },
+    }),
+
+    getUsersByStatus: builder.query<
+      { users: UserWithPartnerInfo[]; total: number },
+      { status: string; limit?: number; offset?: number }
+    >({
+      query: ({ status, limit = 50, offset = 0 }) => 
+        `/users/by-status/${encodeURIComponent(status)}?limit=${limit}&offset=${offset}`,
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch users by status";
+      },
+    }),
+
+    exportLEAdminPayments: builder.query<
+      Blob,
+      { start_date?: string; end_date?: string; status?: string }
+    >({
+      queryFn: async (params, _queryApi, _extraOptions, fetchWithBQ) => {
+        const queryParams = new URLSearchParams();
+        if (params.start_date) queryParams.append('start_date', params.start_date);
+        if (params.end_date) queryParams.append('end_date', params.end_date);
+        if (params.status) queryParams.append('status', params.status);
+
+        const result = await fetchWithBQ({
+          url: `/payments/le-admins/export?${queryParams.toString()}`,
+          responseHandler: (response) => response.blob(),
+        });
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return { data: result.data as Blob };
+      },
+    }),
+
+    exportStandardAdminPayments: builder.query<
+      Blob,
+      { start_date?: string; end_date?: string; status?: string; tier?: string }
+    >({
+      queryFn: async (params, _queryApi, _extraOptions, fetchWithBQ) => {
+        const queryParams = new URLSearchParams();
+        if (params.start_date) queryParams.append('start_date', params.start_date);
+        if (params.end_date) queryParams.append('end_date', params.end_date);
+        if (params.status) queryParams.append('status', params.status);
+        if (params.tier) queryParams.append('tier', params.tier);
+
+        const result = await fetchWithBQ({
+          url: `/payments/standard-admins/export?${queryParams.toString()}`,
+          responseHandler: (response) => response.blob(),
+        });
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return { data: result.data as Blob };
+      },
+    }),
+
+    exportUsers: builder.query<
+      Blob,
+      { status?: string; user_type?: string; has_partner?: boolean; partner_code?: string }
+    >({
+      queryFn: async (params, _queryApi, _extraOptions, fetchWithBQ) => {
+        const queryParams = new URLSearchParams();
+        if (params.status) queryParams.append('status', params.status);
+        if (params.user_type) queryParams.append('user_type', params.user_type);
+        if (params.has_partner !== undefined) queryParams.append('has_partner', params.has_partner.toString());
+        if (params.partner_code) queryParams.append('partner_code', params.partner_code);
+
+        const result = await fetchWithBQ({
+          url: `/users/export?${queryParams.toString()}`,
+          responseHandler: (response) => response.blob(),
+        });
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return { data: result.data as Blob };
+      },
+    }),
+
+    exportPartnerAnalytics: builder.query<Blob, void>({
+      queryFn: async (_arg, _queryApi, _extraOptions, fetchWithBQ) => {
+        const result = await fetchWithBQ({
+          url: "/partners/analytics/export",
+          responseHandler: (response) => response.blob(),
+        });
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return { data: result.data as Blob };
+      },
+    }),
   }),
 });
 
@@ -687,6 +800,12 @@ export const {
   useGetPartnerAnalyticsQuery,
   useGetPartnerPerformanceQuery,
   useGetAllSystemPermissionsQuery,
+  useGetUserStatusHistoryQuery,
+  useGetUsersByStatusQuery,
+  useExportLEAdminPaymentsQuery,
+  useExportStandardAdminPaymentsQuery,
+  useExportUsersQuery,
+  useExportPartnerAnalyticsQuery,
   useLazyGetPlatformStatsQuery,
   useLazyGetActivityLogsQuery,
   useLazyListPlatformAdminsQuery,
@@ -698,6 +817,12 @@ export const {
   useLazyGetPartnerAnalyticsQuery,
   useLazyGetPartnerPerformanceQuery,
   useLazyGetAllSystemPermissionsQuery,
+  useLazyGetUserStatusHistoryQuery,
+  useLazyGetUsersByStatusQuery,
+  useLazyExportLEAdminPaymentsQuery,
+  useLazyExportStandardAdminPaymentsQuery,
+  useLazyExportUsersQuery,
+  useLazyExportPartnerAnalyticsQuery,
 } = platformAdminApi;
 
 export const selectPlatformStats =
