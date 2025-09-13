@@ -129,14 +129,8 @@ const ThreatProfilingSidebar: React.FC<ThreatProfilingSidebarProps> = ({ classNa
 
   return (
     <aside className={`w-64 bg-secondary-800 border-r border-secondary-700/50 flex flex-col ${className}`}>
-      {/* Header */}
-      <div className="p-6 border-b border-secondary-700/50">
-        <h2 className="text-lg font-semibold text-white mb-2">Threat Profiling</h2>
-        <p className="text-sm text-secondary-400">Navigate through security assessment sections</p>
-      </div>
-
       {/* Navigation Items */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-auto">
         {sidebarItems.map((item) => (
           <button
             key={item.id}
@@ -163,13 +157,6 @@ const ThreatProfilingSidebar: React.FC<ThreatProfilingSidebarProps> = ({ classNa
           </button>
         ))}
       </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-secondary-700/50">
-        <div className="text-xs text-secondary-500 text-center">
-          Comprehensive threat assessment and security profiling
-        </div>
-      </div>
     </aside>
   );
 };
