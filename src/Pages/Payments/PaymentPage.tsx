@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useGetProfileQuery } from "../../Redux/api/userApi";
 import {
-  useLazyHandlePaymentSuccessQuery,
+  useHandlePaymentSuccessMutation,
   useCreateCheckoutSessionMutation,
 } from "../../Redux/api/paymentsApi";
 import { useGetTiersQuery } from "../../Redux/api/tiersApi";
@@ -22,7 +22,7 @@ export const PaymentPage: React.FC = () => {
   const { data: userProfile, isLoading: profileLoading } = useGetProfileQuery();
   const { data: tiers, isLoading: tiersLoading } = useGetTiersQuery();
   const [handlePaymentSuccess, { isLoading: paymentLoading }] =
-    useLazyHandlePaymentSuccessQuery();
+    useHandlePaymentSuccessMutation();
   const [createCheckoutSession, { isLoading: checkoutLoading }] =
     useCreateCheckoutSessionMutation();
 
@@ -82,10 +82,10 @@ export const PaymentPage: React.FC = () => {
 
     try {
       const checkoutData = {
-        amount: selectedPlan.price_monthly,
+        amount: selectedPlan.price_onetime_registration,
         client_name: userProfile.user_info.client_name,
         tier: selectedPlan.sub_level,
-        payment_type: "monthly" as const,
+        payment_type: "onetime" as const,
       };
 
       const response = await createCheckoutSession(checkoutData).unwrap();
@@ -259,9 +259,9 @@ export const PaymentPage: React.FC = () => {
                       </h3>
                       <div className="mb-4">
                         <span className="text-3xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
-                          ${tier.price_monthly.toFixed(2)}
+                          ${tier.price_onetime_registration.toFixed(2)}
                         </span>
-                        <span className="text-secondary-400 ml-1">/month</span>
+                        <span className="text-secondary-400 ml-1"> one-time</span>
                       </div>
                       {tier.description && (
                         <p className="text-secondary-300 text-sm leading-relaxed">
@@ -355,12 +355,12 @@ export const PaymentPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-secondary-300">Monthly Subscription</span>
+                <span className="text-secondary-300">One-time Payment</span>
                 <div className="text-right">
                   <span className="text-2xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
-                    ${selectedPlan.price_monthly.toFixed(2)}
+                    ${selectedPlan.price_onetime_registration.toFixed(2)}
                   </span>
-                  <span className="text-secondary-400 ml-1">/month</span>
+                  <span className="text-secondary-400 ml-1"> one-time</span>
                 </div>
               </div>
             </div>
@@ -373,7 +373,7 @@ export const PaymentPage: React.FC = () => {
               >
                 {checkoutLoading
                   ? "Creating Session..."
-                  : `Pay $${selectedPlan.price_monthly.toFixed(2)}`}
+                  : `Pay $${selectedPlan.price_onetime_registration.toFixed(2)}`}
               </Button>
 
               <Button

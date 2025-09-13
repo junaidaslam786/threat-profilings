@@ -8,7 +8,7 @@ export interface StripeCheckoutDto {
   client_name: string;
   partner_code?: string;
   tier?: string;
-  payment_type: "registration" | "monthly" | "upgrade";
+  payment_type: "registration" | "monthly" | "upgrade" | "onetime";
   success_url?: string;
   cancel_url?: string;
 }

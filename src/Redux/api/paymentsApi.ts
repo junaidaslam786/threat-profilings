@@ -23,7 +23,7 @@ export const paymentsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Payment", "PaymentStatus", "Invoice", "Subscription"],
+  tagTypes: ["Payment", "PaymentStatus", "Invoice", "Subscription", "User"],
   endpoints: (builder) => ({
     createPaymentIntent: builder.mutation<
       PaymentIntentResponse,
@@ -105,8 +105,12 @@ export const paymentsApi = createApi({
       },
     }),
 
-    handlePaymentSuccess: builder.query<{ success: boolean; message: string; session?: object }, string>({
-      query: (session_id) => `/payments/success?session_id=${session_id}`,
+    handlePaymentSuccess: builder.mutation<{ success: boolean; message: string; session?: object }, string>({
+      query: (session_id) => ({
+        url: `/payments/success?session_id=${session_id}`,
+        method: 'GET',
+      }),
+      invalidatesTags: ['Payment', 'Subscription', 'User'],
       transformErrorResponse: (response: {
         status: number;
         data?: { message?: string };
@@ -148,7 +152,7 @@ export const {
   useGetInvoicesQuery,
   useLazyGetPaymentStatusQuery,
   useLazyGetInvoicesQuery,
-  useLazyHandlePaymentSuccessQuery,
+  useHandlePaymentSuccessMutation,
   useGetCheckoutSessionQuery,
   useLazyGetCheckoutSessionQuery,
   useTestWebhookProcessingMutation,

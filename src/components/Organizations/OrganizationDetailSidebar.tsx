@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Common/Sidebar";
+import ThreatProfilingControlPanel from "./ThreatProfilingControlPanel";
 
 interface Organization {
   client_name: string;
@@ -408,6 +409,9 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Threat Profiling Control Panel */}
+        <ThreatProfilingControlPanel clientName={organization.client_name} />
 
         {/* Contact Information */}
         {(organization.contact_email ||

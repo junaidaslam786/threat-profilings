@@ -35,13 +35,13 @@ export default function TierDetailPage() {
         <div className="mb-3 text-xs text-gray-300">{tier.max_apps}</div>
         <div className="mb-3 text-blue-400 font-semibold">Run Quota</div>
         <div className="mb-3 text-xs text-gray-300">{tier.run_quota}</div>
-        <div className="mb-3 text-blue-400 font-semibold">Monthly Price</div>
-        <div className="mb-3 text-xs text-gray-300">${tier.price_monthly}</div>
+        <div className="mb-3 text-blue-400 font-semibold">Subscription Price</div>
+        <div className="mb-3 text-xs text-gray-300">${tier.price_onetime_registration} (one-time)</div>
         <div className="mb-3 text-blue-400 font-semibold">
-          One-time Registration
+          Monthly Rate (Legacy)
         </div>
         <div className="mb-3 text-xs text-gray-300">
-          ${tier.price_onetime_registration}
+          ${tier.price_monthly}
         </div>
         <Button
           variant="outline"

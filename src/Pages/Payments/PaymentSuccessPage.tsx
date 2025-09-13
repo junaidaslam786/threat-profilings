@@ -1,53 +1,82 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useLazyHandlePaymentSuccessQuery } from "../../Redux/api/paymentsApi";
+import { useHandlePaymentSuccessMutation } from "../../Redux/api/paymentsApi";
+import { useUser } from "../../hooks/useUser";
+import { useAppDispatch } from "../../Redux/hooks";
+import { userApi } from "../../Redux/api/userApi";
+import { forceRefreshUser } from "../../Redux/slices/userSlice";
 import Button from "../../components/Common/Button";
 
 export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [handlePaymentSuccess] = useLazyHandlePaymentSuccessQuery();
+  const { refetch: refetchUser } = useUser();
+  const [handlePaymentSuccess] = useHandlePaymentSuccessMutation();
+  const dispatch = useAppDispatch();
   const [isProcessing, setIsProcessing] = useState(true);
   const [paymentResult, setPaymentResult] = useState<{
     success: boolean;
     message: string;
     sessionId?: string;
   } | null>(null);
-
-  const handlePaymentCompletion = useCallback(async (sessionId: string) => {
-    try {
-      setIsProcessing(true);
-      
-      // Use the success endpoint to handle payment completion
-      const result = await handlePaymentSuccess(sessionId).unwrap();
-
-      setPaymentResult({
-        success: result.success,
-        message: result.message || "Payment processed successfully!",
-        sessionId: sessionId
-      });
-    } catch (error: unknown) {
-      console.error("Payment processing failed:", error);
-      const errorMessage = error && typeof error === 'object' && 'data' in error && 
-        error.data && typeof error.data === 'object' && 'message' in error.data && 
-        typeof error.data.message === 'string' 
-          ? error.data.message 
-          : "Payment processing failed";
-      
-      setPaymentResult({
-        success: false,
-        message: errorMessage
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [handlePaymentSuccess]);
+  const hasProcessedPayment = useRef(false);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
     
+    // Prevent multiple payment processing attempts
+    if (hasProcessedPayment.current) {
+      return;
+    }
+    
     if (sessionId) {
-      handlePaymentCompletion(sessionId);
+      hasProcessedPayment.current = true;
+      
+      const processPayment = async () => {
+        try {
+          setIsProcessing(true);
+          
+          // Use the success endpoint to handle payment completion
+          const result = await handlePaymentSuccess(sessionId).unwrap();
+
+          setPaymentResult({
+            success: result.success,
+            message: result.message || "Payment processed successfully!",
+            sessionId: sessionId
+          });
+
+          // Refetch user data to update subscription status
+          if (result.success) {
+            try {
+              // Force complete refresh of user data
+              dispatch(forceRefreshUser());
+              dispatch(userApi.util.invalidateTags(['User']));
+              
+              await refetchUser();
+              // Set a flag that dashboard can detect for forced refresh
+              sessionStorage.setItem('payment_completed', 'true');
+            } catch (error) {
+              console.warn("Failed to refetch user data after payment success:", error);
+            }
+          }
+        } catch (error: unknown) {
+          console.error("Payment processing failed:", error);
+          const errorMessage = error && typeof error === 'object' && 'data' in error && 
+            error.data && typeof error.data === 'object' && 'message' in error.data && 
+            typeof error.data.message === 'string' 
+              ? error.data.message 
+              : "Payment processing failed";
+          
+          setPaymentResult({
+            success: false,
+            message: errorMessage
+          });
+        } finally {
+          setIsProcessing(false);
+        }
+      };
+      
+      processPayment();
     } else {
       setPaymentResult({
         success: false,
@@ -55,7 +84,7 @@ export default function PaymentSuccessPage() {
       });
       setIsProcessing(false);
     }
-  }, [searchParams, handlePaymentCompletion]);
+  }, [searchParams, handlePaymentSuccess, refetchUser, dispatch]);
 
   if (isProcessing) {
     return (
@@ -136,7 +165,15 @@ export default function PaymentSuccessPage() {
 
           <div className="space-y-4">
             <Button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => {
+                // Add a small delay to ensure user data is refreshed
+                setTimeout(() => {
+                  navigate('/dashboard', { 
+                    replace: true, 
+                    state: { fromPayment: true } 
+                  });
+                }, 500);
+              }}
               className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
             >
               <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">

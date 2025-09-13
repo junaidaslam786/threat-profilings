@@ -84,15 +84,15 @@ const TierDetailSidebar: React.FC<TierDetailSidebarProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 p-4 rounded-lg border border-green-500/30">
               <div className="text-2xl font-bold text-green-400">
-                ${tier.price_monthly}
-              </div>
-              <div className="text-sm text-green-300">Monthly</div>
-            </div>
-            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 p-4 rounded-lg border border-blue-500/30">
-              <div className="text-2xl font-bold text-blue-400">
                 ${tier.price_onetime_registration}
               </div>
-              <div className="text-sm text-blue-300">Registration</div>
+              <div className="text-sm text-green-300">Active Pricing</div>
+            </div>
+            <div className="bg-gradient-to-br from-gray-500/20 to-gray-600/20 p-4 rounded-lg border border-gray-500/30">
+              <div className="text-2xl font-bold text-gray-400">
+                ${tier.price_monthly}
+              </div>
+              <div className="text-sm text-gray-300">Legacy (Monthly)</div>
             </div>
           </div>
         </div>

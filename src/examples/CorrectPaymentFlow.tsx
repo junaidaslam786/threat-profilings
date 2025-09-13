@@ -1,7 +1,7 @@
 // Example: Correct Payment Flow Implementation
 // This file demonstrates the proper way to handle Stripe payments
 
-import { useCreateCheckoutSessionMutation, useLazyHandlePaymentSuccessQuery } from "../Redux/api/paymentsApi";
+import { useCreateCheckoutSessionMutation, useHandlePaymentSuccessMutation } from "../Redux/api/paymentsApi";
 import type { StripeCheckoutDto } from "../Redux/slices/paymentsSlice";
 
 // React Hook for handling Stripe checkout
@@ -30,7 +30,7 @@ export const useStripeCheckout = () => {
 
 // React Hook for handling payment return
 export const usePaymentReturn = () => {
-  const [handlePaymentSuccess] = useLazyHandlePaymentSuccessQuery();
+  const [handlePaymentSuccess] = useHandlePaymentSuccessMutation();
   
   const handlePaymentReturn = async (sessionId: string) => {
     try {

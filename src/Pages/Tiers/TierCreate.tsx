@@ -251,14 +251,14 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelClasses}>Monthly Price *</label>
+              <label className={labelClasses}>Active Subscription Price *</label>
               <input
                 type="number"
                 step="0.01"
-                name="price_monthly"
-                value={fields.price_monthly}
+                name="price_onetime_registration"
+                value={fields.price_onetime_registration}
                 onChange={handleChange}
-                placeholder="29.99"
+                placeholder="99.00"
                 className={inputClasses}
                 required
               />
@@ -266,15 +266,15 @@ export default function TierCreate({ onSuccess }: TierCreateProps) {
 
             <div>
               <label className={labelClasses}>
-                One-time Registration Price *
+                Legacy Monthly Price *
               </label>
               <input
                 type="number"
                 step="0.01"
-                name="price_onetime_registration"
-                value={fields.price_onetime_registration}
+                name="price_monthly"
+                value={fields.price_monthly}
                 onChange={handleChange}
-                placeholder="0.00"
+                placeholder="29.99"
                 className={inputClasses}
                 required
               />

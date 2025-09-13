@@ -35,8 +35,12 @@ export function useUser() {
     isFetching,
     error,
     refetch,
+    isUninitialized,
   } = useGetProfileQuery(undefined, {
     skip: shouldSkip,
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
   });
 
   const [hydrated, setHydrated] = useState(false);
@@ -89,7 +93,13 @@ export function useUser() {
     isAdmin: checkAdmin(user),
     isLEAdmin: checkLEAdmin(user),
     isViewer: checkViewer(user),
-    refetch,
+    refetch: () => {
+      // Only refetch if the query is not skipped/uninitialized
+      if (!shouldSkip && !isUninitialized) {
+        return refetch();
+      }
+      return Promise.resolve({ data: user });
+    },
     hasBothTokens,
   };
 }

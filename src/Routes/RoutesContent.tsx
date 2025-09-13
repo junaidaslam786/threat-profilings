@@ -19,6 +19,20 @@ const EnhancedComponentsDashboard = lazy(
   () => import("../Pages/Dashboard/EnhancedComponentsDashboard")
 );
 
+// Home Page for non-admin users
+const OrganizationDetailsHome = lazy(
+  () => import("../Pages/Home/OrganizationDetailsHome")
+);
+
+// Threat Profiling Pages
+const TargetPage = lazy(() => import("../Pages/ThreatProfiling/TargetPage"));
+const IntroPage = lazy(() => import("../Pages/ThreatProfiling/IntroPage"));
+const ThreatActorPage = lazy(() => import("../Pages/ThreatProfiling/ThreatActorPage"));
+const ThreatsPage = lazy(() => import("../Pages/ThreatProfiling/ThreatsPage"));
+const DetectionPage = lazy(() => import("../Pages/ThreatProfiling/DetectionPage"));
+const ComplianceIsmPage = lazy(() => import("../Pages/ThreatProfiling/ComplianceIsmPage"));
+const ComplianceE8Page = lazy(() => import("../Pages/ThreatProfiling/ComplianceE8Page"));
+
 // Admin-specific Pages (non-platform admin)
 const AdminPendingJoinRequests = lazy(
   () => import("../Pages/Admin/AdminPendingJoinRequests")
@@ -151,6 +165,74 @@ const RoutesContent: React.FC = () => {
         {/* Dashboard route - handles its own auth logic */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Home page for non-admin users */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <OrganizationDetailsHome />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Threat Profiling Routes */}
+        <Route
+          path="/threat-profiling/target"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <TargetPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/intro"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <IntroPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/threat-actor"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ThreatActorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/threats"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ThreatsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/detection"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <DetectionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/compliance-ism"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ComplianceIsmPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/compliance-e8"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ComplianceE8Page />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected routes that require authentication */}
         <Route

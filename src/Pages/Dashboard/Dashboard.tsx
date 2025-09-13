@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../hooks/useUser";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import LoadingScreen from "../../components/Common/LoadingScreen";
 import Navbar from "../../components/Common/Navbar";
@@ -17,8 +17,10 @@ const Dashboard: React.FC = () => {
     isSuperAdmin,
     hasBothTokens,
     hydrated,
+    refetch: refetchUser,
   } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const [signInUrl, setSignInUrl] = useState<string>("/");
   const [initialLoad, setInitialLoad] = useState(true);
 
@@ -45,6 +47,40 @@ const Dashboard: React.FC = () => {
 
     fetchAuthConfig();
   }, []);
+
+  // Force refresh user data when dashboard loads, especially after payment success
+  useEffect(() => {
+    if (hasAuthToken && user && hydrated) {
+      // Check if we're coming from a payment flow or if user data seems stale
+      const urlParams = new URLSearchParams(location.search);
+      const fromPayment = urlParams.get('from') === 'payment' || 
+                         location.state?.fromPayment ||
+                         sessionStorage.getItem('payment_completed');
+      
+      if (fromPayment) {
+        // Clear the payment completion flag
+        sessionStorage.removeItem('payment_completed');
+        
+        // Force refresh user data
+        refetchUser().catch((error) => {
+          console.warn("Failed to refresh user data after payment:", error);
+        });
+      }
+    }
+  }, [hasAuthToken, user, hydrated, location, refetchUser]);
+
+  // Additional effect to periodically check for subscription updates
+  useEffect(() => {
+    if (hasAuthToken && user && hydrated) {
+      const interval = setInterval(() => {
+        refetchUser().catch((error) => {
+          console.warn("Failed to refresh user data:", error);
+        });
+      }, 30000); // Refresh every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [hasAuthToken, user, hydrated, refetchUser]);
 
   useEffect(() => {
     if (!user && hasBothTokens && hydrated && !initialLoad && !isLoading) {
@@ -236,34 +272,36 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Common routes for all users */}
-              <button
-                onClick={() => navigate("/roles")}
-                className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-primary-500/50 transition-all duration-300 cursor-pointer text-left"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-primary-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
+              {isPlatformAdmin && (
+                <button
+                  onClick={() => navigate("/roles")}
+                  className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-primary-500/50 transition-all duration-300 cursor-pointer text-left"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-primary-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-white">Roles</h3>
+                      <p className="text-xs text-secondary-400">
+                        View user roles
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium text-white">Roles</h3>
-                    <p className="text-xs text-secondary-400">
-                      View user roles
-                    </p>
-                  </div>
-                </div>
-              </button>
+                </button>
+              )}
 
               <button
                 onClick={() =>

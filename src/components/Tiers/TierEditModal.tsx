@@ -145,23 +145,7 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-300 mb-1">
-                Monthly Price (Previous: ${tier.price_monthly})
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.price_monthly}
-                onChange={(e) =>
-                  setFormData({ ...formData, price_monthly: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Registration Price (Previous: ${tier.price_onetime_registration}
-                )
+                Active Subscription Price (Previous: ${tier.price_onetime_registration})
               </label>
               <input
                 type="number"
@@ -172,6 +156,21 @@ const TierEditModal: React.FC<TierEditModalProps> = ({
                     ...formData,
                     price_onetime_registration: e.target.value,
                   })
+                }
+                className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-300 mb-1">
+                Legacy Monthly Price (Previous: ${tier.price_monthly})
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.price_monthly}
+                onChange={(e) =>
+                  setFormData({ ...formData, price_monthly: e.target.value })
                 }
                 className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded text-white"
                 required

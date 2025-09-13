@@ -10,7 +10,22 @@ interface NavItem {
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isPlatformAdmin, isAdmin, isLEAdmin } = useUser();
+  const { user, isPlatformAdmin, isAdmin, isLEAdmin, isSuperAdmin } = useUser();
+  
+  // Simplified user is anyone who's not a platform admin or super admin
+  const isSimplifiedUser = !isPlatformAdmin && !isSuperAdmin;
+  
+  // Check if user has an active subscription (including LE subscriptions)
+  const hasActiveSubscription = () => {
+    if (!user?.subscriptions || user.subscriptions.length === 0) return false;
+    
+    // Check for any active subscription including LE
+    return user.subscriptions.some(sub => 
+      sub.subscription_level && 
+      sub.subscription_level !== "L0" && // L0 is typically free tier
+      sub.subscription_level.length > 0
+    );
+  };
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -94,31 +109,42 @@ const Navbar: React.FC = () => {
     <nav className="bg-gradient-to-r from-secondary-900 to-secondary-800 border-b border-secondary-700/50 sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand */}
-          <div className="flex items-center">
+          {/* Logo/Brand and Subscription Indicator */}
+          <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate(isSimplifiedUser ? "/home" : "/dashboard")}
               className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent hover:from-primary-300 hover:to-primary-200 transition-all duration-300 cursor-pointer"
             >
               Threat Profiling
             </button>
+            
+            {/* Subscription Tier Indicator for Simplified Users */}
+            {isSimplifiedUser && !hasActiveSubscription() && (
+              <button
+                onClick={() => navigate("/subscriptions")}
+                className="px-3 py-1 bg-amber-600/20 border border-amber-500/30 text-amber-300 text-xs rounded-lg hover:bg-amber-600/30 transition-all duration-200 cursor-pointer"
+              >
+                No Subscription Tier. Subscribe to a tier
+              </button>
+            )}
           </div>
 
-          {/* Navigation Items */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all duration-200 cursor-pointer relative group"
-              >
-                <span className="relative z-10">{item.label}</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-primary-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-              </button>
-            ))}
+          {/* Navigation Items - Only for Platform Admins and Super Admins */}
+          {(isPlatformAdmin || isSuperAdmin) && (
+            <div className="hidden md:flex items-center space-x-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all duration-200 cursor-pointer relative group"
+                >
+                  <span className="relative z-10">{item.label}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-primary-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                </button>
+              ))}
 
-            {/* Management Dropdown for Platform Admins */}
-            {isPlatformAdmin && (
+              {/* Management Dropdown for Platform Admins */}
+              {isPlatformAdmin && (
               <div className="relative" ref={managementDropdownRef}>
                 <button
                   onClick={() =>
@@ -224,7 +250,8 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+          )}
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
@@ -309,6 +336,25 @@ const Navbar: React.FC = () => {
               </div>
 
               <div className="p-2">
+                {/* Navigation items for simplified users (non-platform/super admins) */}
+                {isSimplifiedUser && (
+                  <>
+                    {navItems.map((item) => (
+                      <button
+                        key={item.path}
+                        onClick={() => {
+                          navigate(item.path);
+                          setShowProfileDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all duration-200 cursor-pointer"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                    <hr className="my-2 border-secondary-700/50" />
+                  </>
+                )}
+                
                 <button
                   onClick={() => {
                     navigate("/profile");

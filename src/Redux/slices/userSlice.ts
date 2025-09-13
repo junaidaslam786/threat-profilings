@@ -260,6 +260,12 @@ const userSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    forceRefreshUser: (state) => {
+      // Clear user data to force a fresh fetch
+      state.user = null;
+      state.isLoading = true;
+      state.error = null;
+    },
     setPendingJoinRequests: (
       state,
       action: PayloadAction<PendingJoinDto[]>
@@ -284,6 +290,7 @@ export const {
   logoutUser,
   setLoading,
   setError,
+  forceRefreshUser,
   setPendingJoinRequests,
   setUsers,
   setAdminOrganizations,

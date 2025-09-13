@@ -204,9 +204,9 @@ const PaymentDashboard: React.FC = () => {
                         </h3>
                         <div className="mb-4">
                           <span className="text-3xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
-                            ${tier.price_monthly.toFixed(2)}
+                            ${tier.price_onetime_registration.toFixed(2)}
                           </span>
-                          <span className="text-secondary-400 ml-1">/month</span>
+                          <span className="text-secondary-400 ml-1"> one-time</span>
                         </div>
                         {tier.description && (
                           <p className="text-secondary-300 text-sm leading-relaxed">

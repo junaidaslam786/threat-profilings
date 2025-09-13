@@ -3,15 +3,13 @@ import Cookies from "js-cookie";
 
 export interface StartProfilingDto {
   client_name: string;
-  description?: string;
-  compliance_frameworks?: string[];
-  [key: string]: unknown;
+  reason?: string;
 }
 
 export interface ProfilingProgress {
   client_name: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  progress_percentage: number;
+  progress: number;
   current_step?: string;
   estimated_completion?: string;
   error_message?: string;
@@ -21,10 +19,81 @@ export interface ProfilingResults {
   client_name: string;
   has_results: boolean;
   results?: {
-    threats: Record<string, unknown>[];
-    detections: Record<string, unknown>[];
-    compliance: Record<string, unknown>[];
-    recommendations: Record<string, unknown>[];
+    isms?: Array<{
+      control_id: string;
+      control_description: string;
+      applicability: boolean;
+      implementation_guidance: string;
+      control_name: string;
+      implementation_status: string;
+      recommendations: string[];
+      compliance_score: number;
+    }>;
+    e8s?: Array<{
+      gaps_identified: string[];
+      mitigation_name: string;
+      description: string;
+      mitigation_id: string;
+      implementation_level: string;
+      priority: string;
+      recommendations: string[];
+      current_implementation: string;
+    }>;
+    tas?: Array<{
+      capabilities: string[];
+      sophistication: string;
+      techniques: string[];
+      motivation: string[];
+      name: string;
+      id: string;
+      type: string;
+      relevance_score: number;
+    }>;
+    ttps_applicable?: Array<{
+      applicability_score: number;
+      detection_methods: string[];
+      technique_name: string;
+      description: string;
+      technique_id: string;
+      mitigations: string[];
+      tactic: string;
+    }>;
+    detections?: Array<{
+      query: string;
+      confidence_level: string;
+      name: string;
+      description: string;
+      query_language: string;
+      mitre_techniques: string[];
+      detection_id: string;
+      data_sources: string[];
+      false_positive_rate: string;
+    }>;
+    executive_summary?: {
+      overview: string;
+      recommendations: string[];
+      key_findings: string[];
+      risk_posture: string;
+    };
+    compliance_status?: {
+      ism_compliance_percentage: number;
+      overall_security_score: number;
+      e8_maturity_level: number;
+    };
+    metadata?: {
+      last_updated: string;
+      profiling_duration_seconds: number;
+      data_sources_analyzed: string[];
+      confidence_level: string;
+    };
+    report_id?: string;
+    generated_at?: string;
+    generated_by?: string;
+    version?: string;
+    // Legacy fields for backward compatibility
+    threats?: Record<string, unknown>[];
+    compliance?: Record<string, unknown>[];
+    recommendations?: Record<string, unknown>[];
     [key: string]: unknown;
   };
 }

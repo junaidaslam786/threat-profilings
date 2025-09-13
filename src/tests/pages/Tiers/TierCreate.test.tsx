@@ -38,7 +38,7 @@ describe("TierCreate", () => {
     expect(screen.getByPlaceholderText("5")).toBeInTheDocument(); // Max Apps
     expect(screen.getByPlaceholderText("100")).toBeInTheDocument(); // Run Quota
     expect(screen.getByPlaceholderText("29.99")).toBeInTheDocument(); // Monthly Price
-    expect(screen.getByPlaceholderText("0.00")).toBeInTheDocument(); // One-time Registration Price
+    expect(screen.getByPlaceholderText("99.00")).toBeInTheDocument(); // One-time Registration Price
   });
 
   it("should validate required fields before submission", async () => {
@@ -79,7 +79,7 @@ describe("TierCreate", () => {
     fireEvent.change(screen.getByPlaceholderText("29.99"), {
       target: { value: "99.99" },
     });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), {
+    fireEvent.change(screen.getByPlaceholderText("99.00"), {
       target: { value: "199.99" },
     });
 
@@ -138,7 +138,7 @@ describe("TierCreate", () => {
     fireEvent.change(screen.getByPlaceholderText("29.99"), {
       target: { value: "199.99" },
     });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), {
+    fireEvent.change(screen.getByPlaceholderText("99.00"), {
       target: { value: "399.99" },
     });
 
@@ -178,7 +178,7 @@ describe("TierCreate", () => {
     fireEvent.change(screen.getByPlaceholderText("29.99"), {
       target: { value: "99.99" },
     });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), {
+    fireEvent.change(screen.getByPlaceholderText("99.00"), {
       target: { value: "199.99" },
     });
 
@@ -214,7 +214,7 @@ describe("TierCreate", () => {
     fireEvent.change(screen.getByPlaceholderText("29.99"), {
       target: { value: "99.99" },
     });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), {
+    fireEvent.change(screen.getByPlaceholderText("99.00"), {
       target: { value: "199.99" },
     });
 
@@ -248,7 +248,7 @@ describe("TierCreate", () => {
     fireEvent.change(screen.getByPlaceholderText("29.99"), {
       target: { value: "99.99" },
     });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), {
+    fireEvent.change(screen.getByPlaceholderText("99.00"), {
       target: { value: "199.99" },
     });
 
