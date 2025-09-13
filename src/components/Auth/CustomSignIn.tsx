@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { confirmSignIn, type SignInOutput } from 'aws-amplify/auth';
+import { type SignInOutput } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../Common/InputField';
 import Button from '../Common/Button';
 import ErrorMessage from '../Common/ErrorMessage';
 import LoadingScreen from '../Common/LoadingScreen';
 import { redirectToForgotPassword } from '../../utils/authHelpers';
-import { customSignIn } from '../../utils/customAuthHelpers';
+import { customSignIn, customConfirmSignIn } from '../../utils/customAuthHelpers';
 
 interface CustomSignInProps {
   onSwitchToSignUp: () => void;
@@ -20,18 +20,30 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    confirmationCode: ''
+    mfaCode: ''
   });
-  const [step, setStep] = useState<'signIn' | 'confirmSignIn'>('signIn');
+  const [step, setStep] = useState<'signIn' | 'mfa'>('signIn');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
 
+  const getStepDescription = () => {
+    return 'Enter the 6-digit code from your authenticator app';
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Special handling for MFA code - only allow 6 digits
+    if (name === 'mfaCode') {
+      const numericValue = value.replace(/\D/g, '').slice(0, 6);
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    
     if (error) setError('');
   };
 
@@ -41,21 +53,29 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     setError('');
 
     try {
+      console.log('Starting sign in process...');
       const { isSignedIn, nextStep }: SignInOutput = await customSignIn({
         username: formData.email,
         password: formData.password
       });
 
+      console.log('Sign in response:', { isSignedIn, nextStep });
+
       if (isSignedIn) {
         onSignInSuccess?.();
         navigate('/dashboard');
-      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        setStep('confirmSignIn');
-      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_SMS_CODE') {
-        setStep('confirmSignIn');
+      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
+        // MFA is enabled, show authenticator code input
+        console.log('MFA challenge detected, switching to MFA step');
+        setStep('mfa');
+      } else {
+        // Handle any other unexpected challenge
+        console.log('Unexpected challenge:', nextStep.signInStep);
+        setError('An unexpected authentication challenge occurred. Please contact support.');
       }
     } catch (err: unknown) {
       const error = err as Error;
+      console.error('Sign in error:', error);
       setError(error.message || 'Sign in failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -68,17 +88,37 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     setError('');
 
     try {
-      const { isSignedIn } = await confirmSignIn({
-        challengeResponse: formData.confirmationCode
+      console.log('Starting MFA confirmation with code:', formData.mfaCode);
+      const { isSignedIn } = await customConfirmSignIn({
+        challengeResponse: formData.mfaCode
       });
 
+      console.log('MFA confirmation response:', { isSignedIn });
+
       if (isSignedIn) {
+        console.log('MFA successful, redirecting to dashboard');
         onSignInSuccess?.();
         navigate('/dashboard');
       }
     } catch (err: unknown) {
       const error = err as Error;
-      setError(error.message || 'Confirmation failed. Please try again.');
+      console.error('MFA confirmation error:', error);
+      
+      // Provide more specific error messages and recovery options
+      if (error.message?.includes('signIn was not called') || 
+          error.message?.includes('Invalid session') ||
+          error.message?.includes('session has expired')) {
+        setError('Your session has expired. Please sign in again to continue.');
+        setStep('signIn'); // Go back to sign in step
+        setFormData(prev => ({ ...prev, mfaCode: '' })); // Clear MFA code
+      } else if (error.message?.includes('Code mismatch') || 
+                 error.message?.includes('Invalid verification code')) {
+        setError('Invalid authenticator code. Please check your authenticator app and try again.');
+      } else if (error.message?.includes('CodeExpired')) {
+        setError('The code has expired. Please try a new code from your authenticator app.');
+      } else {
+        setError(error.message || 'Invalid authenticator code. Please check your authenticator app and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -93,12 +133,12 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
       <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl border border-white/20 p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            {step === 'signIn' ? 'Welcome Back' : 'Confirm Sign In'}
+            {step === 'signIn' ? 'Welcome Back' : 'Multi-Factor Authentication'}
           </h1>
           <p className="text-gray-200">
             {step === 'signIn' 
               ? 'Sign in to your Threat Profiling account' 
-              : 'Enter the confirmation code sent to you'
+              : getStepDescription()
             }
           </p>
         </div>
@@ -162,13 +202,27 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
           </form>
         ) : (
           <form onSubmit={handleConfirmSignIn} className="space-y-6">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
+                <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current 6-digit code for your account.
+              </p>
+              <p className="text-gray-400 text-xs mt-2">
+                The code refreshes every 30 seconds
+              </p>
+            </div>
+
             <InputField
-              label="Confirmation Code"
+              label="Authenticator Code"
               type="text"
-              name="confirmationCode"
-              value={formData.confirmationCode}
+              name="mfaCode"
+              value={formData.mfaCode}
               onChange={handleInputChange}
-              placeholder="Enter confirmation code"
+              placeholder="Enter 6-digit code from authenticator app"
               required
               className="bg-white/10 border-white/30 text-white placeholder-gray-300"
             />
@@ -188,7 +242,7 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
                 className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
                 disabled={isLoading}
               >
-                {isLoading ? 'Confirming...' : 'Confirm'}
+                {isLoading ? 'Verifying...' : 'Verify'}
               </Button>
             </div>
           </form>

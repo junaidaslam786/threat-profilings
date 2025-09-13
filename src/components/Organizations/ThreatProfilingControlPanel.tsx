@@ -137,7 +137,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                 <div className="w-full bg-gray-600 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress.progress}%` }}
+                    style={{width: progress.progress + '%'}}
                   />
                 </div>
               </div>

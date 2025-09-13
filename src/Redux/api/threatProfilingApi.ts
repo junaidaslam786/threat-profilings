@@ -6,13 +6,27 @@ export interface StartProfilingDto {
   reason?: string;
 }
 
+export interface BulkStatusDto {
+  client_names: string[];
+}
+
+export type ProfilingStatus = 
+  | 'idle'
+  | 'preparing'
+  | 'in_progress'
+  | 'analyzing'
+  | 'generating_report'
+  | 'completed'
+  | 'failed';
+
 export interface ProfilingProgress {
   client_name: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: ProfilingStatus;
   progress: number;
   current_step?: string;
   estimated_completion?: string;
   error_message?: string;
+  message?: string;
 }
 
 export interface ProfilingResults {
@@ -117,6 +131,72 @@ export interface CanRerunResponse {
   runs_remaining?: number;
 }
 
+export interface OrganizationProfilingOverview {
+  client_name: string;
+  organization_name: string;
+  user_role: string;
+  profiling_status: ProfilingStatus;
+  progress: number;
+  last_profiling_date?: string;
+  runs_used: number;
+  runs_remaining: number | string;
+  can_run_profiling: boolean;
+  can_rerun: boolean;
+  has_results: boolean;
+}
+
+export interface AvailableOrganization {
+  client_name: string;
+  organization_name: string;
+  user_role: string;
+  subscription_level: string;
+  profiling_status: ProfilingStatus;
+  progress: number;
+  runs_used: number;
+  runs_remaining: string | number;
+  can_run_profiling: boolean;
+  can_rerun: boolean;
+  has_results: boolean;
+}
+
+export interface AvailableOrganizationsResponse {
+  available_organizations: AvailableOrganization[];
+  total_count: number;
+  user_email: string;
+  user_id: string;
+}
+
+export interface StatusOverviewResponse {
+  organizations: OrganizationProfilingOverview[];
+  profiling_in_progress: number;
+  total_organizations: number;
+  available_for_profiling: number;
+  completed_profiles: number;
+}
+
+export interface BulkStatusResponse {
+  statuses: Record<string, {
+    status: ProfilingStatus;
+    progress: number;
+    can_rerun: boolean;
+    has_results: boolean;
+    last_updated?: string;
+  }>;
+}
+
+export interface FieldLockStatus {
+  locked_fields: string[];
+  locked_at: string;
+  locked_reason: string;
+  can_unlock: string[];
+}
+
+export interface FieldLockResponse {
+  client_name: string;
+  field_name: string;
+  is_locked: boolean;
+}
+
 export const threatProfilingApi = createApi({
   reducerPath: "threatProfilingApi",
   baseQuery: fetchBaseQuery({
@@ -130,7 +210,7 @@ export const threatProfilingApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["ThreatProfiling", "ProfilingProgress", "ProfilingResults", "ProfilingHistory"],
+  tagTypes: ["ThreatProfiling", "ProfilingProgress", "ProfilingResults", "ProfilingHistory", "AvailableOrganizations", "StatusOverview", "FieldLocks"],
   endpoints: (builder) => ({
     startProfiling: builder.mutation<{ success: boolean; message: string; execution_arn?: string }, StartProfilingDto>({
       query: (body) => ({
@@ -198,6 +278,91 @@ export const threatProfilingApi = createApi({
         return response.data?.message || "Failed to fetch profiling history";
       },
     }),
+
+    // New endpoints
+    getAvailableOrganizations: builder.query<AvailableOrganizationsResponse, void>({
+      query: () => '/threat-profiling/available-organizations',
+      providesTags: [{ type: "AvailableOrganizations" }],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch available organizations";
+      },
+    }),
+
+    getStatusOverview: builder.query<StatusOverviewResponse, void>({
+      query: () => '/threat-profiling/status-overview',
+      providesTags: [{ type: "StatusOverview" }],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch status overview";
+      },
+    }),
+
+    getBulkStatus: builder.mutation<BulkStatusResponse, BulkStatusDto>({
+      query: (body) => ({
+        url: '/threat-profiling/bulk-status',
+        method: 'POST',
+        body,
+      }),
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch bulk status";
+      },
+    }),
+
+    getFieldLocks: builder.query<FieldLockStatus, string>({
+      query: (clientName) => `/threat-profiling/field-locks/${encodeURIComponent(clientName)}`,
+      providesTags: (_result, _error, clientName) => [
+        { type: "FieldLocks", id: clientName },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to fetch field locks";
+      },
+    }),
+
+    isFieldLocked: builder.query<FieldLockResponse, { clientName: string; fieldName: string }>({
+      query: ({ clientName, fieldName }) => 
+        `/threat-profiling/field-locks/${encodeURIComponent(clientName)}/${encodeURIComponent(fieldName)}`,
+      providesTags: (_result, _error, { clientName, fieldName }) => [
+        { type: "FieldLocks", id: `${clientName}-${fieldName}` },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to check field lock status";
+      },
+    }),
+
+    updateFieldLock: builder.mutation<
+      FieldLockResponse,
+      { client_name: string; field_name: string; is_locked: boolean }
+    >({
+      query: ({ client_name, field_name, is_locked }) => ({
+        url: `/threat-profiling/field-locks/${encodeURIComponent(client_name)}/${encodeURIComponent(field_name)}`,
+        method: "PUT",
+        body: { is_locked },
+      }),
+      invalidatesTags: (_result, _error, { client_name, field_name }) => [
+        { type: "FieldLocks", id: client_name },
+        { type: "FieldLocks", id: `${client_name}-${field_name}` },
+      ],
+      transformErrorResponse: (response: {
+        status: number;
+        data?: { message?: string };
+      }) => {
+        return response.data?.message || "Failed to update field lock";
+      },
+    }),
   }),
 });
 
@@ -211,6 +376,17 @@ export const {
   useLazyGetProfilingResultsQuery,
   useLazyCanRerunProfilingQuery,
   useLazyGetProfilingHistoryQuery,
+  // New hooks
+  useGetAvailableOrganizationsQuery,
+  useLazyGetAvailableOrganizationsQuery,
+  useGetStatusOverviewQuery,
+  useLazyGetStatusOverviewQuery,
+  useGetBulkStatusMutation,
+  useGetFieldLocksQuery,
+  useLazyGetFieldLocksQuery,
+  useIsFieldLockedQuery,
+  useLazyIsFieldLockedQuery,
+  useUpdateFieldLockMutation,
 } = threatProfilingApi;
 
 export const selectProfilingProgress = (clientName: string) =>
@@ -221,3 +397,15 @@ export const selectProfilingResults = (clientName: string) =>
 
 export const selectProfilingHistory = (clientName: string) =>
   threatProfilingApi.endpoints.getProfilingHistory.select(clientName);
+
+export const selectAvailableOrganizations = () =>
+  threatProfilingApi.endpoints.getAvailableOrganizations.select();
+
+export const selectStatusOverview = () =>
+  threatProfilingApi.endpoints.getStatusOverview.select();
+
+export const selectFieldLocks = (clientName: string) =>
+  threatProfilingApi.endpoints.getFieldLocks.select(clientName);
+
+export const selectFieldLock = (clientName: string, fieldName: string) =>
+  threatProfilingApi.endpoints.isFieldLocked.select({ clientName, fieldName });

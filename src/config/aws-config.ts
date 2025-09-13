@@ -5,7 +5,10 @@ const amplifyConfig = {
     Cognito: {
       userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
       userPoolClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-      userPoolClientSecret: import.meta.env.VITE_COGNITO_CLIENT_SECRET,
+      // Only include userPoolClientSecret if it exists and is needed
+      ...(import.meta.env.VITE_COGNITO_CLIENT_SECRET && {
+        userPoolClientSecret: import.meta.env.VITE_COGNITO_CLIENT_SECRET
+      }),
       loginWith: {
         oauth: {
           domain: import.meta.env.VITE_COGNITO_DOMAIN,

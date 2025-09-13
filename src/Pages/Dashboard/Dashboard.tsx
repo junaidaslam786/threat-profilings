@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -21,32 +21,9 @@ const Dashboard: React.FC = () => {
   } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const [signInUrl, setSignInUrl] = useState<string>("/");
-  const [initialLoad, setInitialLoad] = useState(true);
 
   const isActive = user?.user_info?.status === "active";
   const hasAuthToken = !!Cookies.get("id_token");
-
-  useEffect(() => {
-    const fetchAuthConfig = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/auth/config`
-        );
-        if (response.ok) {
-          const config = await response.json();
-          if (config.signInUrl) {
-            setSignInUrl(config.signInUrl);
-          }
-        }
-      } catch (error) {
-        console.warn("Failed to fetch auth config:", error);
-      }
-      setInitialLoad(false);
-    };
-
-    fetchAuthConfig();
-  }, []);
 
   // Force refresh user data when dashboard loads, especially after payment success
   useEffect(() => {
@@ -83,12 +60,12 @@ const Dashboard: React.FC = () => {
   }, [hasAuthToken, user, hydrated, refetchUser]);
 
   useEffect(() => {
-    if (!user && hasBothTokens && hydrated && !initialLoad && !isLoading) {
+    if (!user && hasBothTokens && hydrated && !isLoading) {
       navigate("/user/organization/create", { replace: true });
     }
-  }, [user, hasBothTokens, hydrated, initialLoad, isLoading, navigate]);
+  }, [user, hasBothTokens, hydrated, isLoading, navigate]);
 
-  if (initialLoad || (hasAuthToken && isLoading)) {
+  if (hasAuthToken && isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary-900 text-white">
         <LoadingScreen />
@@ -105,7 +82,7 @@ const Dashboard: React.FC = () => {
   }
 
   if (!hasBothTokens) {
-    return <UnauthenticatedView signInUrl={signInUrl} />;
+    return <UnauthenticatedView signInUrl={"/auth"} />;
   }
 
   if (user && !isActive) {

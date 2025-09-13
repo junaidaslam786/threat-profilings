@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/Auth/ProtectedRoute";
+import ErrorBoundary from "../components/Common/ErrorBoundary";
 import TaxRules from "../Pages/PlatformAdmins/TaxRules";
 import PartnerManagement from "../Pages/PlatformAdmins/PartnerManagement";
 import Invoices from "../Pages/PlatformAdmins/Invoices";
@@ -27,11 +28,19 @@ const OrganizationDetailsHome = lazy(
 // Threat Profiling Pages
 const TargetPage = lazy(() => import("../Pages/ThreatProfiling/TargetPage"));
 const IntroPage = lazy(() => import("../Pages/ThreatProfiling/IntroPage"));
-const ThreatActorPage = lazy(() => import("../Pages/ThreatProfiling/ThreatActorPage"));
+const ThreatActorPage = lazy(
+  () => import("../Pages/ThreatProfiling/ThreatActorPage")
+);
 const ThreatsPage = lazy(() => import("../Pages/ThreatProfiling/ThreatsPage"));
-const DetectionPage = lazy(() => import("../Pages/ThreatProfiling/DetectionPage"));
-const ComplianceIsmPage = lazy(() => import("../Pages/ThreatProfiling/ComplianceIsmPage"));
-const ComplianceE8Page = lazy(() => import("../Pages/ThreatProfiling/ComplianceE8Page"));
+const DetectionPage = lazy(
+  () => import("../Pages/ThreatProfiling/DetectionPage")
+);
+const ComplianceIsmPage = lazy(
+  () => import("../Pages/ThreatProfiling/ComplianceIsmPage")
+);
+const ComplianceE8Page = lazy(
+  () => import("../Pages/ThreatProfiling/ComplianceE8Page")
+);
 
 // Admin-specific Pages (non-platform admin)
 const AdminPendingJoinRequests = lazy(
@@ -52,20 +61,8 @@ const OrganizationEditPage = lazy(
 const OrganizationSettingsPage = lazy(
   () => import("../Pages/Organizations/OrganizationSettingsPage")
 );
-const SecurityAssessmentPage = lazy(
-  () => import("../Pages/Organizations/SecurityAssessmentPage")
-);
-const VulnerabilityScanPage = lazy(
-  () => import("../Pages/Organizations/VulnerabilityScanPage")
-);
-const ThreatReportsPage = lazy(
-  () => import("../Pages/Organizations/ThreatReportsPage")
-);
-const OrganizationAnalyticsPage = lazy(
-  () => import("../Pages/Organizations/OrganizationAnalyticsPage")
-);
-const ComplianceReportsPage = lazy(
-  () => import("../Pages/Organizations/ComplianceReportsPage")
+const ThreatProfilingManagementPage = lazy(
+  () => import("../Pages/Organizations/ThreatProfilingManagementPage")
 );
 
 // Role Pages
@@ -314,42 +311,12 @@ const RoutesContent: React.FC = () => {
           }
         />
         <Route
-          path="/orgs/:client_name/security-assessment"
+          path="/threat-profiling-management"
           element={
             <ProtectedRoute>
-              <SecurityAssessmentPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orgs/:client_name/vulnerability-scan"
-          element={
-            <ProtectedRoute>
-              <VulnerabilityScanPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orgs/:client_name/threat-reports"
-          element={
-            <ProtectedRoute>
-              <ThreatReportsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orgs/:client_name/analytics"
-          element={
-            <ProtectedRoute>
-              <OrganizationAnalyticsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orgs/:client_name/compliance"
-          element={
-            <ProtectedRoute>
-              <ComplianceReportsPage />
+              <ErrorBoundary>
+                <ThreatProfilingManagementPage />
+              </ErrorBoundary>
             </ProtectedRoute>
           }
         />
