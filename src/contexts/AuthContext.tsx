@@ -35,13 +35,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
 
       if (!response.ok) {
+        // Only remove tokens for specific authentication errors
+        if (response.status === 401 || response.status === 403) {
+          console.warn("Authentication failed, removing tokens:", response.status);
+          removeAuthTokens();
+        } else {
+          console.warn("API error, but keeping tokens:", response.status);
+        }
         throw new Error("Failed to fetch user");
       }
 
       return await response.json();
     } catch (error) {
       console.error("Error fetching user:", error);
-      removeAuthTokens();
+      // Don't automatically remove tokens for network errors
+      // Only remove for authentication-specific errors
+      if (error instanceof Error && error.message.includes("401")) {
+        removeAuthTokens();
+      }
       return null;
     }
   };

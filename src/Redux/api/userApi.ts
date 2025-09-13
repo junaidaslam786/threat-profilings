@@ -32,8 +32,28 @@ export const userApi = createApi({
     validateStatus: (response) => {
       // Consider 401 as an error that should not be cached
       if (response.status === 401) {
-        // Clear invalid token
-        removeAuthTokens();
+        // Only clear tokens after multiple failed attempts to avoid race conditions
+        console.warn("401 response received, checking if tokens should be cleared");
+        
+        // Add a small delay to check if this is a temporary issue
+        setTimeout(() => {
+          const currentToken = Cookies.get("id_token");
+          if (currentToken) {
+            // Try a simple verification call
+            fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
+              headers: { Authorization: `Bearer ${currentToken}` }
+            }).then(verifyResponse => {
+              if (verifyResponse.status === 401) {
+                console.warn("Token verification failed, removing tokens");
+                removeAuthTokens();
+              }
+            }).catch(() => {
+              // Network error, don't remove tokens
+              console.warn("Network error during token verification, keeping tokens");
+            });
+          }
+        }, 1000); // 1 second delay
+        
         return false;
       }
       return response.status >= 200 && response.status <= 299;
