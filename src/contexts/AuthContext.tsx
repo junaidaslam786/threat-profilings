@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import type { UserMeResponse } from "../Redux/slices/userSlice";
 import {
-  getAuthCookieOptions,
-  removeAuthTokens,
   getIdToken,
   performLogout,
-} from "../utils/cookieHelpers";
+  setAuthTokens,
+} from "../utils/authStorage";
 import { AuthContext } from "./AuthContextTypes";
 
 interface AuthProviderProps {
@@ -35,24 +33,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
 
       if (!response.ok) {
-        // Only remove tokens for specific authentication errors
-        if (response.status === 401 || response.status === 403) {
-          console.warn("Authentication failed, removing tokens:", response.status);
-          removeAuthTokens();
-        } else {
-          console.warn("API error, but keeping tokens:", response.status);
-        }
-        throw new Error("Failed to fetch user");
+        // Be more conservative about token removal in production
+        // Don't remove tokens immediately - let explicit logout handle this
+        console.warn(`User fetch failed with status ${response.status}, but preserving tokens`);
+        throw new Error(`Failed to fetch user: ${response.status}`);
       }
 
       return await response.json();
     } catch (error) {
       console.error("Error fetching user:", error);
-      // Don't automatically remove tokens for network errors
-      // Only remove for authentication-specific errors
-      if (error instanceof Error && error.message.includes("401")) {
-        removeAuthTokens();
-      }
+      // Don't automatically remove tokens - let the application handle this explicitly
       return null;
     }
   };
@@ -68,8 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = (token: string) => {
-    const options = getAuthCookieOptions();
-    Cookies.set("id_token", token, options);
+    setAuthTokens(token, token); // Set both tokens (assuming access token is same as id token)
     refetchUser();
   };
 

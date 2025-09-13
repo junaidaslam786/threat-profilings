@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
-import { performLogout } from "../../utils/cookieHelpers";
+import { performLogout } from "../../utils/authStorage";
 
 interface NavItem {
   label: string;

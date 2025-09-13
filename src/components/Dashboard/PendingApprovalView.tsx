@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../Common/Button';
-import { performLogout } from '../../utils/cookieHelpers';
+import { performLogout } from '../../utils/authStorage';
 
 interface PendingApprovalViewProps {
   user: {

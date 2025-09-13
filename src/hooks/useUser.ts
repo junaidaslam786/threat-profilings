@@ -15,16 +15,13 @@ import {
   isLEAdmin as checkLEAdmin,
   isViewer as checkViewer,
 } from "../utils/roleUtils";
-import Cookies from "js-cookie";
-import { toast } from "react-hot-toast";
-import { extractErrorMessage } from "../utils/errorHandling";
-import { hasAuthTokens } from "../utils/cookieHelpers";
+import { hasAuthTokens, getIdToken } from "../utils/authStorage";
 
 export function useUser() {
   const dispatch = useAppDispatch();
   const { user, isLoading: userLoading } = useAppSelector((state: RootState) => state.user);
 
-  const hasAuthToken = !!Cookies.get("id_token");
+  const hasAuthToken = !!getIdToken();
   const hasBothTokens = hasAuthTokens();
 
   const shouldSkip = !hasAuthToken || !!user;
@@ -33,7 +30,6 @@ export function useUser() {
     data: profileData,
     isLoading: queryLoading,
     isFetching,
-    error,
     refetch,
     isUninitialized,
   } = useGetProfileQuery(undefined, {
@@ -63,14 +59,6 @@ export function useUser() {
       dispatch(setUserDetails(profileData));
     }
   }, [profileData, dispatch]);
-
-  useEffect(() => {
-    if (error) {
-      const msg = extractErrorMessage(error) || "Failed to fetch user profile.";
-      toast.error(msg);
-      dispatch(logoutUser());
-    }
-  }, [error, dispatch]);
 
   useEffect(() => {
     if (!hasAuthToken && user) {

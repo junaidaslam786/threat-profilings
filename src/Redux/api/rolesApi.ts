@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { getIdToken } from "../../utils/authStorage";
 import type { 
   CreateRoleDto,
   RoleConfigDto, 
@@ -12,7 +12,7 @@ export const rolesApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
-      const idToken = Cookies.get("id_token");
+      const idToken = getIdToken();
       if (idToken) {
         headers.set("Authorization", `Bearer ${idToken}`);
       }

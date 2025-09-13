@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../hooks/useUser";
 import { useNavigate, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
+import { getIdToken } from "../../utils/authStorage";
 import LoadingScreen from "../../components/Common/LoadingScreen";
 import Navbar from "../../components/Common/Navbar";
 import UnauthenticatedView from "../../components/Dashboard/UnauthenticatedView";
@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
   const [initialLoad, setInitialLoad] = useState(true);
 
   const isActive = user?.user_info?.status === "active";
-  const hasAuthToken = !!Cookies.get("id_token");
+  const hasAuthToken = !!getIdToken();
 
   useEffect(() => {
     const fetchAuthConfig = async () => {

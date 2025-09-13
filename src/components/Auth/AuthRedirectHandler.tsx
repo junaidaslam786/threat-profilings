@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import { setAuthTokens } from "../../utils/cookieHelpers";
+import { setAuthTokens, monitorTokenStability, getIdToken, getAccessToken } from "../../utils/authStorage";
 
 const checkUserLevel = async (
   idToken: string
@@ -61,6 +60,9 @@ const AuthRedirectHandler: React.FC = () => {
 
         if (idToken && accessToken) {
           setAuthTokens(idToken, accessToken);
+          
+          // Start monitoring token stability to catch any premature removal
+          monitorTokenStability();
 
           const userResult = await checkUserLevel(idToken);
 
@@ -86,8 +88,8 @@ const AuthRedirectHandler: React.FC = () => {
           "No hash found in URL. This component should only be hit after Cognito redirect."
         );
 
-        const existingIdToken = Cookies.get("id_token");
-        const existingAccessToken = Cookies.get("access_token");
+        const existingIdToken = getIdToken();
+        const existingAccessToken = getAccessToken();
         
         if (existingIdToken && existingAccessToken) {
           const userResult = await checkUserLevel(existingIdToken);

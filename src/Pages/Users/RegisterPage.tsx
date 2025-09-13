@@ -3,7 +3,7 @@ import type { DetectFlowResponse } from "../../Redux/slices/userSlice";
 import { useDetectRegistrationFlowMutation } from "../../Redux/api/userApi";
 import EmailDetectionStep from "../../components/Users/EmailDetectionStep";
 import DynamicRegistrationForm from "../../components/Users/DynamicRegistrationForm";
-import { getIdToken } from "../../utils/cookieHelpers";
+import { getIdToken } from "../../utils/authStorage";
 import { getEmailFromToken } from "../../utils/jwtHelpers";
 
 type LoadingPhase = 'extracting' | 'detecting' | 'complete';

@@ -1,6 +1,6 @@
 // src/utils/authHelpers.ts
 import { signOut } from 'aws-amplify/auth';
-import { performLogout } from './cookieHelpers';
+import { performLogout } from './authStorage';
 import { getCognitoConfig } from './cognitoHelpers';
 
 // This file can contain utility functions that don't directly deal with UI or state.
