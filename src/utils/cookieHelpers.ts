@@ -13,17 +13,25 @@ const getEnvironmentInfo = () => {
 };
 
 export const getAuthCookieOptions = () => {
-  const { isProduction } = getEnvironmentInfo();
+  const { isProduction, hostname } = getEnvironmentInfo();
 
-  return {
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  // Use number of days instead of absolute date for better compatibility
+  const options = {
+    expires: 1, // 1 day in days (not milliseconds)
     secure: isProduction,
     sameSite: isProduction ? ("None" as const) : ("Lax" as const),
     path: "/",
-    ...(isProduction && {
-      domain: "tp.cyorn.com",
-    }),
   };
+
+  // Only set domain if we're in production and on the correct domain
+  if (isProduction && (hostname === "tp.cyorn.com" || hostname.endsWith(".cyorn.com"))) {
+    return {
+      ...options,
+      domain: ".cyorn.com", // Use leading dot for subdomain support
+    };
+  }
+
+  return options;
 };
 
 export const setAuthTokens = (
@@ -32,54 +40,86 @@ export const setAuthTokens = (
 ) => {
   try {
     const options = getAuthCookieOptions();
+    
+    // Log cookie options for debugging in development
+    if (!getEnvironmentInfo().isProduction) {
+      console.log("Setting cookies with options:", options);
+    }
 
     if (typeof idTokenOrTokens === 'string' && accessToken) {
       // Called with two separate parameters
       Cookies.set("id_token", idTokenOrTokens, options);
       Cookies.set("access_token", accessToken, options);
+      
+      // Verify cookies were set
+      const setIdToken = Cookies.get("id_token");
+      const setAccessToken = Cookies.get("access_token");
+      
+      if (!setIdToken || !setAccessToken) {
+        console.error("Failed to set cookies - they were not saved properly", {
+          idTokenSet: !!setIdToken,
+          accessTokenSet: !!setAccessToken,
+          options
+        });
+      }
+      
     } else if (typeof idTokenOrTokens === 'object' && idTokenOrTokens.id_token && idTokenOrTokens.access_token) {
       // Called with an object containing both tokens
       Cookies.set("id_token", idTokenOrTokens.id_token, options);
       Cookies.set("access_token", idTokenOrTokens.access_token, options);
+      
+      // Verify cookies were set
+      const setIdToken = Cookies.get("id_token");
+      const setAccessToken = Cookies.get("access_token");
+      
+      if (!setIdToken || !setAccessToken) {
+        console.error("Failed to set cookies - they were not saved properly", {
+          idTokenSet: !!setIdToken,
+          accessTokenSet: !!setAccessToken,
+          options
+        });
+      }
+      
     } else {
       throw new Error('Invalid parameters provided to setAuthTokens');
     }
   } catch (error) {
     console.error("Failed to set auth tokens:", error);
+    throw error; // Re-throw to ensure calling code knows about the failure
   }
 };
 
 export const removeAuthTokens = () => {
   try {
-    const { isProduction } = getEnvironmentInfo();
+    const { isProduction, hostname } = getEnvironmentInfo();
     
-    const baseOptions = {
+    // Create the same options used when setting cookies
+    const currentOptions = getAuthCookieOptions();
+    
+    // Remove tokens with the current options
+    Cookies.remove("id_token", currentOptions);
+    Cookies.remove("access_token", currentOptions);
+
+    // Also try removing with basic options (fallback)
+    const fallbackOptions = {
       secure: isProduction,
       sameSite: isProduction ? ("None" as const) : ("Lax" as const),
       path: "/",
     };
+    
+    Cookies.remove("id_token", fallbackOptions);
+    Cookies.remove("access_token", fallbackOptions);
 
-    const productionOptions = {
-      ...baseOptions,
-      ...(isProduction && {
-        domain: "tp.cyorn.com",
-      }),
-    };
-
-    Cookies.remove("id_token", productionOptions);
-    Cookies.remove("access_token", productionOptions);
-
-    if (isProduction) {
-      Cookies.remove("id_token", baseOptions);
-      Cookies.remove("access_token", baseOptions);
-    }
-
+    // Remove with minimal options as final fallback
     Cookies.remove("id_token", { path: "/" });
     Cookies.remove("access_token", { path: "/" });
     
-    if (isProduction) {
-      Cookies.remove("id_token", { path: "/", domain: ".cyorn.com" });
-      Cookies.remove("access_token", { path: "/", domain: ".cyorn.com" });
+    // If we're in production, also try removing with explicit domain variants
+    if (isProduction && (hostname === "tp.cyorn.com" || hostname.endsWith(".cyorn.com"))) {
+      Cookies.remove("id_token", { path: "/", domain: ".cyorn.com", secure: true, sameSite: "None" as const });
+      Cookies.remove("access_token", { path: "/", domain: ".cyorn.com", secure: true, sameSite: "None" as const });
+      Cookies.remove("id_token", { path: "/", domain: "tp.cyorn.com", secure: true, sameSite: "None" as const });
+      Cookies.remove("access_token", { path: "/", domain: "tp.cyorn.com", secure: true, sameSite: "None" as const });
     }
   } catch (error) {
     console.error("Failed to remove auth tokens:", error);
@@ -105,4 +145,38 @@ export const performLogout = (redirectPath: string = "/dashboard") => {
   localStorage.clear();
   sessionStorage.clear();
   window.location.href = redirectPath;
+};
+
+// Debug function to help troubleshoot cookie issues
+export const debugCookies = () => {
+  const { isProduction, hostname, isLocalhost } = getEnvironmentInfo();
+  const options = getAuthCookieOptions();
+  const idToken = getIdToken();
+  const accessToken = getAccessToken();
+  
+  console.log("Cookie Debug Info:", {
+    environment: {
+      isProduction,
+      hostname,
+      isLocalhost,
+      protocol: window.location.protocol,
+      origin: window.location.origin
+    },
+    cookieOptions: options,
+    tokens: {
+      hasIdToken: !!idToken,
+      hasAccessToken: !!accessToken,
+      idTokenLength: idToken?.length || 0,
+      accessTokenLength: accessToken?.length || 0
+    },
+    allCookies: document.cookie
+  });
+  
+  return {
+    isProduction,
+    hostname,
+    isLocalhost,
+    options,
+    hasTokens: !!(idToken && accessToken)
+  };
 };

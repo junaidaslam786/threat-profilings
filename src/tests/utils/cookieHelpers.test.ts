@@ -74,20 +74,13 @@ describe("cookieHelpers utility", () => {
       expect(options.secure).toBe(true);
       expect(options.sameSite).toBe("None");
       expect(options.path).toBe("/");
-      expect(options.domain).toBe("tp.cyorn.com");
+      expect('domain' in options && (options as { domain: string }).domain).toBe(".cyorn.com");
     });
 
-    it("should include expiration date", () => {
+    it("should include expiration in days", () => {
       const options = getAuthCookieOptions();
-      expect(options.expires).toBeInstanceOf(Date);
-
-      const expectedExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-      const actualExpiry = options.expires as Date;
-
-      // Allow for small time difference (1 second)
-      expect(
-        Math.abs(actualExpiry.getTime() - expectedExpiry.getTime())
-      ).toBeLessThan(1000);
+      expect(typeof options.expires).toBe("number");
+      expect(options.expires).toBe(1); // 1 day
     });
   });
 
@@ -159,6 +152,7 @@ describe("cookieHelpers utility", () => {
 
     it("should remove tokens in production environment", () => {
       mockLocation.protocol = "https:";
+      mockLocation.hostname = "tp.cyorn.com";
 
       removeAuthTokens();
 
@@ -171,7 +165,7 @@ describe("cookieHelpers utility", () => {
         "access_token",
         expect.any(Object)
       );
-      expect(mockCookies.remove).toHaveBeenCalledTimes(8); // Multiple removal attempts
+      expect(mockCookies.remove).toHaveBeenCalledTimes(10); // Multiple removal attempts with domain variants
     });
   });
 
