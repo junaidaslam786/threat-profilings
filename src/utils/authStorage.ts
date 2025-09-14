@@ -159,7 +159,7 @@ export const performLogout = (redirectPath: string = "/dashboard") => {
 };
 
 // Debug function to help troubleshoot storage issues
-export const debugCookies = () => {
+export const debugStorage = () => {
   const isProduction = window.location.protocol === "https:";
   const hostname = window.location.hostname;
   const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
@@ -234,7 +234,7 @@ export const monitorTokenStability = () => {
 };
 
 // Test function to verify localStorage functionality
-export const testCookieSupport = () => {
+export const testStorageSupport = () => {
   const testKey = 'storage_test_' + Date.now();
   const testValue = 'test_value_' + Math.random();
   

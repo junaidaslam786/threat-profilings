@@ -12,6 +12,7 @@ const AuthRedirectHandlerPage = lazy(
   () => import("../Pages/Auth/AuthRedirectHandlerPage")
 );
 const CustomAuthPage = lazy(() => import("../Pages/Auth/CustomAuthPage"));
+const MFASetup = lazy(() => import("../components/Auth/MFASetup"));
 const AdminLogin = lazy(() => import("../Pages/Admin/AdminLogin"));
 
 // Dashboard
@@ -21,12 +22,16 @@ const EnhancedComponentsDashboard = lazy(
 );
 
 // Home Page for non-admin users
+const HomePage = lazy(
+  () => import("../Pages/Home/HomePage")
+);
+
+// Organization threat profiling details
 const OrganizationDetailsHome = lazy(
   () => import("../Pages/Home/OrganizationDetailsHome")
 );
 
 // Threat Profiling Pages
-const TargetPage = lazy(() => import("../Pages/ThreatProfiling/TargetPage"));
 const IntroPage = lazy(() => import("../Pages/ThreatProfiling/IntroPage"));
 const ThreatActorPage = lazy(
   () => import("../Pages/ThreatProfiling/ThreatActorPage")
@@ -156,32 +161,18 @@ const RoutesContent: React.FC = () => {
           element={<AuthRedirectHandlerPage />}
         />
         <Route path="/auth" element={<CustomAuthPage />} />
+        <Route path="/mfa-setup" element={<MFASetup onComplete={() => window.location.href = '/dashboard'} onCancel={() => window.location.href = '/auth'} />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/user/organization/create" element={<RegisterPage />} />
 
         {/* Dashboard route - handles its own auth logic */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/dashboard" element={<Dashboard />} />
 
-        {/* Home page for non-admin users */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute requireAuth={true} requireActive={true}>
-              <OrganizationDetailsHome />
-            </ProtectedRoute>
-          }
-        />
+        {/* Home page - handles its own auth logic */}
+        <Route path="/home" element={<HomePage />} />
 
         {/* Threat Profiling Routes */}
-        <Route
-          path="/threat-profiling/target"
-          element={
-            <ProtectedRoute requireAuth={true} requireActive={true}>
-              <TargetPage />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/threat-profiling/intro"
           element={
@@ -224,6 +215,56 @@ const RoutesContent: React.FC = () => {
         />
         <Route
           path="/threat-profiling/compliance-e8"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ComplianceE8Page />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Organization-specific Threat Profiling Routes */}
+        <Route
+          path="/threat-profiling/:client_name/intro"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <IntroPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/:client_name/threat-actors"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ThreatActorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/:client_name/threats"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ThreatsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/:client_name/detection"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <DetectionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/:client_name/compliance-ism"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ComplianceIsmPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/threat-profiling/:client_name/compliance-e8"
           element={
             <ProtectedRoute requireAuth={true} requireActive={true}>
               <ComplianceE8Page />
@@ -307,6 +348,16 @@ const RoutesContent: React.FC = () => {
           element={
             <ProtectedRoute>
               <OrganizationSettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Threat Profiling Results Route */}
+        <Route
+          path="/threat-profiling/:client_name"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <OrganizationDetailsHome />
             </ProtectedRoute>
           }
         />

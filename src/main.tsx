@@ -6,6 +6,7 @@ import store from "./Redux/store.ts";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import "./config/aws-config";
+import "./utils/debugAuth"; // Add debug function to window
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

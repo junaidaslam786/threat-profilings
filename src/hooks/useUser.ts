@@ -24,7 +24,8 @@ export function useUser() {
   const hasAuthToken = !!getIdToken();
   const hasBothTokens = hasAuthTokens();
 
-  const shouldSkip = !hasAuthToken || !!user;
+  // More aggressive skip logic - always fetch if we have tokens but no user
+  const shouldSkip = !hasAuthToken;
 
   const {
     data: profileData,

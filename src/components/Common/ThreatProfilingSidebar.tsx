@@ -19,18 +19,11 @@ const ThreatProfilingSidebar: React.FC<ThreatProfilingSidebarProps> = ({ classNa
 
   const sidebarItems: SidebarItem[] = [
     {
-      id: 'organization-details',
-      label: 'Organization Details',
-      path: '/home',
-      icon: 'building',
-      description: 'Organization information and overview'
-    },
-    {
       id: 'target',
       label: 'Target',
-      path: '/threat-profiling/target',
+      path: '/home',
       icon: 'target',
-      description: 'Organization and application details'
+      description: 'Organization & application details'
     },
     {
       id: 'intro',

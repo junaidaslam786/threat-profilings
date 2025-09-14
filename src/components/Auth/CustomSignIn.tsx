@@ -22,7 +22,7 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     password: '',
     mfaCode: ''
   });
-  const [step, setStep] = useState<'signIn' | 'mfa'>('signIn');
+  const [step, setStep] = useState<'signIn' | 'mfa' | 'mfaSetup'>('signIn');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +64,16 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
       if (isSignedIn) {
         onSignInSuccess?.();
         navigate('/dashboard');
+      } else if (nextStep.signInStep === 'CONTINUE_SIGN_IN_WITH_MFA_SELECTION') {
+        // First-time MFA setup required
+        console.log('MFA setup required, switching to MFA setup step');
+        // Store the session for MFA setup
+        const session = sessionStorage.getItem('currentAuthSession');
+        if (session) {
+          const authSession = JSON.parse(session);
+          sessionStorage.setItem('mfaSetupSession', authSession.session);
+        }
+        setStep('mfaSetup');
       } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
         // MFA is enabled, show authenticator code input
         console.log('MFA challenge detected, switching to MFA step');
@@ -80,6 +90,17 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleMFASetupComplete = () => {
+    console.log('MFA setup completed, switching to MFA verification step');
+    setStep('mfa');
+  };
+
+  const handleMFASetupCancel = () => {
+    console.log('MFA setup cancelled, returning to sign in');
+    setStep('signIn');
+    setFormData({ email: '', password: '', mfaCode: '' });
   };
 
   const handleConfirmSignIn = async (e: React.FormEvent) => {
@@ -133,11 +154,13 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
       <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl border border-white/20 p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            {step === 'signIn' ? 'Welcome Back' : 'Multi-Factor Authentication'}
+            {step === 'signIn' ? 'Welcome Back' : step === 'mfaSetup' ? 'Setup Required' : 'Multi-Factor Authentication'}
           </h1>
           <p className="text-gray-200">
             {step === 'signIn' 
               ? 'Sign in to your Threat Profiling account' 
+              : step === 'mfaSetup'
+              ? 'Please set up multi-factor authentication to secure your account'
               : getStepDescription()
             }
           </p>
@@ -149,7 +172,38 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
           </div>
         )}
 
-        {step === 'signIn' ? (
+        {step === 'mfaSetup' ? (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
+                <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <p className="text-gray-300 text-sm">
+                To complete your sign-in, please set up multi-factor authentication using an authenticator app.
+              </p>
+            </div>
+            <div className="flex space-x-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleMFASetupCancel}
+                className="flex-1 bg-white/10 border border-white/30 text-white hover:bg-white/20"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => navigate('/mfa-setup')}
+                className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
+              >
+                Setup MFA
+              </Button>
+            </div>
+          </div>
+        ) : step === 'signIn' ? (
           <form onSubmit={handleSignIn} className="space-y-6">
             <InputField
               label="Email Address"

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
 import { useGetProfileQuery } from "../../Redux/api/userApi";
 import {
   useHandlePaymentSuccessMutation,
@@ -26,13 +25,13 @@ export const PaymentPage: React.FC = () => {
   const [createCheckoutSession, { isLoading: checkoutLoading }] =
     useCreateCheckoutSessionMutation();
 
-  // Extract session_id from URL and store in cookies
+  // Extract session_id from URL and store in localStorage
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const sessionIdFromUrl = urlParams.get("session_id");
 
     if (sessionIdFromUrl) {
-      Cookies.set("payment_session_id", sessionIdFromUrl, { expires: 1 });
+      localStorage.setItem("payment_session_id", sessionIdFromUrl);
       setIsProcessingPayment(true);
 
       // Handle payment success automatically

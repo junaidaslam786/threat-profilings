@@ -28,7 +28,7 @@ export const PaymentTestPage: React.FC = () => {
               <h3 className="font-semibold text-gray-900">Test Scenarios:</h3>
               <ul className="mt-2 text-sm text-gray-600 space-y-1">
                 <li>✓ Session ID extraction from URL</li>
-                <li>✓ Cookie storage for session management</li>
+                <li>✓ LocalStorage for session management</li>
                 <li>✓ Backend API integration for payment success</li>
                 <li>✓ User profile fetching and display</li>
                 <li>✓ Subscription plan selection and pricing</li>

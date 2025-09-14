@@ -6,6 +6,7 @@ const checkUserLevel = async (
   idToken: string
 ): Promise<{ level: string | null; userNotFound: boolean }> => {
   try {
+    console.log("Checking platform admin endpoint...");
     const platformResponse = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`,
       {
@@ -16,11 +17,14 @@ const checkUserLevel = async (
       }
     );
 
+    console.log("Platform response status:", platformResponse.status);
     if (platformResponse.ok) {
       const data = await platformResponse.json();
+      console.log("Platform admin data:", data);
       return { level: data.level || null, userNotFound: false };
     }
 
+    console.log("Checking regular user endpoint...");
     const userResponse = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/users/me`,
       {
@@ -31,15 +35,18 @@ const checkUserLevel = async (
       }
     );
 
+    console.log("User response status:", userResponse.status);
     if (userResponse.ok) {
       const data = await userResponse.json();
+      console.log("User data:", data);
       return { level: data.level || null, userNotFound: false };
     }
 
     const userNotFound =
-      (platformResponse.status === 404 || platformResponse.status === 401) &&
-      (userResponse.status === 404 || userResponse.status === 401);
+      (platformResponse.status === 404 || platformResponse.status === 401 || platformResponse.status === 403) &&
+      (userResponse.status === 404 || userResponse.status === 401 || userResponse.status === 403);
 
+    console.log("User not found:", userNotFound, "Platform status:", platformResponse.status, "User status:", userResponse.status);
     return { level: null, userNotFound };
   } catch (error) {
     console.error("Error checking user level:", error);
@@ -65,12 +72,16 @@ const AuthRedirectHandler: React.FC = () => {
           monitorTokenStability();
 
           const userResult = await checkUserLevel(idToken);
+          console.log("User result:", userResult);
 
           if (userResult.userNotFound) {
+            console.log("Redirecting to organization create");
             navigate("/user/organization/create", { replace: true });
           } else if (userResult.level === "super") {
+            console.log("Redirecting to platform admins");
             navigate("/platform-admins", { replace: true });
           } else {
+            console.log("Redirecting to dashboard");
             navigate("/dashboard", { replace: true });
           }
 
@@ -81,7 +92,7 @@ const AuthRedirectHandler: React.FC = () => {
           );
         } else {
           console.warn("ID token or Access token not found in URL hash.");
-          navigate("/login");
+          navigate("/auth");
         }
       } else {
         console.log(
@@ -92,14 +103,19 @@ const AuthRedirectHandler: React.FC = () => {
         const existingAccessToken = getAccessToken();
         
         if (existingIdToken && existingAccessToken) {
+          console.log("Found existing tokens, checking user level...");
           const userResult = await checkUserLevel(existingIdToken);
+          console.log("Existing token user result:", userResult);
           if (userResult.userNotFound) {
+            console.log("Existing user not found, redirecting to organization create");
             navigate("/user/organization/create", { replace: true });
             return;
           } else if (userResult.level === "super") {
+            console.log("Existing super user, redirecting to platform admins");
             navigate("/platform-admins", { replace: true });
             return;
           } else {
+            console.log("Existing regular user, redirecting to dashboard");
             navigate("/dashboard", { replace: true });
             return;
           }

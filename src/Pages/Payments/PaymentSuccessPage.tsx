@@ -20,34 +20,61 @@ export default function PaymentSuccessPage() {
     sessionId?: string;
   } | null>(null);
   const hasProcessedPayment = useRef(false);
+  const sessionIdRef = useRef<string | null>(null);
+  const [componentKey] = useState(() => Math.random().toString(36));
 
   useEffect(() => {
+    console.log("PaymentSuccessPage useEffect triggered, component key:", componentKey);
     const sessionId = searchParams.get("session_id");
+    console.log("Session ID:", sessionId);
     
-    // Prevent multiple payment processing attempts
-    if (hasProcessedPayment.current) {
+    // Use sessionStorage to persist processing state across re-renders
+    const storageKey = `payment_processing_${sessionId}`;
+    const isAlreadyProcessed = sessionStorage.getItem(storageKey);
+    
+    console.log("Already processed in storage:", isAlreadyProcessed);
+    console.log("Has processed payment ref:", hasProcessedPayment.current);
+    console.log("Previous session ID ref:", sessionIdRef.current);
+    
+    // If payment was already processed, load result from storage and show success
+    if (isAlreadyProcessed || (hasProcessedPayment.current && sessionIdRef.current === sessionId)) {
+      console.log("Payment already processed for this session, showing success");
+      setPaymentResult({
+        success: true,
+        message: "Payment completed successfully!",
+        sessionId: sessionId || undefined
+      });
+      setIsProcessing(false);
       return;
     }
     
-    if (sessionId) {
+    if (sessionId && sessionId !== sessionIdRef.current) {
+      console.log("Processing payment for session:", sessionId);
+      sessionStorage.setItem(storageKey, 'true');
       hasProcessedPayment.current = true;
+      sessionIdRef.current = sessionId;
       
       const processPayment = async () => {
         try {
+          console.log("Setting processing to true");
           setIsProcessing(true);
           
+          console.log("Calling handlePaymentSuccess API");
           // Use the success endpoint to handle payment completion
           const result = await handlePaymentSuccess(sessionId).unwrap();
+          console.log("Payment success result:", result);
 
           setPaymentResult({
             success: result.success,
             message: result.message || "Payment processed successfully!",
             sessionId: sessionId
           });
+          console.log("Payment result set");
 
           // Refetch user data to update subscription status
           if (result.success) {
             try {
+              console.log("Refreshing user data");
               // Force complete refresh of user data
               dispatch(forceRefreshUser());
               dispatch(userApi.util.invalidateTags(['User']));
@@ -55,6 +82,7 @@ export default function PaymentSuccessPage() {
               await refetchUser();
               // Set a flag that dashboard can detect for forced refresh
               sessionStorage.setItem('payment_completed', 'true');
+              console.log("User data refreshed successfully");
             } catch (error) {
               console.warn("Failed to refetch user data after payment success:", error);
             }
@@ -71,22 +99,29 @@ export default function PaymentSuccessPage() {
             success: false,
             message: errorMessage
           });
+          console.log("Error payment result set");
         } finally {
+          console.log("Setting processing to false");
           setIsProcessing(false);
         }
       };
       
       processPayment();
-    } else {
+    } else if (!sessionId) {
+      console.log("No session ID found");
+      hasProcessedPayment.current = true;
       setPaymentResult({
         success: false,
         message: "No session ID found in URL parameters"
       });
       setIsProcessing(false);
     }
-  }, [searchParams, handlePaymentSuccess, refetchUser, dispatch]);
+  }, []);
+
+  console.log("Render - isProcessing:", isProcessing, "paymentResult:", paymentResult);
 
   if (isProcessing) {
+    console.log("Rendering processing view");
     return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 flex items-center justify-center">
         <div className="text-center">
@@ -102,6 +137,8 @@ export default function PaymentSuccessPage() {
       </div>
     );
   }
+
+  console.log("Rendering success/failure view");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 flex items-center justify-center px-4">

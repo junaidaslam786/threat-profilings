@@ -26,7 +26,10 @@ const Dashboard: React.FC = () => {
 
   const isActive = user?.user_info?.status === "active";
   const hasAuthToken = !!getIdToken();
+  const subscriptions = user?.subscriptions || [];
+  const isL0User = subscriptions.length === 1 && subscriptions[0]?.subscription_level === "L0";
 
+  // All useEffect hooks must be at the top level
   useEffect(() => {
     const fetchAuthConfig = async () => {
       try {
@@ -88,6 +91,20 @@ const Dashboard: React.FC = () => {
     }
   }, [user, hasBothTokens, hydrated, initialLoad, isLoading, navigate]);
 
+  // Handle unauthenticated users
+  useEffect(() => {
+    if (!hasBothTokens && !initialLoad) {
+      navigate("/home", { replace: true });
+    }
+  }, [hasBothTokens, initialLoad, navigate]);
+
+  // Handle L0 user redirect
+  useEffect(() => {
+    if (isL0User && !isPlatformAdmin && user && hydrated) {
+      navigate("/home", { replace: true });
+    }
+  }, [isL0User, isPlatformAdmin, user, hydrated, navigate]);
+
   if (initialLoad || (hasAuthToken && isLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary-900 text-white">
@@ -105,7 +122,7 @@ const Dashboard: React.FC = () => {
   }
 
   if (!hasBothTokens) {
-    return <UnauthenticatedView signInUrl={signInUrl} />;
+    return null;
   }
 
   if (user && !isActive) {
@@ -128,60 +145,8 @@ const Dashboard: React.FC = () => {
     return "Organization Viewer";
   };
 
-  // Check if user has only L0 subscription (free tier)
-  const subscriptions = user?.subscriptions || [];
-  const isL0User =
-    subscriptions.length === 1 && subscriptions[0]?.subscription_level === "L0";
-
-  // Show subscription required view for L0 users (except platform admins)
   if (isL0User && !isPlatformAdmin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
-        <Navbar />
-
-        <div className="max-w-4xl mx-auto p-8">
-          <div className="text-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-1a2 2 0 00-2-2H6a2 2 0 00-2 2v1a2 2 0 002 2zM12 7a4 4 0 100 8 4 4 0 000-8z"
-                />
-              </svg>
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-4">
-              Subscription Required
-            </h1>
-            <p className="text-xl text-secondary-300 mb-8">
-              You're currently on the free tier. Subscribe to unlock full
-              platform access.
-            </p>
-          </div>
-          <div className="mt-8 bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-8 border border-secondary-700/50 text-center">
-            <h2 className="text-2xl font-bold text-primary-300 mb-4">
-              Unlock Premium Features
-            </h2>
-            <p className="text-secondary-300 mb-6">
-              Subscribe to access organizations, threat profiling, analytics,
-              and more.
-            </p>
-            <button
-              onClick={() => navigate("/payments")}
-              className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
-            >
-              💳 Choose Your Plan
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

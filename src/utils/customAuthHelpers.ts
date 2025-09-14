@@ -1,6 +1,7 @@
 import { signIn as amplifySignIn, signUp as amplifySignUp, confirmSignUp as amplifyConfirmSignUp, confirmSignIn as amplifyConfirmSignIn, type SignInOutput, type SignUpOutput, type ConfirmSignUpOutput, type ConfirmSignInOutput } from 'aws-amplify/auth';
 import { CognitoIdentityProviderClient, InitiateAuthCommand, SignUpCommand, ConfirmSignUpCommand, RespondToAuthChallengeCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { generateSecretHash, getCognitoConfig } from './cognitoHelpers';
+import { setAuthTokens } from './authStorage';
 
 // Create a Cognito client - no credentials needed for public operations
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -74,12 +75,11 @@ const customSignInWithSecret = async (params: { username: string; password: stri
     if (response.AuthenticationResult) {
       // Store tokens for later use
       if (response.AuthenticationResult.AccessToken && response.AuthenticationResult.IdToken) {
-        // You can use cookie helpers or localStorage to store these
-        document.cookie = `access_token=${response.AuthenticationResult.AccessToken}; path=/`;
-        document.cookie = `id_token=${response.AuthenticationResult.IdToken}; path=/`;
-        if (response.AuthenticationResult.RefreshToken) {
-          document.cookie = `refresh_token=${response.AuthenticationResult.RefreshToken}; path=/`;
-        }
+        // Use localStorage to store these
+        setAuthTokens(
+          response.AuthenticationResult.IdToken,
+          response.AuthenticationResult.AccessToken
+        );
       }
       
       return {
@@ -97,6 +97,9 @@ const customSignInWithSecret = async (params: { username: string; password: stri
         username: params.username
       };
       
+      // Also store in sessionStorage for MFA setup component access
+      sessionStorage.setItem('currentAuthSession', JSON.stringify(currentAuthSession));
+      
       console.log('MFA challenge detected:', response.ChallengeName);
       console.log('Session stored for MFA:', currentAuthSession);
       
@@ -107,7 +110,13 @@ const customSignInWithSecret = async (params: { username: string; password: stri
         case 'NEW_PASSWORD_REQUIRED':
           signInStep = 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED';
           break;
+        case 'MFA_SETUP':
+        case 'SELECT_MFA_TYPE':
+          // First-time MFA setup required
+          signInStep = 'CONTINUE_SIGN_IN_WITH_MFA_SELECTION';
+          break;
         case 'SOFTWARE_TOKEN_MFA':
+          // User already has MFA configured, just needs to enter code
           signInStep = 'CONFIRM_SIGN_IN_WITH_TOTP_CODE';
           break;
         case 'SMS_MFA':
@@ -124,7 +133,7 @@ const customSignInWithSecret = async (params: { username: string; password: stri
       return {
         isSignedIn: false,
         nextStep: {
-          signInStep: signInStep as 'CONFIRM_SIGN_IN_WITH_TOTP_CODE' | 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED' | 'CONFIRM_SIGN_IN_WITH_SMS_CODE' | 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE'
+          signInStep: signInStep as 'CONFIRM_SIGN_IN_WITH_TOTP_CODE' | 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED' | 'CONFIRM_SIGN_IN_WITH_SMS_CODE' | 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE' | 'CONTINUE_SIGN_IN_WITH_MFA_SELECTION'
         }
       };
     }
@@ -149,16 +158,20 @@ export const customSignUp = async (params: {
   options: {
     userAttributes: {
       email: string;
-      given_name: string;
-      family_name: string;
     };
   };
 }): Promise<SignUpOutput> => {
   const cognitoConfig = getCognitoConfig();
   
   if (cognitoConfig.hasClientSecret && cognitoConfig.clientSecret) {
+    // For email alias pools, use email prefix as username instead of full email
+    const uniqueUsername = params.username.split('@')[0];
+    
+    // Store the mapping for confirmation step
+    emailToUsernameMap[params.username] = uniqueUsername;
+    
     const secretHash = generateSecretHash(
-      params.username,
+      uniqueUsername,
       cognitoConfig.clientId,
       cognitoConfig.clientSecret
     );
@@ -166,13 +179,18 @@ export const customSignUp = async (params: {
     try {
       const command = new SignUpCommand({
         ClientId: cognitoConfig.clientId,
-        Username: params.username,
+        Username: uniqueUsername,
         Password: params.password,
         SecretHash: secretHash,
         UserAttributes: [
-          { Name: 'email', Value: params.options.userAttributes.email },
-          { Name: 'given_name', Value: params.options.userAttributes.given_name },
-          { Name: 'family_name', Value: params.options.userAttributes.family_name },
+          {
+            Name: 'email',
+            Value: params.options.userAttributes.email
+          },
+          {
+            Name: 'name',
+            Value: params.options.userAttributes.email.split('@')[0]
+          }
         ],
       });
       
@@ -206,6 +224,9 @@ export const customSignUp = async (params: {
   });
 };
 
+// Store the mapping between email and generated username
+const emailToUsernameMap: { [email: string]: string } = {};
+
 export const customConfirmSignUp = async (params: {
   username: string;
   confirmationCode: string;
@@ -213,8 +234,11 @@ export const customConfirmSignUp = async (params: {
   const cognitoConfig = getCognitoConfig();
   
   if (cognitoConfig.hasClientSecret && cognitoConfig.clientSecret) {
+    // Use the stored username mapping or fallback to provided username
+    const actualUsername = emailToUsernameMap[params.username] || params.username;
+    
     const secretHash = generateSecretHash(
-      params.username,
+      actualUsername,
       cognitoConfig.clientId,
       cognitoConfig.clientSecret
     );
@@ -222,12 +246,15 @@ export const customConfirmSignUp = async (params: {
     try {
       const command = new ConfirmSignUpCommand({
         ClientId: cognitoConfig.clientId,
-        Username: params.username,
+        Username: actualUsername,
         ConfirmationCode: params.confirmationCode,
         SecretHash: secretHash,
       });
       
       await cognitoClient.send(command);
+      
+      // Clean up the mapping after successful confirmation
+      delete emailToUsernameMap[params.username];
       
       return {
         isSignUpComplete: true,
@@ -278,11 +305,10 @@ export const customConfirmSignIn = async (params: { challengeResponse: string })
       if (response.AuthenticationResult) {
         // Store tokens
         if (response.AuthenticationResult.AccessToken && response.AuthenticationResult.IdToken) {
-          document.cookie = `access_token=${response.AuthenticationResult.AccessToken}; path=/`;
-          document.cookie = `id_token=${response.AuthenticationResult.IdToken}; path=/`;
-          if (response.AuthenticationResult.RefreshToken) {
-            document.cookie = `refresh_token=${response.AuthenticationResult.RefreshToken}; path=/`;
-          }
+          setAuthTokens(
+            response.AuthenticationResult.IdToken,
+            response.AuthenticationResult.AccessToken
+          );
         }
         
         // Clear the stored session

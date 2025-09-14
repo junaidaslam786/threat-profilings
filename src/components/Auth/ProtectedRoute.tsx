@@ -75,7 +75,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If user doesn't have both tokens, redirect to custom auth page
   if (requireAuth && !hasBothTokens) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/home" replace />;
   }
   
   if (requireActive && user && user.user_info.status !== "active") {
