@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { CognitoIdentityProviderClient, VerifySoftwareTokenCommand } from '@aws-sdk/client-cognito-identity-provider';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '../Common/Button';
 import InputField from '../Common/InputField';
 import ErrorMessage from '../Common/ErrorMessage';
-
-const cognitoClient = new CognitoIdentityProviderClient({
-  region: 'eu-north-1',
-});
+import { 
+  buildOtpauthUri, 
+  otpauthToDataUrl, 
+  isValidTotpCode
+} from '../../utils/totpHelpers';
+import { 
+  handleMFASetupChallenge, 
+  completeMFASetupChallenge 
+} from '../../utils/customAuthHelpers';
 
 interface MFASetupProps {
   onComplete?: () => void;
@@ -21,33 +25,47 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [setupComplete, setSetupComplete] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>('');
 
-  useEffect(() => {
-    if (step === 'setup' && !isLoading && !secretCode && !setupComplete) {
-      setupMFA();
-    }
-  }, [step, isLoading, secretCode, setupComplete]);
-
-  const setupMFA = async () => {
+  const setupMFA = useCallback(async () => {
     setIsLoading(true);
     setError('');
 
     try {
-      // Get QR code from Cognito MFA endpoint
-      const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
-      const redirectUri = import.meta.env.VITE_APP_URL;
-      const mfaUrl = `https://tpauth.cyorn.com/mfa/totp?client_id=${clientId}&response_type=token&scope=openid&redirect_uri=${encodeURIComponent(redirectUri)}&_data=routes%2Fmfa_.totp`;
+      // Use the challenge-based MFA setup
+      const result = await handleMFASetupChallenge();
       
-      const response = await fetch(mfaUrl);
-      const data = await response.json();
-      
-      if (data.registrationParams?.qrCode && data.registrationParams?.secretKey) {
-        setSecretCode(data.registrationParams.secretKey);
-        setQrCodeUrl(data.registrationParams.qrCode);
-        setSetupComplete(true);
-      } else {
-        throw new Error('Failed to get MFA setup data from Cognito');
+      if (!result.secretCode) {
+        throw new Error('Failed to get TOTP secret from Cognito');
       }
+
+      // Get the email from session storage or use fallback
+      let email = userEmail;
+      if (!email) {
+        const authSession = sessionStorage.getItem('currentAuthSession');
+        if (authSession) {
+          const parsed = JSON.parse(authSession);
+          email = parsed.username || 'user@example.com';
+        } else {
+          email = 'user@example.com';
+        }
+        setUserEmail(email);
+      }
+
+      // Build the otpauth URI with custom branding
+      const otpauthUri = buildOtpauthUri(
+        result.secretCode,
+        email,
+        'Threat Profiling',
+        'auth.cyorn.com'
+      );
+
+      // Generate QR code
+      const qrCodeDataUrl = await otpauthToDataUrl(otpauthUri);
+
+      setSecretCode(result.secretCode);
+      setQrCodeUrl(qrCodeDataUrl);
+      setSetupComplete(true);
     } catch (err: unknown) {
       const error = err as Error;
       console.error('MFA setup error:', error);
@@ -55,7 +73,13 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (step === 'setup' && !isLoading && !secretCode && !setupComplete) {
+      setupMFA();
+    }
+  }, [step, isLoading, secretCode, setupComplete, setupMFA]);
 
   const verifyMFA = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,25 +87,32 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
     setError('');
 
     try {
-      const session = sessionStorage.getItem('mfaSetupSession');
-      if (!session) {
-        throw new Error('No MFA setup session found. Please sign in again.');
+      if (!isValidTotpCode(verificationCode)) {
+        throw new Error('Please enter a valid 6-digit code');
       }
 
-      const command = new VerifySoftwareTokenCommand({
-        Session: session,
-        UserCode: verificationCode,
-      });
+      // Use our challenge-based TOTP completion flow
+      const result = await completeMFASetupChallenge(verificationCode);
 
-      await cognitoClient.send(command);
-      // Clear sessions after successful verification
-      sessionStorage.removeItem('mfaSetupSession');
-      sessionStorage.removeItem('currentAuthSession');
-      if (onComplete) {
-        onComplete();
-      } else {
-        // Default behavior - redirect to sign in to complete the flow
-        window.location.href = '/auth';
+      if (result.isSignedIn) {
+        // MFA setup completed and user is signed in
+        sessionStorage.removeItem('mfaSetupSession');
+        sessionStorage.removeItem('currentAuthSession');
+        
+        if (onComplete) {
+          onComplete();
+        } else {
+          // Default behavior - redirect to dashboard since user is now signed in
+          window.location.href = '/dashboard';
+        }
+      } else if (result.nextChallenge === 'SOFTWARE_TOKEN_MFA') {
+        // MFA is set up but need to verify again with newly set up TOTP
+        if (onComplete) {
+          onComplete();
+        } else {
+          // Signal that setup is complete and now need regular MFA verification
+          window.location.href = '/auth';
+        }
       }
     } catch (err: unknown) {
       const error = err as Error;
@@ -100,14 +131,17 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
         <img 
           src={qrCodeUrl} 
           alt="QR Code for MFA Setup" 
-          className="mx-auto mb-4 border border-white/20 rounded-lg"
+          className="mx-auto mb-4 border border-white/20 rounded-lg bg-white p-2"
         />
         <p className="text-sm text-gray-300 mb-2">
           Scan this QR code with your authenticator app
         </p>
-        <p className="text-xs text-gray-400">
-          Or manually enter this secret: <code className="bg-white/10 px-2 py-1 rounded">{secretCode}</code>
-        </p>
+        <div className="bg-white/10 rounded-lg p-3 text-xs">
+          <p className="text-gray-400 mb-1">Or manually enter this secret:</p>
+          <code className="bg-white/20 px-2 py-1 rounded text-white font-mono break-all">
+            {secretCode}
+          </code>
+        </div>
       </div>
     );
   };
@@ -145,10 +179,10 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
                 {generateQRCode()}
                 
                 <div className="bg-white/5 rounded-lg p-4 text-sm text-gray-300">
-                  <h3 className="font-semibold mb-2">Instructions:</h3>
+                  <h3 className="font-semibold mb-2 text-primary-300">Instructions:</h3>
                   <ol className="list-decimal list-inside space-y-1">
-                    <li>Install an authenticator app (Google Authenticator, Authy, etc.)</li>
-                    <li>Scan the QR code above or manually enter the secret</li>
+                    <li>Install an authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc.)</li>
+                    <li>Scan the QR code above or manually enter the secret key</li>
                     <li>Click "Continue" to verify your setup</li>
                   </ol>
                 </div>
@@ -176,6 +210,30 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
           </div>
         ) : (
           <form onSubmit={verifyMFA} className="space-y-6">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
+                <svg
+                  className="w-8 h-8 text-primary-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Open your authenticator app and enter the current 6-digit code for <span className="font-semibold text-primary-300">{userEmail}</span>
+              </p>
+              <p className="text-gray-400 text-xs mt-2">
+                The code refreshes every 30 seconds
+              </p>
+            </div>
+
             <InputField
               label="Verification Code"
               type="text"
@@ -184,7 +242,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
               onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="Enter 6-digit code"
               required
-              className="bg-white/10 border-white/30 text-white placeholder-gray-300"
+              className="bg-white/10 border-white/30 text-white placeholder-gray-300 text-center text-lg font-mono"
             />
 
             <div className="flex space-x-4">

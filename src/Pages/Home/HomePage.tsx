@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import ThreatProfilingLayout from "../../components/Common/ThreatProfilingLayout";
 import LoadingScreen from "../../components/Common/LoadingScreen";
@@ -358,7 +358,6 @@ const OrganizationSection: React.FC<OrganizationSectionProps> = ({
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isPlatformAdmin, hasBothTokens } = useUser();
-  const [signInUrl, setSignInUrl] = useState<string>("/");
   const hasAuthToken = !!getIdToken();
 
   // Only fetch organizations if user is authenticated
@@ -375,26 +374,6 @@ const HomePage: React.FC = () => {
   const [runningOrganizations, setRunningOrganizations] = React.useState<
     Set<string>
   >(new Set());
-
-  useEffect(() => {
-    const fetchAuthConfig = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/auth/config`
-        );
-        if (response.ok) {
-          const config = await response.json();
-          if (config.signInUrl) {
-            setSignInUrl(config.signInUrl);
-          }
-        }
-      } catch (error) {
-        console.warn("Failed to fetch auth config:", error);
-      }
-    };
-
-    fetchAuthConfig();
-  }, []);
 
   // Check if user has only L0 subscription (free tier)
   const subscriptions = user?.subscriptions || [];
@@ -600,7 +579,7 @@ const HomePage: React.FC = () => {
         {!hasAuthToken || !hasBothTokens ? (
           <div className="text-center py-12">
             <Button
-              onClick={() => (window.location.href = signInUrl)}
+              onClick={() => (window.location.href = "/auth")}
               variant="primary"
               className="px-8 py-3 text-lg"
             >

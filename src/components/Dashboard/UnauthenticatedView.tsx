@@ -1,11 +1,7 @@
 import React from 'react';
 import Button from '../Common/Button';
 
-interface UnauthenticatedViewProps {
-  signInUrl: string;
-}
-
-const UnauthenticatedView: React.FC<UnauthenticatedViewProps> = ({ signInUrl }) => {
+const UnauthenticatedView: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 text-center">
@@ -15,7 +11,7 @@ const UnauthenticatedView: React.FC<UnauthenticatedViewProps> = ({ signInUrl }) 
         <p className="mb-4">
           You are not signed in. Please log in to access the dashboard.
         </p>
-        <Button onClick={() => (window.location.href = signInUrl)}>
+        <Button onClick={() => (window.location.href = "/auth")}>
           Go to Login
         </Button>
       </div>

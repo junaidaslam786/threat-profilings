@@ -17,7 +17,6 @@ export const PaymentPage: React.FC = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentProcessed, setPaymentProcessed] = useState(false);
 
-  // API hooks
   const { data: userProfile, isLoading: profileLoading } = useGetProfileQuery();
   const { data: tiers, isLoading: tiersLoading } = useGetTiersQuery();
   const [handlePaymentSuccess, { isLoading: paymentLoading }] =
@@ -25,7 +24,6 @@ export const PaymentPage: React.FC = () => {
   const [createCheckoutSession, { isLoading: checkoutLoading }] =
     useCreateCheckoutSessionMutation();
 
-  // Extract session_id from URL and store in localStorage
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const sessionIdFromUrl = urlParams.get("session_id");
@@ -34,7 +32,6 @@ export const PaymentPage: React.FC = () => {
       localStorage.setItem("payment_session_id", sessionIdFromUrl);
       setIsProcessingPayment(true);
 
-      // Handle payment success automatically
       handlePaymentSuccess(sessionIdFromUrl)
         .unwrap()
         .then(
@@ -47,7 +44,6 @@ export const PaymentPage: React.FC = () => {
             setPaymentProcessed(true);
             setIsProcessingPayment(false);
 
-            // Remove session_id from URL without refreshing
             const newUrl = window.location.pathname;
             window.history.replaceState({}, "", newUrl);
           }
@@ -90,7 +86,6 @@ export const PaymentPage: React.FC = () => {
       const response = await createCheckoutSession(checkoutData).unwrap();
 
       if (response.checkout_url) {
-        // Redirect to Stripe checkout
         window.location.href = response.checkout_url;
       }
     } catch (error) {
@@ -164,7 +159,6 @@ export const PaymentPage: React.FC = () => {
           )}
         </div>
 
-        {/* Subscription Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {tiers
             ?.filter(
@@ -191,7 +185,6 @@ export const PaymentPage: React.FC = () => {
                   } ${isPopular ? "ring-2 ring-primary-400" : ""}`}
                   onClick={() => !isCurrentTier && handleSelectPlan(tier)}
                 >
-                  {/* Current Tier Badge */}
                   {isCurrentTier && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
                       <span className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -200,7 +193,6 @@ export const PaymentPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Popular Badge */}
                   {isPopular && !isCurrentTier && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
                       <span className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -209,7 +201,6 @@ export const PaymentPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Discount Badge */}
                   {discountPercent > 0 && (
                     <div className="absolute -top-2 -right-2 z-10">
                       <span className="bg-gradient-to-r from-green-500 to-green-600 text-white px-2 py-1 rounded-full text-xs font-bold">
@@ -218,7 +209,6 @@ export const PaymentPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Selection Indicator */}
                   {isSelected && (
                     <div className="absolute top-4 right-4 z-10">
                       <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
@@ -240,7 +230,6 @@ export const PaymentPage: React.FC = () => {
                   )}
 
                   <div className="p-6 flex flex-col h-full">
-                    {/* Plan Header */}
                     <div className="text-center mb-6">
                       <div
                         className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center transition-all duration-300 ${
@@ -260,7 +249,10 @@ export const PaymentPage: React.FC = () => {
                         <span className="text-3xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
                           ${tier.price_onetime_registration.toFixed(2)}
                         </span>
-                        <span className="text-secondary-400 ml-1"> one-time</span>
+                        <span className="text-secondary-400 ml-1">
+                          {" "}
+                          one-time
+                        </span>
                       </div>
                       {tier.description && (
                         <p className="text-secondary-300 text-sm leading-relaxed">
@@ -269,7 +261,6 @@ export const PaymentPage: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Features List */}
                     <div className="space-y-3 mb-6 flex-grow">
                       {features.slice(0, 6).map((feature, featureIndex) => (
                         <div
@@ -304,8 +295,6 @@ export const PaymentPage: React.FC = () => {
                         </div>
                       )}
                     </div>
-
-                    {/* Select Button */}
                     <button
                       disabled={isCurrentTier}
                       className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 mt-auto ${
@@ -328,7 +317,6 @@ export const PaymentPage: React.FC = () => {
             })}
         </div>
 
-        {/* Payment Section */}
         {selectedPlan && (
           <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 mb-8 border border-secondary-700/50">
             <h2 className="text-2xl font-bold text-primary-300 mb-6">
@@ -372,7 +360,9 @@ export const PaymentPage: React.FC = () => {
               >
                 {checkoutLoading
                   ? "Creating Session..."
-                  : `Pay $${selectedPlan.price_onetime_registration.toFixed(2)}`}
+                  : `Pay $${selectedPlan.price_onetime_registration.toFixed(
+                      2
+                    )}`}
               </Button>
 
               <Button
@@ -385,7 +375,6 @@ export const PaymentPage: React.FC = () => {
           </div>
         )}
 
-        {/* Additional Information */}
         <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 mb-8">
           <h3 className="text-xl font-semibold text-primary-300 mb-4">
             Payment Information

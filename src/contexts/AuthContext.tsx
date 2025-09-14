@@ -5,7 +5,12 @@ import {
   performLogout,
   setAuthTokens,
 } from "../utils/authStorage";
-import { AuthContext } from "./AuthContextTypes";
+import { AuthContext, type TotpSetupResult } from "./AuthContextTypes";
+import { 
+  setupTotpFlow, 
+  completeTotpSetup, 
+  preferTotp 
+} from "../utils/totpHelpers";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -33,16 +38,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
 
       if (!response.ok) {
-        // Be more conservative about token removal in production
-        // Don't remove tokens immediately - let explicit logout handle this
-        console.warn(`User fetch failed with status ${response.status}, but preserving tokens`);
         throw new Error(`Failed to fetch user: ${response.status}`);
       }
 
       return await response.json();
     } catch (error) {
       console.error("Error fetching user:", error);
-      // Don't automatically remove tokens - let the application handle this explicitly
       return null;
     }
   };
@@ -64,6 +65,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     performLogout("/dashboard");
+  };
+
+  // TOTP methods
+  const setupTotp = async (
+    userEmail?: string, 
+    accessToken?: string, 
+    session?: string
+  ): Promise<TotpSetupResult> => {
+    // Try to get email from user object or fallback to provided email
+    const email = userEmail || (user && 'email' in user ? (user as { email: string }).email : null) || 'user@example.com';
+    return await setupTotpFlow(email, accessToken, session, 'auth.cyorn.com');
+  };
+
+  const verifyTotp = async (
+    code: string, 
+    accessToken?: string, 
+    session?: string
+  ): Promise<boolean> => {
+    try {
+      const result = await completeTotpSetup(code, accessToken, session);
+      return result.success;
+    } catch (error) {
+      console.error('TOTP verification failed:', error);
+      return false;
+    }
+  };
+
+  const enableTotpPreference = async (accessToken: string): Promise<void> => {
+    await preferTotp(accessToken);
   };
 
   useEffect(() => {
@@ -91,6 +121,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         refetchUser,
+        setupTotp,
+        verifyTotp,
+        enableTotpPreference,
       }}
     >
       {children}

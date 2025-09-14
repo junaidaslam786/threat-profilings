@@ -41,7 +41,6 @@ const OrganizationSettingsPage: React.FC = () => {
   });
 
   const handleSave = () => {
-    // Implementation for saving settings
     console.log('Saving settings:', settings);
   };
 

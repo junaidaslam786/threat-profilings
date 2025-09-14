@@ -16,14 +16,8 @@ const FieldLockManager: React.FC<FieldLockManagerProps> = ({ clientName }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedField, setSelectedField] = useState<string>('');
 
-  console.log('FieldLockManager props:', { clientName });
-  console.log('FieldLockManager user:', user);
-  console.log('FieldLockManager clientName type:', typeof clientName);
-  console.log('FieldLockManager clientName value:', JSON.stringify(clientName));
-
   // Validate and sanitize clientName
   const sanitizedClientName = clientName?.trim();
-  console.log('Sanitized clientName:', sanitizedClientName);
 
   const {
     data: fieldLocks,
@@ -42,15 +36,6 @@ const FieldLockManager: React.FC<FieldLockManagerProps> = ({ clientName }) => {
     { clientName: sanitizedClientName!, fieldName: selectedField },
     { skip: !sanitizedClientName || !selectedField }
   );
-
-  console.log('FieldLockManager API state:', {
-    fieldLocks,
-    isLoading,
-    error,
-    fieldLockStatus,
-    isCheckingLock,
-    sanitizedClientName
-  });
 
   // Check if user has permission to manage field locks
   const hasPermission = user && (isLEMaster(user) || isOrgAdmin(user));

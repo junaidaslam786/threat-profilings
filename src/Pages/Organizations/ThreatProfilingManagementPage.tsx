@@ -13,12 +13,6 @@ const ThreatProfilingManagementPage: React.FC = () => {
   );
   const [selectedOrganization, setSelectedOrganization] = useState<string>("");
 
-  // Add debugging
-  useEffect(() => {
-    console.log("ThreatProfilingManagementPage mounted");
-    console.log("User:", user);
-  }, [user]);
-
   // Check if user has permission to access threat profiling management
   const hasPermission = user && (isLEMaster(user) || isOrgAdmin(user));
 
@@ -39,13 +33,6 @@ const ThreatProfilingManagementPage: React.FC = () => {
       console.error("Error loading organizations:", orgsError);
     }
   }, [orgsError]);
-
-  // Add debugging for availableOrgs (can be removed in production)
-  useEffect(() => {
-    if (availableOrgsResponse) {
-      console.log("Organizations loaded successfully:", availableOrgsResponse);
-    }
-  }, [availableOrgsResponse]);
 
   if (orgsError) {
     return (

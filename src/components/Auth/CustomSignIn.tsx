@@ -1,144 +1,154 @@
-import React, { useState } from 'react';
-import { type SignInOutput } from 'aws-amplify/auth';
-import { useNavigate } from 'react-router-dom';
-import InputField from '../Common/InputField';
-import Button from '../Common/Button';
-import ErrorMessage from '../Common/ErrorMessage';
-import LoadingScreen from '../Common/LoadingScreen';
-import { redirectToForgotPassword } from '../../utils/authHelpers';
-import { customSignIn, customConfirmSignIn } from '../../utils/customAuthHelpers';
+import React, { useState } from "react";
+import { type SignInOutput } from "aws-amplify/auth";
+import { useNavigate } from "react-router-dom";
+import InputField from "../Common/InputField";
+import Button from "../Common/Button";
+import ErrorMessage from "../Common/ErrorMessage";
+import LoadingScreen from "../Common/LoadingScreen";
+import MFASetup from "./MFASetup";
+import { redirectToForgotPassword } from "../../utils/authHelpers";
+import {
+  customSignIn,
+  customConfirmSignIn,
+} from "../../utils/customAuthHelpers";
 
 interface CustomSignInProps {
   onSwitchToSignUp: () => void;
   onSignInSuccess?: () => void;
 }
 
-const CustomSignIn: React.FC<CustomSignInProps> = ({ 
-  onSwitchToSignUp, 
-  onSignInSuccess 
+const CustomSignIn: React.FC<CustomSignInProps> = ({
+  onSwitchToSignUp,
+  onSignInSuccess,
 }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    mfaCode: ''
+    email: "",
+    password: "",
+    mfaCode: "",
   });
-  const [step, setStep] = useState<'signIn' | 'mfa' | 'mfaSetup'>('signIn');
+  const [step, setStep] = useState<"signIn" | "mfa" | "mfaSetup">("signIn");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const navigate = useNavigate();
 
   const getStepDescription = () => {
-    return 'Enter the 6-digit code from your authenticator app';
+    return "Enter the 6-digit code from your authenticator app";
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     // Special handling for MFA code - only allow 6 digits
-    if (name === 'mfaCode') {
-      const numericValue = value.replace(/\D/g, '').slice(0, 6);
-      setFormData(prev => ({ ...prev, [name]: numericValue }));
+    if (name === "mfaCode") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 6);
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    
-    if (error) setError('');
+
+    if (error) setError("");
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      console.log('Starting sign in process...');
       const { isSignedIn, nextStep }: SignInOutput = await customSignIn({
         username: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-
-      console.log('Sign in response:', { isSignedIn, nextStep });
 
       if (isSignedIn) {
         onSignInSuccess?.();
-        navigate('/dashboard');
-      } else if (nextStep.signInStep === 'CONTINUE_SIGN_IN_WITH_MFA_SELECTION') {
-        // First-time MFA setup required
-        console.log('MFA setup required, switching to MFA setup step');
-        // Store the session for MFA setup
-        const session = sessionStorage.getItem('currentAuthSession');
+        navigate("/dashboard");
+      } else if (
+        nextStep.signInStep === "CONTINUE_SIGN_IN_WITH_MFA_SELECTION"
+      ) {
+        const session = sessionStorage.getItem("currentAuthSession");
         if (session) {
           const authSession = JSON.parse(session);
-          sessionStorage.setItem('mfaSetupSession', authSession.session);
+          sessionStorage.setItem("mfaSetupSession", authSession.session);
         }
-        setStep('mfaSetup');
-      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
-        // MFA is enabled, show authenticator code input
-        console.log('MFA challenge detected, switching to MFA step');
-        setStep('mfa');
+        setStep("mfaSetup");
+      } else if (nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_TOTP_CODE") {
+        setStep("mfa");
       } else {
-        // Handle any other unexpected challenge
-        console.log('Unexpected challenge:', nextStep.signInStep);
-        setError('An unexpected authentication challenge occurred. Please contact support.');
+        setError(
+          "An unexpected authentication challenge occurred. Please contact support."
+        );
       }
     } catch (err: unknown) {
       const error = err as Error;
-      console.error('Sign in error:', error);
-      setError(error.message || 'Sign in failed. Please try again.');
+      console.error("Sign in error:", error);
+      setError(error.message || "Sign in failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleMFASetupComplete = () => {
-    console.log('MFA setup completed, switching to MFA verification step');
-    setStep('mfa');
+    const idToken = localStorage.getItem('id_token');
+    const accessToken = localStorage.getItem('access_token');
+    
+    if (idToken && accessToken) {
+      onSignInSuccess?.();
+      navigate("/auth-redirect-handler");
+    } else {
+      setStep("mfa");
+    }
   };
 
   const handleMFASetupCancel = () => {
-    console.log('MFA setup cancelled, returning to sign in');
-    setStep('signIn');
-    setFormData({ email: '', password: '', mfaCode: '' });
+    setStep("signIn");
+    setFormData({ email: "", password: "", mfaCode: "" });
   };
 
   const handleConfirmSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      console.log('Starting MFA confirmation with code:', formData.mfaCode);
       const { isSignedIn } = await customConfirmSignIn({
-        challengeResponse: formData.mfaCode
+        challengeResponse: formData.mfaCode,
       });
 
-      console.log('MFA confirmation response:', { isSignedIn });
-
       if (isSignedIn) {
-        console.log('MFA successful, redirecting to dashboard');
         onSignInSuccess?.();
-        navigate('/dashboard');
+        navigate("/auth-redirect-handler");
       }
     } catch (err: unknown) {
       const error = err as Error;
-      console.error('MFA confirmation error:', error);
-      
-      // Provide more specific error messages and recovery options
-      if (error.message?.includes('signIn was not called') || 
-          error.message?.includes('Invalid session') ||
-          error.message?.includes('session has expired')) {
-        setError('Your session has expired. Please sign in again to continue.');
-        setStep('signIn'); // Go back to sign in step
-        setFormData(prev => ({ ...prev, mfaCode: '' })); // Clear MFA code
-      } else if (error.message?.includes('Code mismatch') || 
-                 error.message?.includes('Invalid verification code')) {
-        setError('Invalid authenticator code. Please check your authenticator app and try again.');
-      } else if (error.message?.includes('CodeExpired')) {
-        setError('The code has expired. Please try a new code from your authenticator app.');
+      console.error("MFA confirmation error:", error);
+
+      if (
+        error.message?.includes("signIn was not called") ||
+        error.message?.includes("Invalid session") ||
+        error.message?.includes("session has expired")
+      ) {
+        setError("Your session has expired. Please sign in again to continue.");
+        setStep("signIn");
+        setFormData((prev) => ({ ...prev, mfaCode: "" }));
+      } else if (
+        error.message?.includes("Code mismatch") ||
+        error.message?.includes("Invalid verification code")
+      ) {
+        setError(
+          "Invalid authenticator code. Please check your authenticator app and try again."
+        );
+      } else if (error.message?.includes("CodeExpired")) {
+        setError(
+          "The code has expired. Please try a new code from your authenticator app."
+        );
       } else {
-        setError(error.message || 'Invalid authenticator code. Please check your authenticator app and try again.');
+        setError(
+          error.message ||
+            "Invalid authenticator code. Please check your authenticator app and try again."
+        );
       }
     } finally {
       setIsLoading(false);
@@ -149,61 +159,39 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     return <LoadingScreen />;
   }
 
+  // If we're in MFA setup step, render the MFASetup component directly
+  if (step === "mfaSetup") {
+    return (
+      <MFASetup 
+        onComplete={handleMFASetupComplete}
+        onCancel={handleMFASetupCancel}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 flex items-center justify-center p-4">
       <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl border border-white/20 p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            {step === 'signIn' ? 'Welcome Back' : step === 'mfaSetup' ? 'Setup Required' : 'Multi-Factor Authentication'}
+            {step === "signIn"
+              ? "Welcome Back"
+              : "Multi-Factor Authentication"}
           </h1>
           <p className="text-gray-200">
-            {step === 'signIn' 
-              ? 'Sign in to your Threat Profiling account' 
-              : step === 'mfaSetup'
-              ? 'Please set up multi-factor authentication to secure your account'
-              : getStepDescription()
-            }
+            {step === "signIn"
+              ? "Sign in to your Threat Profiling account"
+              : getStepDescription()}
           </p>
         </div>
 
         {error && (
           <div className="mb-6">
-            <ErrorMessage message={error} onClose={() => setError('')} />
+            <ErrorMessage message={error} onClose={() => setError("")} />
           </div>
         )}
 
-        {step === 'mfaSetup' ? (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
-                <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <p className="text-gray-300 text-sm">
-                To complete your sign-in, please set up multi-factor authentication using an authenticator app.
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleMFASetupCancel}
-                className="flex-1 bg-white/10 border border-white/30 text-white hover:bg-white/20"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => navigate('/mfa-setup')}
-                className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
-              >
-                Setup MFA
-              </Button>
-            </div>
-          </div>
-        ) : step === 'signIn' ? (
+        {step === "signIn" ? (
           <form onSubmit={handleSignIn} className="space-y-6">
             <InputField
               label="Email Address"
@@ -219,7 +207,7 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
             <div className="relative">
               <InputField
                 label="Password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
@@ -233,13 +221,38 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
                 className="absolute right-3 top-9 text-gray-300 hover:text-white transition-colors"
               >
                 {showPassword ? (
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                    />
                   </svg>
                 ) : (
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 )}
               </button>
@@ -251,19 +264,30 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
               className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleConfirmSignIn} className="space-y-6">
             <div className="text-center mb-4">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
-                <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                <svg
+                  className="w-8 h-8 text-primary-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <p className="text-gray-300 text-sm">
-                Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current 6-digit code for your account.
+                Open your authenticator app (Google Authenticator, Authy, etc.)
+                and enter the current 6-digit code for your account.
               </p>
               <p className="text-gray-400 text-xs mt-2">
                 The code refreshes every 30 seconds
@@ -285,7 +309,7 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => setStep('signIn')}
+                onClick={() => setStep("signIn")}
                 className="flex-1 bg-white/10 border border-white/30 text-white hover:bg-white/20 transition-all duration-200"
               >
                 Back
@@ -296,13 +320,13 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
                 className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
                 disabled={isLoading}
               >
-                {isLoading ? 'Verifying...' : 'Verify'}
+                {isLoading ? "Verifying..." : "Verify"}
               </Button>
             </div>
           </form>
         )}
 
-        {step === 'signIn' && (
+        {step === "signIn" && (
           <div className="mt-8 text-center space-y-4">
             <button
               type="button"
@@ -311,9 +335,9 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
             >
               Forgot your password?
             </button>
-            
+
             <div className="text-gray-300">
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <button
                 type="button"
                 onClick={onSwitchToSignUp}
