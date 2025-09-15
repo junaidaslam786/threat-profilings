@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { type SignUpOutput } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import InputField from "../Common/InputField";
 import Button from "../Common/Button";
-import ErrorMessage from "../Common/ErrorMessage";
 import LoadingScreen from "../Common/LoadingScreen";
 import {
   customSignUp,
@@ -27,7 +27,6 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
   });
   const [step, setStep] = useState<"signUp" | "confirmSignUp">("signUp");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -36,22 +35,21 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (error) setError("");
   };
 
   const validateForm = () => {
     if (!formData.email || !formData.password) {
-      setError("All fields are required.");
+      toast.error("All fields are required.");
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+      toast.error("Passwords do not match.");
       return false;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      toast.error("Password must be at least 8 characters long.");
       return false;
     }
 
@@ -64,7 +62,6 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setError("");
 
     try {
       const { isSignUpComplete, nextStep }: SignUpOutput = await customSignUp({
@@ -85,7 +82,7 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
       }
     } catch (err: unknown) {
       const error = err as Error;
-      setError(error.message || "Sign up failed. Please try again.");
+      toast.error(error.message || "Sign up failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +91,6 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
   const handleConfirmSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       const { isSignUpComplete } = await customConfirmSignUp({
@@ -109,7 +105,7 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
       }
     } catch (err: unknown) {
       const error = err as Error;
-      setError(error.message || "Confirmation failed. Please try again.");
+      toast.error(error.message || "Confirmation failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -132,12 +128,6 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
               : `Enter the confirmation code sent to ${formData.email}`}
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6">
-            <ErrorMessage message={error} onClose={() => setError("")} />
-          </div>
-        )}
 
         {step === "signUp" ? (
           <form onSubmit={handleSignUp} className="space-y-6">

@@ -70,7 +70,7 @@ const AuthRedirectHandler: React.FC = () => {
           } else if (userResult.level === "super") {
             navigate("/platform-admins", { replace: true });
           } else {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
           }
 
           window.history.replaceState(
@@ -98,7 +98,7 @@ const AuthRedirectHandler: React.FC = () => {
             navigate("/platform-admins", { replace: true });
             return;
           } else {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
             return;
           }
         }

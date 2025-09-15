@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
 import Button from '../Common/Button';
 import InputField from '../Common/InputField';
-import ErrorMessage from '../Common/ErrorMessage';
 import { 
   buildOtpauthUri, 
   otpauthToDataUrl, 
@@ -23,13 +23,11 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [setupComplete, setSetupComplete] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
 
   const setupMFA = useCallback(async () => {
     setIsLoading(true);
-    setError('');
 
     try {
       // Use the challenge-based MFA setup
@@ -57,7 +55,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
         result.secretCode,
         email,
         'Threat Profiling',
-        'tpauth.cyorn.com'
+        'TPcyorn'
       );
 
       // Generate QR code
@@ -69,7 +67,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
     } catch (err: unknown) {
       const error = err as Error;
       console.error('MFA setup error:', error);
-      setError(error.message || 'Failed to setup MFA. Please try again.');
+      toast.error(error.message || 'Failed to setup MFA. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +82,6 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
   const verifyMFA = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       if (!isValidTotpCode(verificationCode)) {
@@ -117,7 +114,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
     } catch (err: unknown) {
       const error = err as Error;
       console.error('MFA verification error:', error);
-      setError(error.message || 'Invalid verification code. Please try again.');
+      toast.error(error.message || 'Invalid verification code. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -160,12 +157,6 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
             }
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6">
-            <ErrorMessage message={error} onClose={() => setError('')} />
-          </div>
-        )}
 
         {step === 'setup' ? (
           <div className="space-y-6">

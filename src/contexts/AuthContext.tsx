@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<TotpSetupResult> => {
     // Try to get email from user object or fallback to provided email
     const email = userEmail || (user && 'email' in user ? (user as { email: string }).email : null) || 'user@example.com';
-    return await setupTotpFlow(email, accessToken, session, 'tpauth.cyorn.com');
+    return await setupTotpFlow(email, accessToken, session, 'TPcyorn');
   };
 
   const verifyTotp = async (

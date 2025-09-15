@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { type SignInOutput } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import InputField from "../Common/InputField";
 import Button from "../Common/Button";
-import ErrorMessage from "../Common/ErrorMessage";
 import LoadingScreen from "../Common/LoadingScreen";
 import MFASetup from "./MFASetup";
 import { redirectToForgotPassword } from "../../utils/authHelpers";
@@ -28,7 +28,6 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
   });
   const [step, setStep] = useState<"signIn" | "mfa" | "mfaSetup">("signIn");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
@@ -47,14 +46,11 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
-
-    if (error) setError("");
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       const { isSignedIn, nextStep }: SignInOutput = await customSignIn({
@@ -77,14 +73,14 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
       } else if (nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_TOTP_CODE") {
         setStep("mfa");
       } else {
-        setError(
+        toast.error(
           "An unexpected authentication challenge occurred. Please contact support."
         );
       }
     } catch (err: unknown) {
       const error = err as Error;
       console.error("Sign in error:", error);
-      setError(error.message || "Sign in failed. Please try again.");
+      toast.error(error.message || "Sign in failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +106,6 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
   const handleConfirmSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       const { isSignedIn } = await customConfirmSignIn({
@@ -130,22 +125,22 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
         error.message?.includes("Invalid session") ||
         error.message?.includes("session has expired")
       ) {
-        setError("Your session has expired. Please sign in again to continue.");
+        toast.error("Your session has expired. Please sign in again to continue.");
         setStep("signIn");
         setFormData((prev) => ({ ...prev, mfaCode: "" }));
       } else if (
         error.message?.includes("Code mismatch") ||
         error.message?.includes("Invalid verification code")
       ) {
-        setError(
+        toast.error(
           "Invalid authenticator code. Please check your authenticator app and try again."
         );
       } else if (error.message?.includes("CodeExpired")) {
-        setError(
+        toast.error(
           "The code has expired. Please try a new code from your authenticator app."
         );
       } else {
-        setError(
+        toast.error(
           error.message ||
             "Invalid authenticator code. Please check your authenticator app and try again."
         );
@@ -184,12 +179,6 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
               : getStepDescription()}
           </p>
         </div>
-
-        {error && (
-          <div className="mb-6">
-            <ErrorMessage message={error} onClose={() => setError("")} />
-          </div>
-        )}
 
         {step === "signIn" ? (
           <form onSubmit={handleSignIn} className="space-y-6">

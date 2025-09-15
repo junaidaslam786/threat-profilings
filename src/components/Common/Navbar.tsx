@@ -12,7 +12,6 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { user, isPlatformAdmin, isAdmin, isLEAdmin, isSuperAdmin } = useUser();
   
-  // Simplified user is anyone who's not a platform admin or super admin
   const isSimplifiedUser = !isPlatformAdmin && !isSuperAdmin;
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
@@ -92,34 +91,6 @@ const Navbar: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // If user is not logged in, show simplified navbar with sign-in button
-  if (!user) {
-    return (
-      <nav className="bg-gradient-to-r from-secondary-900 to-secondary-800 border-b border-secondary-700/50 sticky top-0 z-50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate("/")}
-                className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent hover:from-primary-300 hover:to-primary-200 transition-all duration-300 cursor-pointer"
-              >
-                TP CYORN
-              </button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate("/auth")}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 font-medium cursor-pointer"
-              >
-                Sign In
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-    );
-  }
 
   return (
     <nav className="bg-gradient-to-r from-secondary-900 to-secondary-800 border-b border-secondary-700/50 sticky top-0 z-50 backdrop-blur-sm">
