@@ -22,9 +22,7 @@ const EnhancedComponentsDashboard = lazy(
 );
 
 // Home Page for non-admin users
-const HomePage = lazy(
-  () => import("../Pages/Home/HomePage")
-);
+const HomePage = lazy(() => import("../Pages/Home/HomePage"));
 
 // Organization threat profiling details
 const OrganizationDetailsHome = lazy(
@@ -161,16 +159,45 @@ const RoutesContent: React.FC = () => {
           element={<AuthRedirectHandlerPage />}
         />
         <Route path="/auth" element={<CustomAuthPage />} />
-        <Route path="/mfa-setup" element={<MFASetup onComplete={() => window.location.href = '/dashboard'} onCancel={() => window.location.href = '/auth'} />} />
+        <Route
+          path="/mfa-setup"
+          element={
+            <MFASetup
+              onComplete={() => (window.location.href = "/dashboard")}
+              onCancel={() => (window.location.href = "/auth")}
+            />
+          }
+        />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/user/organization/create" element={<RegisterPage />} />
 
         {/* Dashboard route - handles its own auth logic */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Home page - handles its own auth logic */}
-        <Route path="/home" element={<HomePage />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute requireAuth={true} requireActive={true}>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Threat Profiling Routes */}
         <Route
@@ -351,7 +378,7 @@ const RoutesContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         {/* Threat Profiling Results Route */}
         <Route
           path="/threat-profiling/:client_name"
