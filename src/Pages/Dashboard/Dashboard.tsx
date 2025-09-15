@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-6xl mx-auto p-8">
         <div className="mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
-            Welcome to Threat Profiling Platform
+            Welcome to TP CYORN
           </h1>
           <p className="text-xl text-secondary-300">
             {getUserRoleDisplay()} Dashboard

@@ -57,7 +57,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
         result.secretCode,
         email,
         'Threat Profiling',
-        'auth.cyorn.com'
+        'tpauth.cyorn.com'
       );
 
       // Generate QR code

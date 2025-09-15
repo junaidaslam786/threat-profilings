@@ -14,18 +14,6 @@ const Navbar: React.FC = () => {
   
   // Simplified user is anyone who's not a platform admin or super admin
   const isSimplifiedUser = !isPlatformAdmin && !isSuperAdmin;
-  
-  // Check if user has an active subscription (including LE subscriptions)
-  const hasActiveSubscription = () => {
-    if (!user?.subscriptions || user.subscriptions.length === 0) return false;
-    
-    // Check for any active subscription including LE
-    return user.subscriptions.some(sub => 
-      sub.subscription_level && 
-      sub.subscription_level !== "L0" && // L0 is typically free tier
-      sub.subscription_level.length > 0
-    );
-  };
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -73,7 +61,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    performLogout("/dashboard");
+    performLogout("/");
   };
 
   const navItems = getNavItems();
@@ -105,28 +93,45 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // If user is not logged in, show simplified navbar with sign-in button
+  if (!user) {
+    return (
+      <nav className="bg-gradient-to-r from-secondary-900 to-secondary-800 border-b border-secondary-700/50 sticky top-0 z-50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate("/")}
+                className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent hover:from-primary-300 hover:to-primary-200 transition-all duration-300 cursor-pointer"
+              >
+                TP CYORN
+              </button>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate("/auth")}
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 font-medium cursor-pointer"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <nav className="bg-gradient-to-r from-secondary-900 to-secondary-800 border-b border-secondary-700/50 sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand and Subscription Indicator */}
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate(isSimplifiedUser ? "/home" : "/dashboard")}
               className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent hover:from-primary-300 hover:to-primary-200 transition-all duration-300 cursor-pointer"
             >
-              Threat Profiling
+             TP CYORN
             </button>
-            
-            {/* Subscription Tier Indicator for Simplified Users */}
-            {isSimplifiedUser && !hasActiveSubscription() && (
-              <button
-                onClick={() => navigate("/subscriptions")}
-                className="px-3 py-1 bg-amber-600/20 border border-amber-500/30 text-amber-300 text-xs rounded-lg hover:bg-amber-600/30 transition-all duration-200 cursor-pointer"
-              >
-                No Subscription Tier. Subscribe to a tier
-              </button>
-            )}
           </div>
 
           {/* Navigation Items - Only for Platform Admins and Super Admins */}

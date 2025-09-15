@@ -24,7 +24,7 @@ const TotpTestComponent: React.FC = () => {
         'test@example.com',
         undefined, // No access token for testing
         'test-session', // Mock session
-        'auth.cyorn.com'
+        'tpauth.cyorn.com'
       );
       
       setTotpData(data);
