@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../components/Common/Button';
 import Modal from '../../components/Common/Modal';
 import InputField from '../../components/Common/InputField';
+import { generateInvoicePDF, previewInvoicePDF } from '../../utils/pdfInvoiceGenerator';
 
 interface Invoice {
   id: string;
@@ -64,8 +65,47 @@ const Invoices: React.FC = () => {
     tier: '',
     dueDate: ''
   });
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const [filter, setFilter] = useState<'all' | 'pending' | 'paid' | 'overdue' | 'cancelled'>('all');
+
+  // PDF Generation handlers
+  const handleDownloadPDF = async (invoice: Invoice) => {
+    setIsGeneratingPDF(true);
+    try {
+      // Create a user profile object for the admin invoice
+      const userProfile = {
+        user_info: {
+          name: invoice.organizationName,
+          email: `${invoice.clientName}@example.com`,
+          client_name: invoice.clientName
+        }
+      };
+      await generateInvoicePDF(invoice, userProfile);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handlePreviewPDF = (invoice: Invoice) => {
+    try {
+      // Create a user profile object for the admin invoice
+      const userProfile = {
+        user_info: {
+          name: invoice.organizationName,
+          email: `${invoice.clientName}@example.com`,
+          client_name: invoice.clientName
+        }
+      };
+      previewInvoicePDF(invoice, userProfile);
+    } catch (error) {
+      console.error('Error previewing PDF:', error);
+      alert('Failed to preview PDF. Please try again.');
+    }
+  };
 
   const filteredInvoices = invoices.filter(invoice => 
     filter === 'all' || invoice.status === filter
@@ -262,6 +302,21 @@ const Invoices: React.FC = () => {
                       )}
                       <button className="text-blue-400 hover:text-blue-300">
                         View Details
+                      </button>
+                      <button
+                        onClick={() => handlePreviewPDF(invoice)}
+                        className="text-purple-400 hover:text-purple-300"
+                        title="Preview Invoice PDF"
+                      >
+                        Preview PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownloadPDF(invoice)}
+                        disabled={isGeneratingPDF}
+                        className="text-green-400 hover:text-green-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Download Invoice PDF"
+                      >
+                        {isGeneratingPDF ? 'Generating...' : 'Download PDF'}
                       </button>
                     </td>
                   </tr>

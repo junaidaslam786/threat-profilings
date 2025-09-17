@@ -1,4 +1,5 @@
 import React from 'react';
+import LoadingScreen from '../Common/LoadingScreen';
 
 interface OrganizationListStateProps {
   isLoading: boolean;
@@ -12,7 +13,7 @@ const OrganizationListState: React.FC<OrganizationListStateProps> = ({
   hasNoOrganizations 
 }) => {
   if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (error) {

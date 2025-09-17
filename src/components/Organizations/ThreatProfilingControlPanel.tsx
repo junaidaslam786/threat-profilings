@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo, memo } from "react";
 import Button from "../../components/Common/Button";
 import Modal from "../../components/Common/Modal";
 import { useUser } from "../../hooks/useUser";
@@ -716,8 +716,18 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
   const [startProfiling, { isLoading: isStarting }] = useStartProfilingMutation();
   const { data: canRerun } = useCanRerunProfilingQuery(clientName);
 
-  // Check if user has permission to access threat profiling controls
-  const hasAccess = user && (isLEMaster(user) || isOrgAdmin(user));
+  // Check if user has permission to access threat profiling controls - memoized for performance
+  const hasAccess = useMemo(() => user && (isLEMaster(user) || isOrgAdmin(user)), [user]);
+
+  // Memoized modal handlers for better performance
+  const handleOpenStartModal = useCallback(() => setStartProfilingModal(true), []);
+  const handleCloseStartModal = useCallback(() => setStartProfilingModal(false), []);
+  const handleOpenProgressModal = useCallback(() => setProgressModal(true), []);
+  const handleCloseProgressModal = useCallback(() => setProgressModal(false), []);
+  const handleOpenResultsModal = useCallback(() => setResultsModal(true), []);
+  const handleCloseResultsModal = useCallback(() => setResultsModal(false), []);
+  const handleOpenHistoryModal = useCallback(() => setHistoryModal(true), []);
+  const handleCloseHistoryModal = useCallback(() => setHistoryModal(false), []);
 
   if (!hasAccess) {
     return null; // Don't render anything if user doesn't have access
@@ -786,7 +796,7 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
       
       <div className="space-y-3">
         <button
-          onClick={() => setStartProfilingModal(true)}
+          onClick={handleOpenStartModal}
           disabled={isStartDisabled}
           className="w-full p-4 bg-gradient-to-r from-indigo-600/20 to-indigo-700/20 rounded-lg hover:from-indigo-500/30 hover:to-indigo-600/30 transition-all duration-200 border border-indigo-500/30 hover:border-indigo-400/50 group disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -838,7 +848,7 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
         )}
         
         <button
-          onClick={() => setProgressModal(true)}
+          onClick={handleOpenProgressModal}
           className="w-full p-4 bg-gradient-to-r from-yellow-600/20 to-yellow-700/20 rounded-lg hover:from-yellow-500/30 hover:to-yellow-600/30 transition-all duration-200 border border-yellow-500/30 hover:border-yellow-400/50 group"
         >
           <div className="flex items-center justify-between">
@@ -875,7 +885,7 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
         </button>
         
         <button
-          onClick={() => setResultsModal(true)}
+          onClick={handleOpenResultsModal}
           className="w-full p-4 bg-gradient-to-r from-green-600/20 to-green-700/20 rounded-lg hover:from-green-500/30 hover:to-green-600/30 transition-all duration-200 border border-green-500/30 hover:border-green-400/50 group"
         >
           <div className="flex items-center justify-between">
@@ -912,7 +922,7 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
         </button>
         
         <button
-          onClick={() => setHistoryModal(true)}
+          onClick={handleOpenHistoryModal}
           className="w-full p-4 bg-gradient-to-r from-purple-600/20 to-purple-700/20 rounded-lg hover:from-purple-500/30 hover:to-purple-600/30 transition-all duration-200 border border-purple-500/30 hover:border-purple-400/50 group"
         >
           <div className="flex items-center justify-between">
@@ -970,30 +980,30 @@ const ThreatProfilingControlPanel: React.FC<ThreatProfilingControlPanelProps> = 
       {/* Modals */}
       <StartProfilingModal
         isOpen={startProfilingModal}
-        onClose={() => setStartProfilingModal(false)}
+        onClose={handleCloseStartModal}
         onSubmit={handleStartProfiling}
         isLoading={isStarting}
       />
 
       <ProgressModal
         isOpen={progressModal}
-        onClose={() => setProgressModal(false)}
+        onClose={handleCloseProgressModal}
         clientName={clientName}
       />
 
       <ResultsModal
         isOpen={resultsModal}
-        onClose={() => setResultsModal(false)}
+        onClose={handleCloseResultsModal}
         clientName={clientName}
       />
 
       <HistoryModal
         isOpen={historyModal}
-        onClose={() => setHistoryModal(false)}
+        onClose={handleCloseHistoryModal}
         clientName={clientName}
       />
     </div>
   );
 };
 
-export default ThreatProfilingControlPanel;
+export default memo(ThreatProfilingControlPanel);

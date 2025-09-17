@@ -38,14 +38,14 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children, className = "", 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 modal-enter modal-enter-active">
       <div 
-        className={`bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-2xl p-6 w-full ${sizeClasses[size]} mx-auto border border-secondary-700/50 relative animate-in zoom-in-95 duration-200 ${className}`}
+        className={`bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-2xl p-6 w-full ${sizeClasses[size]} mx-auto border border-secondary-700/50 relative modal-content open ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-secondary-400 hover:text-white hover:bg-secondary-700/50 rounded-lg transition-all duration-200 cursor-pointer"
+          className="absolute top-4 right-4 p-2 text-secondary-400 hover:text-white hover:bg-secondary-700/50 rounded-lg smooth-transition cursor-pointer"
           aria-label="Close modal"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

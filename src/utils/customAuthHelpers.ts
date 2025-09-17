@@ -167,7 +167,7 @@ export const customSignUp = async (params: {
   const cognitoConfig = getCognitoConfig();
 
   if (cognitoConfig.hasClientSecret && cognitoConfig.clientSecret) {
-    const uniqueUsername = params.username.split("@")[0];
+    const uniqueUsername = params.username; // Use full email as username
 
     emailToUsernameMap[params.username] = uniqueUsername;
 
@@ -233,6 +233,7 @@ export const customConfirmSignUp = async (params: {
   const cognitoConfig = getCognitoConfig();
 
   if (cognitoConfig.hasClientSecret && cognitoConfig.clientSecret) {
+    // For new signups, username equals email (no longer extracting part before @)
     const actualUsername =
       emailToUsernameMap[params.username] || params.username;
 

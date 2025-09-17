@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getIdToken } from "../../utils/authStorage";
-import { debugTokenDetails } from "../../utils/debugTokens";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createAuthenticatedBaseQuery } from "../../utils/authenticatedBaseQuery";
 import type {
   RegisterUserDto,
   JoinOrgRequestDto,
@@ -20,33 +19,7 @@ interface GenericSuccessResponse {
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers) => {
-      const idToken = getIdToken();
-      if (idToken) {
-        headers.set("Authorization", `Bearer ${idToken}`);
-        
-        // Debug token details when making API calls
-        if (import.meta.env.MODE === 'development' || window.location.search.includes('debug=true')) {
-          console.log('🔍 Preparing headers for API call');
-          debugTokenDetails();
-        }
-      } else {
-        console.warn('⚠️ No ID token found when preparing headers');
-      }
-      return headers;
-    },
-    validateStatus: (response) => {
-      // Consider 401 as an error that should not be cached, but DON'T remove tokens
-      // Let the application logic handle token management to avoid premature removal
-      if (response.status === 401) {
-        console.warn("401 response received, but preserving tokens for application to handle");
-        return false;
-      }
-      return response.status >= 200 && response.status <= 299;
-    },
-  }),
+  baseQuery: createAuthenticatedBaseQuery(import.meta.env.VITE_API_BASE_URL),
   tagTypes: ['User', 'PendingJoins', 'AdminOrgs'],
   endpoints: (builder) => ({
     detectRegistrationFlow: builder.mutation<DetectFlowResponse, DetectFlowDto>({
@@ -56,17 +29,6 @@ export const userApi = createApi({
         body,
       }),
       transformErrorResponse: (response: { status: number; data: unknown }) => {
-        // Enhanced error logging for detect flow
-        console.group('❌ Detect Flow Error');
-        console.log('Status:', response.status);
-        console.log('Response Data:', response.data);
-        console.log('Full Response:', response);
-        
-        if (response.status === 401) {
-          console.log('🔍 Token debugging for 401 error:');
-          debugTokenDetails();
-        }
-        
         console.groupEnd();
         return response;
       },

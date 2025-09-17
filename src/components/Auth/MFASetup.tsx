@@ -99,8 +99,8 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
         if (onComplete) {
           onComplete();
         } else {
-          // Default behavior - redirect to dashboard since user is now signed in
-          window.location.href = '/dashboard';
+          // Default behavior - redirect to auth-redirect-handler for proper role-based routing
+          window.location.href = '/auth-redirect-handler';
         }
       } else if (result.nextChallenge === 'SOFTWARE_TOKEN_MFA') {
         // MFA is set up but need to verify again with newly set up TOTP

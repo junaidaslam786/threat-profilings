@@ -72,15 +72,59 @@ export const PaymentPage: React.FC = () => {
     return features;
   };
 
+  const calculateUpgradeCost = (newTier: TierConfigDto): { 
+    originalPrice: number; 
+    currentTierCredit: number; 
+    finalAmount: number; 
+    isUpgrade: boolean 
+  } => {
+    const originalPrice = newTier.price_onetime_registration;
+    
+    // Get current tier info
+    const currentSubscription = userProfile?.subscriptions?.[0]?.subscription_level;
+    const currentTier = tiers?.find(tier => tier.sub_level === currentSubscription);
+    
+    if (!currentTier || !currentSubscription || currentSubscription === 'L0') {
+      // No current subscription or free tier - pay full price
+      return {
+        originalPrice,
+        currentTierCredit: 0,
+        finalAmount: originalPrice,
+        isUpgrade: true
+      };
+    }
+    
+    const currentTierPrice = currentTier.price_onetime_registration;
+    const difference = originalPrice - currentTierPrice;
+    
+    // Never charge negative amount - minimum is 0
+    const finalAmount = Math.max(0, difference);
+    
+    return {
+      originalPrice,
+      currentTierCredit: currentTierPrice,
+      finalAmount,
+      isUpgrade: difference > 0
+    };
+  };
+
   const handleProceedToPayment = async () => {
     if (!selectedPlan || !userProfile) return;
 
+    const costBreakdown = calculateUpgradeCost(selectedPlan);
+    
+    // If final amount is 0, don't process payment
+    if (costBreakdown.finalAmount === 0) {
+      console.log("No payment required - tier change can be processed directly");
+      return;
+    }
+
     try {
       const checkoutData = {
-        amount: selectedPlan.price_onetime_registration,
+        amount: costBreakdown.finalAmount,
         client_name: userProfile.user_info.client_name,
         tier: selectedPlan.sub_level,
-        payment_type: "onetime" as const,
+        payment_type: "upgrade" as const,
       };
 
       const response = await createCheckoutSession(checkoutData).unwrap();
@@ -317,63 +361,103 @@ export const PaymentPage: React.FC = () => {
             })}
         </div>
 
-        {selectedPlan && (
-          <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 mb-8 border border-secondary-700/50">
-            <h2 className="text-2xl font-bold text-primary-300 mb-6">
-              Payment Summary
-            </h2>
+        {selectedPlan && (() => {
+          const costBreakdown = calculateUpgradeCost(selectedPlan);
+          const currentSubscription = userProfile?.subscriptions?.[0]?.subscription_level;
+          const currentTier = tiers?.find(tier => tier.sub_level === currentSubscription);
+          
+          return (
+            <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 mb-8 border border-secondary-700/50">
+              <h2 className="text-2xl font-bold text-primary-300 mb-6">
+                Payment Summary
+              </h2>
 
-            <div className="bg-primary-500/10 rounded-lg p-4 mb-6 border border-primary-400/20">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">
-                    {selectedPlan.sub_level}
-                  </span>
+              <div className="bg-primary-500/10 rounded-lg p-4 mb-6 border border-primary-400/20">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                    <span className="text-lg font-bold text-white">
+                      {selectedPlan.sub_level}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">
+                      {selectedPlan.name} Plan
+                    </h3>
+                    {selectedPlan.description && (
+                      <p className="text-primary-200">
+                        {selectedPlan.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">
-                    {selectedPlan.name} Plan
-                  </h3>
-                  {selectedPlan.description && (
-                    <p className="text-primary-200">
-                      {selectedPlan.description}
-                    </p>
+                
+                {/* Cost Breakdown */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-secondary-300">{selectedPlan.name} Plan Price</span>
+                    <span className="text-white font-medium">
+                      ${costBreakdown.originalPrice.toFixed(2)}
+                    </span>
+                  </div>
+                  
+                  {costBreakdown.currentTierCredit > 0 && currentTier && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-secondary-300">
+                        Credit from {currentTier.name} Plan
+                      </span>
+                      <span className="text-green-400 font-medium">
+                        -${costBreakdown.currentTierCredit.toFixed(2)}
+                      </span>
+                    </div>
                   )}
+                  
+                  <div className="border-t border-secondary-600/50 pt-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-secondary-300 font-semibold">
+                        {costBreakdown.finalAmount === 0 ? "No Payment Required" : "Amount to Pay"}
+                      </span>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
+                          ${costBreakdown.finalAmount.toFixed(2)}
+                        </span>
+                        {costBreakdown.finalAmount > 0 && (
+                          <span className="text-secondary-400 ml-1"> one-time</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {!costBreakdown.isUpgrade && costBreakdown.currentTierCredit > 0 && (
+                      <p className="text-sm text-orange-400 mt-2">
+                        ⚠️ You're selecting a lower-tier plan. You'll receive the difference as credit but no refund will be processed.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-secondary-300">One-time Payment</span>
-                <div className="text-right">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent">
-                    ${selectedPlan.price_onetime_registration.toFixed(2)}
-                  </span>
-                  <span className="text-secondary-400 ml-1"> one-time</span>
-                </div>
+
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleProceedToPayment}
+                  disabled={checkoutLoading || costBreakdown.finalAmount === 0}
+                  className="flex-1 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {checkoutLoading
+                    ? "Creating Session..."
+                    : costBreakdown.finalAmount === 0
+                    ? "No Payment Required"
+                    : `Pay $${costBreakdown.finalAmount.toFixed(2)}`}
+                </Button>
+
+                <Button
+                  onClick={() => setSelectedPlan(null)}
+                  className="flex-1 bg-secondary-700/50 hover:bg-secondary-600/50 text-white border border-secondary-600/50 hover:border-secondary-500/50 font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                >
+                  Change Plan
+                </Button>
               </div>
             </div>
-
-            <div className="flex gap-4">
-              <Button
-                onClick={handleProceedToPayment}
-                disabled={checkoutLoading}
-                className="flex-1 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
-              >
-                {checkoutLoading
-                  ? "Creating Session..."
-                  : `Pay $${selectedPlan.price_onetime_registration.toFixed(
-                      2
-                    )}`}
-              </Button>
-
-              <Button
-                onClick={() => setSelectedPlan(null)}
-                className="flex-1 bg-secondary-700/50 hover:bg-secondary-600/50 text-white border border-secondary-600/50 hover:border-secondary-500/50 font-semibold py-3 px-6 rounded-lg transition-all duration-200"
-              >
-                Change Plan
-              </Button>
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 mb-8">
           <h3 className="text-xl font-semibold text-primary-300 mb-4">

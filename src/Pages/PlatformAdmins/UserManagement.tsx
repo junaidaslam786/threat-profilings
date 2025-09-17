@@ -8,7 +8,6 @@ import {
   useSuspendUserMutation,
   useActivateUserMutation,
   useDeleteUserMutation,
-  useUpdateUserStatusMutation,
 } from "../../Redux/api/platformAdminApi";
 import { toast } from "react-hot-toast";
 import type { UserWithPartnerInfo } from "../../Redux/api/platformAdminApi";
@@ -42,7 +41,6 @@ const UserManagement: React.FC = () => {
   const [suspendUser] = useSuspendUserMutation();
   const [activateUser] = useActivateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
-  const [updateUserStatus] = useUpdateUserStatusMutation();
 
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [userToSuspend, setUserToSuspend] = useState<UserWithPartnerInfo | null>(
@@ -135,25 +133,6 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleQuickStatusUpdate = async (userEmail: string, newStatus: "active" | "suspended" | "inactive") => {
-    try {
-      await updateUserStatus({
-        email: userEmail,
-        status: newStatus,
-        reason: `Quick status update to ${newStatus}`,
-      }).unwrap();
-      toast.success(`Successfully updated user status to ${newStatus}`);
-      refetch();
-    } catch (err: unknown) {
-      const errorMessage =
-        typeof err === "string"
-          ? err
-          : (err as { data?: { message?: string } }).data?.message ||
-            "Failed to update user status.";
-      toast.error(errorMessage);
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     const baseClasses = "px-2 py-1 rounded text-xs font-semibold";
     switch (status?.toLowerCase()) {
@@ -167,6 +146,38 @@ const UserManagement: React.FC = () => {
         return `${baseClasses} bg-gray-600 text-white`;
       default:
         return `${baseClasses} bg-gray-600 text-white`;
+    }
+  };
+
+  const getSubscriptionTier = (user: UserWithPartnerInfo) => {
+    if (!user.subscriptions || user.subscriptions.length === 0) {
+      return "No Subscription";
+    }
+    
+    // Get the highest tier subscription
+    const tierPriority = { "L3": 3, "L2": 2, "L1": 1, "L0": 0 };
+    const highestTier = user.subscriptions.reduce((prev, current) => {
+      const prevPriority = tierPriority[prev.subscription_level as keyof typeof tierPriority] || -1;
+      const currentPriority = tierPriority[current.subscription_level as keyof typeof tierPriority] || -1;
+      return currentPriority > prevPriority ? current : prev;
+    });
+    
+    return highestTier.subscription_level;
+  };
+
+  const getTierBadge = (tier: string) => {
+    const baseClasses = "px-2 py-1 rounded text-xs font-semibold";
+    switch (tier) {
+      case "L3":
+        return `${baseClasses} bg-purple-600 text-white`;
+      case "L2":
+        return `${baseClasses} bg-blue-600 text-white`;
+      case "L1":
+        return `${baseClasses} bg-green-600 text-white`;
+      case "L0":
+        return `${baseClasses} bg-gray-600 text-white`;
+      default:
+        return `${baseClasses} bg-gray-500 text-white`;
     }
   };
 
@@ -389,6 +400,24 @@ const UserManagement: React.FC = () => {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
                     >
+                      Role
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      Joined Date
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
+                      Subscription Tier
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                    >
                       Organization
                     </th>
                     <th
@@ -420,18 +449,39 @@ const UserManagement: React.FC = () => {
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {users.map((user: UserWithPartnerInfo) => (
                     <tr key={user.email} className="hover:bg-gray-700/50 transition-colors">
+                      {/* User Details */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <div className="text-sm font-medium text-white">{user.name}</div>
                           <div className="text-sm text-blue-300">{user.email}</div>
-                          <div className="text-xs text-gray-400">
-                            {user.role} • Joined {new Date(user.created_at).toLocaleDateString()}
-                          </div>
                         </div>
                       </td>
+
+                      {/* Role */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 bg-indigo-600/20 text-indigo-300 border border-indigo-400/30 rounded text-xs font-medium">
+                          {user.role}
+                        </span>
+                      </td>
+
+                      {/* Joined Date */}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+
+                      {/* Subscription Tier */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={getTierBadge(getSubscriptionTier(user))}>
+                          {getSubscriptionTier(user)}
+                        </span>
+                      </td>
+
+                      {/* Organization */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {user.organization?.organization_name || "No organization"}
                       </td>
+
+                      {/* Status & Type */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col gap-2">
                           <span className={getStatusBadge(user.status)}>
@@ -442,6 +492,8 @@ const UserManagement: React.FC = () => {
                           </span>
                         </div>
                       </td>
+
+                      {/* Partner Info */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {user.partner_relationship?.has_partner ? (
                           <div className="flex flex-col">
@@ -459,6 +511,8 @@ const UserManagement: React.FC = () => {
                           <span className="text-gray-400">No partner</span>
                         )}
                       </td>
+
+                      {/* Payment Summary */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {user.payment_summary ? (
                           <div className="flex flex-col">
@@ -478,6 +532,8 @@ const UserManagement: React.FC = () => {
                           <span className="text-gray-400">No payments</span>
                         )}
                       </td>
+
+                      {/* Actions */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex flex-col gap-2">
                           {user.status === "suspended" ? (
@@ -501,22 +557,6 @@ const UserManagement: React.FC = () => {
                           >
                             Delete
                           </button>
-                          <select
-                            onChange={(e) => {
-                              const newStatus = e.target.value as "active" | "suspended" | "inactive";
-                              if (newStatus && newStatus !== user.status) {
-                                handleQuickStatusUpdate(user.email, newStatus);
-                              }
-                              e.target.value = ""; // Reset select
-                            }}
-                            className="px-2 py-1 bg-secondary-700 text-white rounded text-xs"
-                            defaultValue=""
-                          >
-                            <option value="" disabled>Quick Status</option>
-                            <option value="active">Set Active</option>
-                            <option value="suspended">Set Suspended</option>
-                            <option value="inactive">Set Inactive</option>
-                          </select>
                         </div>
                       </td>
                     </tr>

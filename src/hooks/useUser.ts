@@ -16,6 +16,7 @@ import {
   isViewer as checkViewer,
 } from "../utils/roleUtils";
 import { hasAuthTokens, getIdToken } from "../utils/authStorage";
+import { validateAndCleanupTokens } from "../utils/tokenValidator";
 
 export function useUser() {
   const dispatch = useAppDispatch();
@@ -23,6 +24,26 @@ export function useUser() {
 
   const hasAuthToken = !!getIdToken();
   const hasBothTokens = hasAuthTokens();
+
+  // Add token validation on mount and periodically
+  useEffect(() => {
+    if (hasBothTokens) {
+      const validateTokens = async () => {
+        const isValid = await validateAndCleanupTokens();
+        if (!isValid) {
+          // Tokens were invalid and cleaned up, trigger logout
+          dispatch(logoutUser());
+        }
+      };
+      
+      // Validate tokens immediately
+      validateTokens();
+      
+      // Set up periodic validation every 5 minutes
+      const interval = setInterval(validateTokens, 5 * 60 * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [hasBothTokens, dispatch]);
 
   // More aggressive skip logic - always fetch if we have tokens but no user
   const shouldSkip = !hasAuthToken;

@@ -1,23 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ThreatProfilingLayout from '../../components/Common/ThreatProfilingLayout';
 import LoadingScreen from '../../components/Common/LoadingScreen';
 import Button from '../../components/Common/Button';
-import { useGetOrgQuery } from '../../Redux/api/organizationsApi';
+import InputField from '../../components/Common/InputField';
+import TextArea from '../../components/Common/TextArea';
+import MultiSelect from '../../components/Common/MultiSelect';
+import { useGetOrgQuery, useUpdateOrgMutation } from '../../Redux/api/organizationsApi';
 import type { ClientDataDto } from '../../Redux/slices/organizationsSlice';
+import { WORLD_COUNTRIES } from '../../constants/countries';
 
 interface OrganizationDetailsHomeProps {
   className?: string;
 }
 
+type EditableField = 'sector' | 'countries_of_operation' | 'website_url' | 'additional_details' | 'govt_sector';
+
 const OrganizationDetailsHome: React.FC<OrganizationDetailsHomeProps> = ({ className = '' }) => {
   const { client_name } = useParams<{ client_name: string }>();
   const navigate = useNavigate();
+
+  // State for editing
+  const [editingField, setEditingField] = useState<EditableField | null>(null);
+  const [editValues, setEditValues] = useState<Record<string, string | string[]>>({});
+  const [govtSector, setGovtSector] = useState<string>('No');
 
   // Fetch organization data
   const { data: orgData, isLoading: orgLoading, error: orgError } = useGetOrgQuery(client_name!, {
     skip: !client_name,
   });
+
+  // Update organization mutation
+  const [updateOrg, { isLoading: isUpdating }] = useUpdateOrgMutation();
+
+  // Load govt sector from localStorage on component mount
+  useEffect(() => {
+    if (client_name) {
+      const savedGovtSector = localStorage.getItem(`govt_sector_${client_name}`);
+      if (savedGovtSector) {
+        setGovtSector(savedGovtSector);
+      }
+    }
+  }, [client_name]);
+
+  // Helper functions for editing
+  const startEditing = (field: EditableField, currentValue: string | string[]) => {
+    setEditingField(field);
+    setEditValues({ [field]: currentValue });
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditValues({});
+  };
+
+  const handleUpdate = async (field: EditableField) => {
+    if (!org || !client_name) return;
+
+    try {
+      if (field === 'govt_sector') {
+        // Save to localStorage for govt_sector
+        const value = editValues[field] as string;
+        localStorage.setItem(`govt_sector_${client_name}`, value);
+        setGovtSector(value);
+      } else {
+        // Update via API for other fields
+        const updateData = {
+          clientName: client_name,
+          body: {
+            [field]: editValues[field]
+          }
+        };
+        await updateOrg(updateData).unwrap();
+      }
+      
+      setEditingField(null);
+      setEditValues({});
+    } catch (error) {
+      console.error('Error updating organization:', error);
+    }
+  };
 
   // Helper function to extract organization data
   const getOrgData = (data: typeof orgData): ClientDataDto | null => {
@@ -90,40 +152,211 @@ const OrganizationDetailsHome: React.FC<OrganizationDetailsHomeProps> = ({ class
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
+              {/* Organization Name - Not Editable */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
                 <label className="block text-sm font-medium text-primary-400 mb-2">Organization Name</label>
                 <p className="text-white">{org.organization_name}</p>
               </div>
               
+              {/* Sector - Editable */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
                 <label className="block text-sm font-medium text-primary-400 mb-2">Sector</label>
-                <p className="text-white">{org.sector || 'Not specified'}</p>
+                {editingField === 'sector' ? (
+                  <div className="space-y-3">
+                    <InputField
+                      label=""
+                      type="text"
+                      name="sector"
+                      value={(editValues.sector as string) || ''}
+                      onChange={(e) => setEditValues({ ...editValues, sector: e.target.value })}
+                      placeholder="Enter sector"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleUpdate('sector')}
+                        variant="primary"
+                        disabled={isUpdating}
+                      >
+                        {isUpdating ? 'Updating...' : 'Update'}
+                      </Button>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditing('sector', org.sector || '')}
+                  >
+                    {org.sector || 'Not specified'}
+                  </p>
+                )}
               </div>
               
+              {/* Operating Countries - Editable with MultiSelect */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
                 <label className="block text-sm font-medium text-primary-400 mb-2">Operating Countries</label>
-                <p className="text-white">
-                  {org.countries_of_operation?.join(', ') || 'Not specified'}
-                </p>
+                {editingField === 'countries_of_operation' ? (
+                  <div className="space-y-3">
+                    <MultiSelect
+                      id="countries"
+                      label=""
+                      options={WORLD_COUNTRIES}
+                      values={(editValues.countries_of_operation as string[]) || []}
+                      onChange={(values) => setEditValues({ ...editValues, countries_of_operation: values })}
+                      placeholder="Select countries"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleUpdate('countries_of_operation')}
+                        variant="primary"
+                        disabled={isUpdating}
+                      >
+                        {isUpdating ? 'Updating...' : 'Update'}
+                      </Button>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditing('countries_of_operation', org.countries_of_operation || [])}
+                  >
+                    {org.countries_of_operation && org.countries_of_operation.length > 0
+                      ? org.countries_of_operation.map(country => 
+                          WORLD_COUNTRIES.find(c => c.value === country)?.label || country
+                        ).join(', ')
+                      : 'Not specified'
+                    }
+                  </p>
+                )}
               </div>
             </div>
             
             <div className="space-y-4">
+              {/* About Us URL (previously Website) - Editable */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
-                <label className="block text-sm font-medium text-primary-400 mb-2">Website</label>
-                <p className="text-white">{org.website_url || 'Not specified'}</p>
+                <label className="block text-sm font-medium text-primary-400 mb-2">About Us URL</label>
+                {editingField === 'website_url' ? (
+                  <div className="space-y-3">
+                    <InputField
+                      label=""
+                      type="url"
+                      name="website_url"
+                      value={(editValues.website_url as string) || ''}
+                      onChange={(e) => setEditValues({ ...editValues, website_url: e.target.value })}
+                      placeholder="Enter About Us URL"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleUpdate('website_url')}
+                        variant="primary"
+                        disabled={isUpdating}
+                      >
+                        {isUpdating ? 'Updating...' : 'Update'}
+                      </Button>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditing('website_url', org.website_url || '')}
+                  >
+                    {org.website_url || 'Not specified'}
+                  </p>
+                )}
               </div>
               
+              {/* Government Sector - Editable with localStorage */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
-                <label className="block text-sm font-medium text-primary-400 mb-2">Client Name</label>
-                <p className="text-white">{org.client_name}</p>
+                <label className="block text-sm font-medium text-primary-400 mb-2">Govt Sector</label>
+                {editingField === 'govt_sector' ? (
+                  <div className="space-y-3">
+                    <select
+                      value={editValues.govt_sector || govtSector}
+                      onChange={(e) => setEditValues({ ...editValues, govt_sector: e.target.value })}
+                      className="w-full px-3 py-2 bg-secondary-700 border border-secondary-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleUpdate('govt_sector')}
+                        variant="primary"
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-white cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditing('govt_sector', govtSector)}
+                  >
+                    {govtSector}
+                  </p>
+                )}
               </div>
               
+              {/* Additional Context - Editable */}
               <div className="bg-secondary-900/50 p-4 rounded-lg">
                 <label className="block text-sm font-medium text-primary-400 mb-2">Additional Context</label>
-                <p className="text-white text-sm leading-relaxed">
-                  {org.additional_details || 'No additional details provided.'}
-                </p>
+                {editingField === 'additional_details' ? (
+                  <div className="space-y-3">
+                    <TextArea
+                      id="additional_details"
+                      label=""
+                      value={(editValues.additional_details as string) || ''}
+                      onChange={(e) => setEditValues({ ...editValues, additional_details: e.target.value })}
+                      placeholder="Enter additional details"
+                      rows={3}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleUpdate('additional_details')}
+                        variant="primary"
+                        disabled={isUpdating}
+                      >
+                        {isUpdating ? 'Updating...' : 'Update'}
+                      </Button>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-white text-sm leading-relaxed cursor-pointer hover:text-primary-300 transition-colors"
+                    onClick={() => startEditing('additional_details', org.additional_details || '')}
+                  >
+                    {org.additional_details || 'No additional details provided.'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -166,68 +399,6 @@ const OrganizationDetailsHome: React.FC<OrganizationDetailsHomeProps> = ({ class
           </div>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div 
-            className="bg-gradient-to-br from-primary-600/20 to-primary-500/20 border border-primary-500/30 rounded-lg p-6 hover:from-primary-600/30 hover:to-primary-500/30 transition-all duration-200 cursor-pointer"
-            onClick={() => navigate(`/threat-profiling/${client_name}/intro`)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-primary-600/30 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Introduction</h4>
-            <p className="text-sm text-secondary-300">Get started with threat profiling overview</p>
-          </div>
-
-          <div 
-            className="bg-gradient-to-br from-amber-600/20 to-amber-500/20 border border-amber-500/30 rounded-lg p-6 hover:from-amber-600/30 hover:to-amber-500/30 transition-all duration-200 cursor-pointer"
-            onClick={() => navigate(`/threat-profiling/${client_name}/threat-actors`)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-amber-600/30 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Threat Actors</h4>
-            <p className="text-sm text-secondary-300">Identify potential adversaries and risks</p>
-          </div>
-
-          <div 
-            className="bg-gradient-to-br from-red-600/20 to-red-500/20 border border-red-500/30 rounded-lg p-6 hover:from-red-600/30 hover:to-red-500/30 transition-all duration-200 cursor-pointer"
-            onClick={() => navigate(`/threat-profiling/${client_name}/threats`)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-red-600/30 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Threats & TTPs</h4>
-            <p className="text-sm text-secondary-300">Analyze attack methods and procedures</p>
-          </div>
-
-          <div 
-            className="bg-gradient-to-br from-green-600/20 to-green-500/20 border border-green-500/30 rounded-lg p-6 hover:from-green-600/30 hover:to-green-500/30 transition-all duration-200 cursor-pointer"
-            onClick={() => navigate(`/threat-profiling/${client_name}/detection`)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-600/30 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-            </div>
-            <h4 className="text-lg font-semibold text-white mb-2">Detection</h4>
-            <p className="text-sm text-secondary-300">Implement monitoring and detection</p>
-          </div>
-        </div>
 
         {/* Status Overview */}
         <div className="bg-secondary-800/50 rounded-xl border border-secondary-700/50 p-6">

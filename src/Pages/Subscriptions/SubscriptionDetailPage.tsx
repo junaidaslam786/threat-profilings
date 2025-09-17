@@ -6,6 +6,7 @@ import {
 } from "../../Redux/api/subscriptionsApi";
 import type { SubscriptionLevel } from "../../Redux/slices/subscriptionsSlice";
 import Button from "../../components/Common/Button";
+import LoadingScreen from "../../components/Common/LoadingScreen";
 
 export default function SubscriptionDetailPage() {
   const { client_name } = useParams<{ client_name: string }>();
@@ -21,12 +22,7 @@ export default function SubscriptionDetailPage() {
     useUpdateSubscriptionMutation();
   const [errMsg, setErrMsg] = useState("");
 
-  if (isLoading)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <LoadingScreen />;
   if (error || !sub)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">

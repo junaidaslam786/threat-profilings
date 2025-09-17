@@ -35,7 +35,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-secondary-900 shadow-lg hover:shadow-xl cursor-pointer";
+  "inline-flex items-center justify-center rounded-lg font-medium smooth-transition focus:outline-none focus-smooth shadow-lg hover:shadow-xl cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0 active:transition-none";
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white border border-primary-500/30",

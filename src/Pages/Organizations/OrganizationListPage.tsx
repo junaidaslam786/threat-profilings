@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import OrganizationCreateModal from "./CreateOrganizationModal";
 import {
   useGetOrgsQuery,
@@ -24,21 +24,27 @@ interface Organization {
   updated_at?: string;
 }
 
-export default function OrganizationListPage() {
+// Memoized Organization List Page for better performance
+const OrganizationListPage = React.memo(() => {
   const { data: userProfile } = useGetProfileQuery();
   const [showModal, setShowModal] = useState(false);
   const [viewingOrganization, setViewingOrganization] =
     useState<Organization | null>(null);
 
-  // Check if user is platform_admin or super_admin
-  const isPlatformAdmin =
-    userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
-      "admin" ||
-    userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
-      "super_admin";
+  // Memoize user permissions to avoid recalculation
+  const userPermissions = useMemo(() => {
+    const isPlatformAdmin =
+      userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
+        "admin" ||
+      userProfile?.roles_and_permissions?.access_levels?.platform_admin ===
+        "super_admin";
+    
+    const isLeAdmin = userProfile?.user_info?.user_type === "LE";
+    
+    return { isPlatformAdmin, isLeAdmin };
+  }, [userProfile]);
 
-  // Check if user is LE_ADMIN (can create organizations)
-  const isLeAdmin = userProfile?.user_info?.user_type === "LE";
+  const { isPlatformAdmin, isLeAdmin } = userPermissions;
 
   // Use getAllOrgs only for platform/super admins, otherwise use regular getOrgs
   const {
@@ -59,50 +65,69 @@ export default function OrganizationListPage() {
     skip: isPlatformAdmin,
   });
 
-  // Determine which data to use
-  const isLoading = isPlatformAdmin ? isLoadingAll : isLoadingUser;
-  const error = isPlatformAdmin ? errorAll : errorUser;
-  const refetch = isPlatformAdmin ? refetchAll : refetchUser;
-
-  let organizations: Organization[] = [];
-  if (isPlatformAdmin && allOrgs) {
-    organizations = Array.isArray(allOrgs) ? allOrgs : [];
-  } else if (!isPlatformAdmin) {
-    if (userOrgs) {
-      organizations = Array.isArray(userOrgs)
-        ? userOrgs
-        : userOrgs?.managed_orgs || [];
+  // Memoize organizations data processing for better performance
+  const organizations = useMemo(() => {
+    let orgs: Organization[] = [];
+    if (isPlatformAdmin && allOrgs) {
+      orgs = Array.isArray(allOrgs) ? allOrgs : [];
+    } else if (!isPlatformAdmin) {
+      if (userOrgs) {
+        orgs = Array.isArray(userOrgs)
+          ? userOrgs
+          : userOrgs?.managed_orgs || [];
+      }
+      // Always use accessible_organizations as fallback for LE users
+      if (orgs.length === 0 && userProfile?.accessible_organizations) {
+        orgs = userProfile.accessible_organizations.map((org) => ({
+          client_name: org.client_name,
+          organization_name: org.organization_name,
+          sector: undefined,
+          website_url: undefined,
+        }));
+      }
     }
-    // Always use accessible_organizations as fallback for LE users
-    if (organizations.length === 0 && userProfile?.accessible_organizations) {
-      organizations = userProfile.accessible_organizations.map((org) => ({
-        client_name: org.client_name,
-        organization_name: org.organization_name,
-        sector: undefined,
-        website_url: undefined,
-      }));
-    }
-  }
+    return orgs;
+  }, [isPlatformAdmin, allOrgs, userOrgs, userProfile?.accessible_organizations]);
 
-  const hasNoOrganizations = !isLoading && !error && organizations.length === 0;
+  // Memoize computed values with proper typing
+  const computedValues = useMemo(() => {
+    const loading = isPlatformAdmin ? isLoadingAll : isLoadingUser;
+    const err = isPlatformAdmin ? errorAll : errorUser;
+    const refetchFn = isPlatformAdmin ? refetchAll : refetchUser;
+    const hasNoOrgs = !loading && !err && organizations.length === 0;
+    
+    return {
+      isLoading: loading,
+      error: err,
+      refetch: refetchFn,
+      hasNoOrganizations: hasNoOrgs,
+    };
+  }, [isPlatformAdmin, isLoadingAll, isLoadingUser, errorAll, errorUser, refetchAll, refetchUser, organizations.length]);
 
-  const handleAddOrganization = () => {
+  const { isLoading, error, refetch, hasNoOrganizations } = computedValues;
+
+  // Memoize event handlers
+  const handleAddOrganization = useCallback(() => {
     setShowModal(true);
-  };
+  }, []);
 
-  const handleViewOrganization = (clientName: string) => {
+  const handleViewOrganization = useCallback((clientName: string) => {
     const org = organizations.find(
       (o: Organization) => o.client_name === clientName
     );
     if (org) {
       setViewingOrganization(org);
     }
-  };
+  }, [organizations]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowModal(false);
     refetch();
-  };
+  }, [refetch]);
+
+  const handleCloseSidebar = useCallback(() => {
+    setViewingOrganization(null);
+  }, []);
 
   return (
     <>
@@ -144,9 +169,14 @@ export default function OrganizationListPage() {
       <OrganizationDetailSidebar
         organization={viewingOrganization}
         isOpen={!!viewingOrganization}
-        onClose={() => setViewingOrganization(null)}
+        onClose={handleCloseSidebar}
         canEdit={!isPlatformAdmin}
       />
     </>
   );
-}
+});
+
+// Set display name for better debugging
+OrganizationListPage.displayName = 'OrganizationListPage';
+
+export default OrganizationListPage;

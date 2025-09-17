@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import OrganizationCard from './OrganizationCard';
 
 interface Organization {
@@ -14,7 +14,8 @@ interface OrganizationListProps {
   onRefresh: () => void;
 }
 
-const OrganizationList: React.FC<OrganizationListProps> = ({ 
+// Memoized OrganizationList for better performance
+const OrganizationList: React.FC<OrganizationListProps> = memo(({ 
   organizations, 
   onViewOrganization, 
   onRefresh 
@@ -31,6 +32,9 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
       ))}
     </div>
   );
-};
+});
+
+// Set display name for better debugging
+OrganizationList.displayName = 'OrganizationList';
 
 export default OrganizationList;

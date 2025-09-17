@@ -8,7 +8,7 @@ import {
 import { useGetTiersQuery } from "../../Redux/api/tiersApi";
 import { useUser } from "../../hooks/useUser";
 import { Button } from "../../components/Common/Button";
-import LoadingSpinner from "../../components/Common/LoadingScreen";
+import LoadingScreen from "../../components/Common/LoadingScreen";
 import Navbar from "../../components/Common/Navbar";
 import type { TierConfigDto } from "../../Redux/slices/tiersSlice";
 
@@ -82,7 +82,7 @@ const PaymentDashboard: React.FC = () => {
   }
 
   if (profileLoading) {
-    return <LoadingSpinner />;
+    return <LoadingScreen />;
   }
 
   if (!clientName) {

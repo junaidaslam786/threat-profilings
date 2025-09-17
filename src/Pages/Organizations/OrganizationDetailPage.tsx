@@ -5,6 +5,7 @@ import {
   useUpdateOrgMutation,
 } from "../../Redux/api/organizationsApi";
 import Button from "../../components/Common/Button";
+import LoadingScreen from "../../components/Common/LoadingScreen";
 import type {
   ClientDataDto,
   UpdateOrgDto,
@@ -52,12 +53,7 @@ export default function OrganizationDetailPage() {
   const [updateOrg, { isLoading: isUpdating }] = useUpdateOrgMutation();
   const [errMsg, setErrMsg] = useState("");
 
-  if (isLoading)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <LoadingScreen />;
   if (error || !org)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">

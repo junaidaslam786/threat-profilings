@@ -2,17 +2,13 @@
 import { useParams } from "react-router-dom";
 import { useGetTierQuery } from "../../Redux/api/tiersApi";
 import Button from "../../components/Common/Button";
+import LoadingScreen from "../../components/Common/LoadingScreen";
 
 export default function TierDetailPage() {
   const { sub_level } = useParams<{ sub_level: string }>();
   const { data: tier, isLoading, error } = useGetTierQuery(sub_level!);
 
-  if (isLoading)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <LoadingScreen />;
   if (error || !tier)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">

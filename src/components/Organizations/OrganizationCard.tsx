@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 
 interface Organization {
   client_name: string;
@@ -13,11 +13,16 @@ interface OrganizationCardProps {
   onRefresh: () => void;
 }
 
-const OrganizationCard: React.FC<OrganizationCardProps> = ({ 
+// Memoized OrganizationCard for better list performance
+const OrganizationCard: React.FC<OrganizationCardProps> = memo(({ 
   organization, 
   onView, 
   onRefresh 
 }) => {
+  // Memoize click handler to prevent recreating on each render
+  const handleView = useCallback(() => {
+    onView(organization.client_name);
+  }, [onView, organization.client_name]);
   return (
     <div className="group bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-xl p-6 border border-secondary-700/50 hover:border-primary-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-500/10">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -62,7 +67,7 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
         
         <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-col gap-3 lg:min-w-[140px]">
           <button
-            onClick={() => onView(organization.client_name)}
+            onClick={handleView}
             className="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-500 hover:to-primary-600 transition-all duration-200 font-medium cursor-pointer shadow-lg hover:shadow-xl"
           >
             View Details
@@ -78,6 +83,9 @@ const OrganizationCard: React.FC<OrganizationCardProps> = ({
       </div>
     </div>
   );
-};
+});
+
+// Set display name for better debugging
+OrganizationCard.displayName = 'OrganizationCard';
 
 export default OrganizationCard;

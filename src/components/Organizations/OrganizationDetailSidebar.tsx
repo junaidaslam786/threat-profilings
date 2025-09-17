@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Common/Sidebar";
 import ThreatProfilingControlPanel from "./ThreatProfilingControlPanel";
@@ -31,12 +31,29 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  if (!organization) return null;
-
-  const handleNavigate = (path: string) => {
+  const handleNavigate = useCallback((path: string) => {
     navigate(path);
     onClose();
-  };
+  }, [navigate, onClose]);
+
+  // Memoized navigation handlers for better performance
+  const handleEditClick = useCallback(() => {
+    if (organization) {
+      handleNavigate(`/orgs/${organization.client_name}/edit`);
+    }
+  }, [organization, handleNavigate]);
+  
+  const handleSettingsClick = useCallback(() => {
+    if (organization) {
+      handleNavigate(`/orgs/${organization.client_name}/settings`);
+    }
+  }, [organization, handleNavigate]);
+  
+  const handleThreatProfilingClick = useCallback(() => {
+    handleNavigate("/threat-profiling-management");
+  }, [handleNavigate]);
+
+  if (!organization) return null;
 
   return (
     <Sidebar
@@ -96,9 +113,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() =>
-                  handleNavigate(`/orgs/${organization.client_name}/edit`)
-                }
+                onClick={handleEditClick}
                 className="p-3 bg-secondary-700/50 rounded-lg hover:bg-secondary-600/50 transition-colors border border-secondary-600/30 hover:border-yellow-500/30 group"
               >
                 <div className="flex items-center space-x-2">
@@ -126,9 +141,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
                 </div>
               </button>
               <button
-                onClick={() =>
-                  handleNavigate(`/orgs/${organization.client_name}/settings`)
-                }
+                onClick={handleSettingsClick}
                 className="p-3 bg-secondary-700/50 rounded-lg hover:bg-secondary-600/50 transition-colors border border-secondary-600/30 hover:border-purple-500/30 group"
               >
                 <div className="flex items-center space-x-2">
@@ -177,9 +190,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
             </h3>
           </div>
           <button
-            onClick={() =>
-              handleNavigate("/threat-profiling-management")
-            }
+            onClick={handleThreatProfilingClick}
             className="w-full p-4 bg-gradient-to-r from-blue-600/20 to-blue-700/20 rounded-lg hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-400/50 group"
           >
             <div className="flex items-center justify-between">
@@ -386,4 +397,4 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
   );
 };
 
-export default OrganizationDetailSidebar;
+export default memo(OrganizationDetailSidebar);

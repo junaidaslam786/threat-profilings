@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, memo } from "react";
 import { useUser } from "../../hooks/useUser";
 import { isLEMaster, isOrgAdmin } from "../../utils/roleUtils";
 import ThreatProfilingOverviewDashboard from "../../components/Organizations/ThreatProfilingOverviewDashboard";
@@ -6,15 +6,54 @@ import FieldLockManager from "../../components/Organizations/FieldLockManager";
 import ErrorBoundary from "../../components/Common/ErrorBoundary";
 import { useGetAvailableOrganizationsQuery } from "../../Redux/api/threatProfilingApi";
 
-const ThreatProfilingManagementPage: React.FC = () => {
+// Memoized loading component
+const LoadingScreen = memo(() => (
+  <div className="min-h-screen bg-primary-900 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+      <p className="text-gray-300">Loading user...</p>
+    </div>
+  </div>
+));
+LoadingScreen.displayName = 'LoadingScreen';
+
+// Memoized error screen component
+const ErrorScreen = memo(({ title, message }: { title: string; message: string }) => (
+  <div className="min-h-screen bg-primary-900 flex items-center justify-center">
+    <div className="text-center">
+      <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+        <svg
+          className="w-8 h-8 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+          />
+        </svg>
+      </div>
+      <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+      <p className="text-gray-400">{message}</p>
+    </div>
+  </div>
+));
+ErrorScreen.displayName = 'ErrorScreen';
+
+const ThreatProfilingManagementPage: React.FC = memo(() => {
   const { user } = useUser();
   const [selectedTab, setSelectedTab] = useState<"overview" | "field-locks">(
     "overview"
   );
   const [selectedOrganization, setSelectedOrganization] = useState<string>("");
 
-  // Check if user has permission to access threat profiling management
-  const hasPermission = user && (isLEMaster(user) || isOrgAdmin(user));
+  // Memoize permission check to avoid recalculation
+  const hasPermission = useMemo(() => {
+    return user && (isLEMaster(user) || isOrgAdmin(user));
+  }, [user]);
 
   const {
     data: availableOrgsResponse,
@@ -24,80 +63,47 @@ const ThreatProfilingManagementPage: React.FC = () => {
     skip: !user || !hasPermission,
   });
 
-  // Extract the array from the response
-  const availableOrgs = availableOrgsResponse?.available_organizations;
+  // Memoize tab change handlers (removed unused ones)
+  // const handleTabChange = useCallback((tab: "overview" | "field-locks") => {
+  //   setSelectedTab(tab);
+  // }, []);
 
-  // Add error logging
+  // const handleOrganizationChange = useCallback((orgName: string) => {
+  //   setSelectedOrganization(orgName);
+  // }, []);
+
+  // Memoize available organizations
+  const availableOrgs = useMemo(() => {
+    return availableOrgsResponse?.available_organizations || [];
+  }, [availableOrgsResponse]);
+
+  // Add error logging - memoized to prevent excessive calls
   useEffect(() => {
     if (orgsError) {
       console.error("Error loading organizations:", orgsError);
     }
   }, [orgsError]);
 
+  // Early returns for loading and error states
   if (orgsError) {
     return (
-      <div className="min-h-screen bg-primary-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-red-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">API Error</h2>
-          <p className="text-gray-400">
-            Failed to load organizations: {String(orgsError)}
-          </p>
-        </div>
-      </div>
+      <ErrorScreen 
+        title="API Error" 
+        message={`Failed to load organizations: ${String(orgsError)}`} 
+      />
     );
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-primary-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading user...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!hasPermission) {
     return (
-      <div className="min-h-screen bg-primary-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-red-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
-          <p className="text-gray-400">
-            You don't have permission to access threat profiling management.
-          </p>
-        </div>
-      </div>
+      <ErrorScreen 
+        title="Access Denied" 
+        message="You don't have permission to access threat profiling management." 
+      />
     );
   }
 
@@ -312,6 +318,9 @@ const ThreatProfilingManagementPage: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+// Set display name for better debugging
+ThreatProfilingManagementPage.displayName = 'ThreatProfilingManagementPage';
 
 export default ThreatProfilingManagementPage;

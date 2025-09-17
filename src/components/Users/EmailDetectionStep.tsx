@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDetectRegistrationFlowMutation } from "../../Redux/api/userApi";
-import { debugTokenDetails } from "../../utils/debugTokens";
 import type { DetectFlowResponse } from "../../Redux/slices/userSlice";
 import Button from "../Common/Button";
 
@@ -106,19 +105,6 @@ export default function EmailDetectionStep({ onFlowDetected }: EmailDetectionSte
           <p className="text-secondary-400 text-sm">
             We'll automatically detect the best registration path for your organization
           </p>
-          
-          {/* Debug button - only show in development or with debug query param */}
-          {(import.meta.env.MODE === 'development' || window.location.search.includes('debug=true')) && (
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => debugTokenDetails()}
-                className="text-xs text-secondary-500 hover:text-secondary-300 underline"
-              >
-                Debug Token Info
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

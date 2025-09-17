@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import InputField from "../Common/InputField";
 import Button from "../Common/Button";
-import LoadingScreen from "../Common/LoadingScreen";
 import MFASetup from "./MFASetup";
 import { redirectToForgotPassword } from "../../utils/authHelpers";
 import {
@@ -60,7 +59,7 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
 
       if (isSignedIn) {
         onSignInSuccess?.();
-        navigate("/dashboard");
+        navigate("/auth-redirect-handler");
       } else if (
         nextStep.signInStep === "CONTINUE_SIGN_IN_WITH_MFA_SELECTION"
       ) {
@@ -151,7 +150,18 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
   };
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return (
+      <div className="text-center flex flex-col items-center py-8">
+        <div className="relative mb-6">
+          <div className="w-8 h-8 border-4 border-primary-600/30 border-t-primary-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-8 h-8 border-4 border-transparent border-t-primary-300/50 rounded-full animate-spin animation-delay-75"></div>
+        </div>
+        <p className="text-primary-300 font-medium">
+          {step === "mfa" ? "Verifying your code..." : "Signing you in..."}
+        </p>
+        <p className="text-secondary-400 text-xs mt-2">Please wait</p>
+      </div>
+    );
   }
 
   // If we're in MFA setup step, render the MFASetup component directly
@@ -165,98 +175,94 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl border border-white/20 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            {step === "signIn"
-              ? "Welcome Back"
-              : "Multi-Factor Authentication"}
-          </h1>
-          <p className="text-gray-200">
-            {step === "signIn"
-              ? "Sign in to your Threat Profiling account"
-              : getStepDescription()}
-          </p>
-        </div>
+    <>
+      {step === "signIn" ? (
+        <form onSubmit={handleSignIn} className="space-y-6">
+          <InputField
+            label="Email Address"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder="Enter your email"
+            required
+            className="bg-white/10 border-white/30 text-white placeholder-gray-300"
+          />
 
-        {step === "signIn" ? (
-          <form onSubmit={handleSignIn} className="space-y-6">
+          <div className="relative">
             <InputField
-              label="Email Address"
-              type="email"
-              name="email"
-              value={formData.email}
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
               onChange={handleInputChange}
-              placeholder="Enter your email"
+              placeholder="Enter your password"
               required
               className="bg-white/10 border-white/30 text-white placeholder-gray-300"
             />
-
-            <div className="relative">
-              <InputField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                placeholder="Enter your password"
-                required
-                className="bg-white/10 border-white/30 text-white placeholder-gray-300"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-300 hover:text-white transition-colors"
-              >
-                {showPassword ? (
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
-              disabled={isLoading}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-gray-300 hover:text-white transition-colors"
             >
-              {isLoading ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
-        ) : (
+              {showPassword ? (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
+      ) : (
+        <div className="space-y-6">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Multi-Factor Authentication
+            </h2>
+            <p className="text-gray-200">
+              {getStepDescription()}
+            </p>
+          </div>
+          
           <form onSubmit={handleConfirmSignIn} className="space-y-6">
             <div className="text-center mb-4">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-full mb-4">
@@ -313,32 +319,32 @@ const CustomSignIn: React.FC<CustomSignInProps> = ({
               </Button>
             </div>
           </form>
-        )}
+        </div>
+      )}
 
-        {step === "signIn" && (
-          <div className="mt-8 text-center space-y-4">
+      {step === "signIn" && (
+        <div className="mt-8 text-center space-y-4">
+          <button
+            type="button"
+            className="text-primary-300 hover:text-primary-200 transition-colors underline"
+            onClick={redirectToForgotPassword}
+          >
+            Forgot your password?
+          </button>
+
+          <div className="text-gray-300">
+            Don't have an account?{" "}
             <button
               type="button"
-              className="text-primary-300 hover:text-primary-200 transition-colors underline"
-              onClick={redirectToForgotPassword}
+              onClick={onSwitchToSignUp}
+              className="text-primary-300 hover:text-primary-200 transition-colors font-semibold"
             >
-              Forgot your password?
+              Sign up here
             </button>
-
-            <div className="text-gray-300">
-              Don't have an account?{" "}
-              <button
-                type="button"
-                onClick={onSwitchToSignUp}
-                className="text-primary-300 hover:text-primary-200 transition-colors font-semibold"
-              >
-                Sign up here
-              </button>
-            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

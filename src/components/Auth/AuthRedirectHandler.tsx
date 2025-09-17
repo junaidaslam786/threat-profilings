@@ -1,25 +1,14 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { setAuthTokens, monitorTokenStability, getIdToken, getAccessToken } from "../../utils/authStorage";
+import { isPlatformAdmin } from "../../utils/roleUtils";
+import type { UserMeResponse } from "../../Redux/slices/userSlice";
 
-const checkUserLevel = async (
+const checkUserDetails = async (
   idToken: string
-): Promise<{ level: string | null; userNotFound: boolean }> => {
+): Promise<{ user: UserMeResponse | null; userNotFound: boolean }> => {
   try {
-    const platformResponse = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/platform-admin/me`,
-      {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    if (platformResponse.ok) {
-      const data = await platformResponse.json();
-      return { level: data.level || null, userNotFound: false };
-    }
-
+    // First try to fetch user details from the standard users/me endpoint
     const userResponse = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/users/me`,
       {
@@ -31,18 +20,16 @@ const checkUserLevel = async (
     );
 
     if (userResponse.ok) {
-      const data = await userResponse.json();
-      return { level: data.level || null, userNotFound: false };
+      const userData = await userResponse.json();
+      return { user: userData, userNotFound: false };
     }
 
-    const userNotFound =
-      (platformResponse.status === 404 || platformResponse.status === 401 || platformResponse.status === 403) &&
-      (userResponse.status === 404 || userResponse.status === 401 || userResponse.status === 403);
-
-    return { level: null, userNotFound };
+    // If user endpoint fails, check if it's a 404/401/403 which indicates user not found
+    const userNotFound = userResponse.status === 404 || userResponse.status === 401 || userResponse.status === 403;
+    return { user: null, userNotFound };
   } catch (error) {
-    console.error("Error checking user level:", error);
-    return { level: null, userNotFound: false };
+    console.error("Error checking user details:", error);
+    return { user: null, userNotFound: false };
   }
 };
 
@@ -63,14 +50,14 @@ const AuthRedirectHandler: React.FC = () => {
           // Start monitoring token stability to catch any premature removal
           monitorTokenStability();
 
-          const userResult = await checkUserLevel(idToken);
+          const userResult = await checkUserDetails(idToken);
 
           if (userResult.userNotFound) {
             navigate("/user/organization/create", { replace: true });
-          } else if (userResult.level === "super") {
+          } else if (userResult.user && isPlatformAdmin(userResult.user)) {
             navigate("/platform-admins", { replace: true });
           } else {
-            navigate("/dashboard", { replace: true });
+            navigate("/", { replace: true });
           }
 
           window.history.replaceState(
@@ -90,15 +77,15 @@ const AuthRedirectHandler: React.FC = () => {
         const existingAccessToken = getAccessToken();
         
         if (existingIdToken && existingAccessToken) {
-          const userResult = await checkUserLevel(existingIdToken);
+          const userResult = await checkUserDetails(existingIdToken);
           if (userResult.userNotFound) {
             navigate("/user/organization/create", { replace: true });
             return;
-          } else if (userResult.level === "super") {
+          } else if (userResult.user && isPlatformAdmin(userResult.user)) {
             navigate("/platform-admins", { replace: true });
             return;
           } else {
-            navigate("/dashboard", { replace: true });
+            navigate("/", { replace: true });
             return;
           }
         }

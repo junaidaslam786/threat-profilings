@@ -128,7 +128,7 @@ const ThreatProfilingSidebar: React.FC<ThreatProfilingSidebarProps> = ({ classNa
           <button
             key={item.id}
             onClick={() => navigate(item.path)}
-            className={`w-full flex items-start p-3 rounded-lg transition-all duration-200 text-left group ${
+            className={`w-full flex items-start p-3 rounded-lg transition-all duration-200 text-left group cursor-pointer ${
               isActive(item.path)
                 ? 'bg-primary-600/20 text-primary-300 border border-primary-500/30'
                 : 'text-secondary-300 hover:text-white hover:bg-secondary-700/50 border border-transparent'

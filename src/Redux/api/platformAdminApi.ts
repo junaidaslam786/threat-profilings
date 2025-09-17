@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getIdToken } from "../../utils/authStorage";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createAuthenticatedBaseQuery } from "../../utils/authenticatedBaseQuery";
 import type {
   PlatformStats,
   GrantAdminDto,
@@ -37,6 +37,13 @@ export interface UserWithPartnerInfo {
   organization?: {
     organization_name: string;
   };
+  subscriptions?: Array<{
+    client_name: string;
+    created_at: string;
+    run_quota: number;
+    subscription_level: string;
+    progress: number;
+  }>;
   partner_relationship?: {
     has_partner: boolean;
     partner_info?: {
@@ -307,17 +314,7 @@ export interface SystemPermissionsResponse {
 
 export const platformAdminApi = createApi({
   reducerPath: "platformAdminApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_BASE_URL}/platform-admin`,
-    prepareHeaders: (headers) => {
-      const idToken = getIdToken();
-      if (idToken) {
-        headers.set("Authorization", `Bearer ${idToken}`);
-      }
-      headers.set("Content-Type", "application/json");
-      return headers;
-    },
-  }),
+  baseQuery: createAuthenticatedBaseQuery(`${import.meta.env.VITE_API_BASE_URL}/platform-admin`),
   tagTypes: ["PlatformStats", "PlatformAdmin", "ActivityLogs", "CurrentAdmin", "Users", "Payments", "PaymentAnalytics"],
   endpoints: (builder) => ({
     getPlatformStats: builder.query<PlatformStats, void>({
