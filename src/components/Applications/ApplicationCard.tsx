@@ -10,7 +10,7 @@ import {
   useDeleteApplicationMutation 
 } from '../../Redux/api/applicationsApi';
 import Button from '../Common/Button';
-import { useAuth } from '../../hooks/useAuth';
+import { useUser } from '../../hooks/useUser';
 import type { Application } from '../../Redux/slices/types/applicationTypes';
 
 interface ApplicationCardProps {
@@ -25,7 +25,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
   showActions = true 
 }) => {
   const dispatch = useAppDispatch();
-  const { user } = useAuth();
+  const { isOrgAdmin, isLEAdmin } = useUser();
   
   const [updateApplication] = useUpdateApplicationMutation();
   const [deleteApplication] = useDeleteApplicationMutation();
@@ -34,9 +34,9 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
   const [editValue, setEditValue] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Check user permissions
-  const canEdit = user?.user_info.user_type && ['admin', 'LE_ADMIN'].includes(user?.user_info.user_type);
-  const canDelete = user?.user_info.user_type && ['admin', 'LE_ADMIN'].includes(user?.user_info.user_type);
+  // Check user permissions - use role checking functions from useUser
+  const canEdit = isOrgAdmin || isLEAdmin;
+  const canDelete = isOrgAdmin || isLEAdmin;
 
   const handleEditStart = (field: string, currentValue: string) => {
     if (!canEdit) return;
@@ -293,7 +293,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
           <label className="text-sm font-medium text-gray-300">Technologies</label>
           <div className="flex flex-wrap gap-1 mt-1">
             {application.technologies.length > 0 ? (
-              application.technologies.map((tech, index) => (
+              application.technologies.map((tech: string, index: number) => (
                 <span
                   key={index}
                   className="px-2 py-1 bg-secondary-700 text-secondary-200 text-xs rounded-md border border-secondary-600"

@@ -13,7 +13,7 @@ import ApplicationCard from './ApplicationCard';
 import ApplicationModal from './ApplicationModal';
 import Button from '../Common/Button';
 import LoadingScreen from '../Common/LoadingScreen';
-import { useAuth } from '../../hooks/useAuth';
+import { useUser } from '../../hooks/useUser';
 
 interface ApplicationManagementProps {
   className?: string;
@@ -21,7 +21,7 @@ interface ApplicationManagementProps {
 
 const ApplicationManagement: React.FC<ApplicationManagementProps> = ({ className = "" }) => {
   const dispatch = useAppDispatch();
-  const { user } = useAuth();
+  const { isOrgAdmin, isLEAdmin } = useUser();
   
   const { loading, error } = useAppSelector((state) => state.applications);
   
@@ -33,8 +33,8 @@ const ApplicationManagement: React.FC<ApplicationManagementProps> = ({ className
     refetch: refetchApplications
   } = useGetApplicationsQuery();
 
-  // Check user permissions
-  const canCreateApps = user?.user_info.user_type && ['admin', 'LE_ADMIN'].includes(user?.user_info.user_type);
+  // Check user permissions - use role checking functions from useUser
+  const canCreateApps = isOrgAdmin || isLEAdmin;
 
   useEffect(() => {
     dispatch(setApplicationsLoading(applicationsLoading));

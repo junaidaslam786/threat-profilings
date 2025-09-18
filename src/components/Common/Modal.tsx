@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children, className = "", 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 modal-enter modal-enter-active">
       <div 
-        className={`bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-2xl p-6 w-full ${sizeClasses[size]} mx-auto border border-secondary-700/50 relative modal-content open ${className}`}
+        className={`bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl shadow-2xl p-6 w-full ${sizeClasses[size]} mx-auto border border-secondary-700/50 relative modal-content open max-h-[80vh] flex flex-col ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -52,7 +52,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children, className = "", 
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="text-white">
+        <div className="text-white flex-1 overflow-y-auto">
           {children}
         </div>
       </div>

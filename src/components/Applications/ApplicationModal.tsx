@@ -16,7 +16,7 @@ import InputField from "../Common/InputField";
 import TextArea from "../Common/TextArea";
 import MultiSelect from "../Common/MultiSelect";
 import Button from "../Common/Button";
-import { useAuth } from "../../hooks/useAuth";
+import { useUser } from "../../hooks/useUser";
 import type {
   ApplicationFormData,
   ApplicationFormErrors,
@@ -37,7 +37,7 @@ const ApplicationModal: React.FC<ApplicationModalProps> = ({
   className = "",
 }) => {
   const dispatch = useAppDispatch();
-  const { user } = useAuth();
+  const { isOrgAdmin, isLEAdmin } = useUser();
 
   const {
     isApplicationModalOpen,
@@ -55,10 +55,8 @@ const ApplicationModal: React.FC<ApplicationModalProps> = ({
   const [showCustomTechnologyInput, setShowCustomTechnologyInput] =
     useState(false);
 
-  // Check user permissions
-  const canCreateEdit =
-    user?.user_info.user_type &&
-    ["admin", "LE_ADMIN"].includes(user?.user_info.user_type);
+  // Check user permissions - use role checking functions from useUser
+  const canCreateEdit = isOrgAdmin || isLEAdmin;
 
   // Technology options with custom input
   const technologyOptions = [
@@ -157,12 +155,12 @@ const ApplicationModal: React.FC<ApplicationModalProps> = ({
       }
     }
 
-    if (applicationForm.contactEmail && applicationForm.contactEmail.trim()) {
-      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-      if (!emailPattern.test(applicationForm.contactEmail)) {
-        errors.contactEmail = "Please enter a valid email address";
-      }
-    }
+    // if (applicationForm.contactEmail && applicationForm.contactEmail.trim()) {
+    //   const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    //   if (!emailPattern.test(applicationForm.contactEmail)) {
+    //     errors.contactEmail = "Please enter a valid email address";
+    //   }
+    // }
 
     if (Object.keys(errors).length > 0) {
       dispatch(setApplicationFormErrors(errors));
