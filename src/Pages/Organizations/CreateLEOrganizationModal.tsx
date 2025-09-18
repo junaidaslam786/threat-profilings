@@ -78,7 +78,7 @@ export default function LEOrganizationCreateModal({
   return (
     <Modal show={isOpen} onClose={onClose} size="xl">
       <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
-        <h2 className="text-xl font-bold text-blue-300 mb-4">
+        <h2 className="text-xl font-bold text-secondary-300 mb-4">
           Create LE Organization
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,7 +89,7 @@ export default function LEOrganizationCreateModal({
           )}
           <div className="space-y-2">
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="orgName"
             placeholder="Organization Name *"
             value={fields.orgName}
@@ -97,7 +97,7 @@ export default function LEOrganizationCreateModal({
             required
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="orgDomain"
             placeholder="Domain (e.g. acme.com) *"
             value={fields.orgDomain}
@@ -105,42 +105,42 @@ export default function LEOrganizationCreateModal({
             required
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="sector"
             placeholder="Sector"
             value={fields.sector}
             onChange={handleChange}
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="websiteUrl"
             placeholder="Website URL"
             value={fields.websiteUrl}
             onChange={handleChange}
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="countriesOfOperation"
             placeholder="Countries (comma-separated)"
             value={fields.countriesOfOperation}
             onChange={handleChange}
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="homeUrl"
             placeholder="Home URL"
             value={fields.homeUrl}
             onChange={handleChange}
           />
           <input
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="aboutUsUrl"
             placeholder="About Us URL"
             value={fields.aboutUsUrl}
             onChange={handleChange}
           />
           <textarea
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
             name="additionalDetails"
             placeholder="Additional Details"
             value={fields.additionalDetails}

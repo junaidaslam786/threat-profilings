@@ -120,7 +120,7 @@ const ThreatActorPage: React.FC = () => {
                         <span className="px-3 py-1 bg-secondary-700 text-secondary-300 text-sm rounded-full">
                           ID: {actor.id}
                         </span>
-                        <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-sm rounded-full">
+                        <span className="px-3 py-1 bg-secondary-600/20 text-secondary-400 text-sm rounded-full">
                           {actor.type?.replace('_', ' ').toUpperCase()}
                         </span>
                       </div>
@@ -195,7 +195,7 @@ const ThreatActorPage: React.FC = () => {
 
                   {/* Techniques */}
                   <div className="bg-secondary-900/50 rounded-lg p-4">
-                    <h4 className="text-lg font-semibold text-blue-400 mb-3 flex items-center">
+                    <h4 className="text-lg font-semibold text-secondary-400 mb-3 flex items-center">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
@@ -205,7 +205,7 @@ const ThreatActorPage: React.FC = () => {
                       {actor.techniques && actor.techniques.length > 0 ? (
                         <div className="space-y-1">
                           {actor.techniques.slice(0, 3).map((technique, idx) => (
-                            <div key={idx} className="text-blue-300 text-sm">
+                            <div key={idx} className="text-secondary-300 text-sm">
                               • {technique}
                             </div>
                           ))}

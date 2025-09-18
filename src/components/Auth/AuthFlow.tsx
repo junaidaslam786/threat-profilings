@@ -3,9 +3,11 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CustomSignIn from './CustomSignIn';
 import CustomSignUp from './CustomSignUp';
+import MFASetup from './MFASetup';
+import MFAVerification from './MFAVerification';
 
 const AuthFlow: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'signIn' | 'signUp'>('signIn');
+  const [currentView, setCurrentView] = useState<'signIn' | 'signUp' | 'mfa' | 'mfaSetup'>('signIn');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,13 +17,10 @@ const AuthFlow: React.FC = () => {
       try {
         const user = await getCurrentUser();
         if (user) {
-          // User is already authenticated, redirect to dashboard
           const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
           navigate(from, { replace: true });
         }
-        // If no user, just stay on auth page - no loading state needed
       } catch {
-        // User is not authenticated or error occurred, stay on auth page
         console.log('Auth check result: not authenticated');
       }
     };
@@ -33,6 +32,33 @@ const AuthFlow: React.FC = () => {
     const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
     navigate(from, { replace: true });
   };
+
+  const handleMFAStep = (step: 'mfa' | 'mfaSetup') => {
+    setCurrentView(step);
+  };
+
+  const handleBackToSignIn = () => {
+    setCurrentView('signIn');
+  };
+
+  // For MFA steps, render without the AuthFlow container
+  if (currentView === 'mfa') {
+    return (
+      <MFAVerification
+        onBack={handleBackToSignIn}
+        onSuccess={handleAuthSuccess}
+      />
+    );
+  }
+
+  if (currentView === 'mfaSetup') {
+    return (
+      <MFASetup
+        onComplete={handleAuthSuccess}
+        onCancel={handleBackToSignIn}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 flex items-center justify-center p-4">
@@ -52,6 +78,7 @@ const AuthFlow: React.FC = () => {
           <CustomSignIn
             onSwitchToSignUp={() => setCurrentView('signUp')}
             onSignInSuccess={handleAuthSuccess}
+            onMFAStep={handleMFAStep}
           />
         ) : (
           <CustomSignUp

@@ -127,25 +127,25 @@ export default function OrganizationDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-xl mx-auto bg-gray-800 rounded-xl shadow-lg border border-blue-700 p-8">
-        <h1 className="text-2xl font-bold text-blue-300 mb-2">
+      <div className="max-w-xl mx-auto bg-gray-800 rounded-xl shadow-lg border border-secondary-700 p-8">
+        <h1 className="text-2xl font-bold text-secondary-300 mb-2">
           {org.organization_name}
         </h1>
         <div className="text-gray-400 text-sm mb-4">{org.client_name}</div>
         {!editing ? (
           <>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">Sector:</span>{" "}
+              <span className="text-secondary-400 font-semibold">Sector:</span>{" "}
               {org.sector || "-"}
             </div>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">Website:</span>{" "}
+              <span className="text-secondary-400 font-semibold">Website:</span>{" "}
               {org.website_url ? (
                 <a
                   href={org.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline text-blue-500"
+                  className="underline text-secondary-500"
                 >
                   {org.website_url}
                 </a>
@@ -154,19 +154,19 @@ export default function OrganizationDetailPage() {
               )}
             </div>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">Countries:</span>{" "}
+              <span className="text-secondary-400 font-semibold">Countries:</span>{" "}
               {org.countries_of_operation?.join(", ") || "-"}
             </div>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">Home URL:</span>{" "}
+              <span className="text-secondary-400 font-semibold">Home URL:</span>{" "}
               {org.home_url || "-"}
             </div>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">About Us:</span>{" "}
+              <span className="text-secondary-400 font-semibold">About Us:</span>{" "}
               {org.about_us_url || "-"}
             </div>
             <div className="mb-3">
-              <span className="text-blue-400 font-semibold">Additional:</span>{" "}
+              <span className="text-secondary-400 font-semibold">Additional:</span>{" "}
               {org.additional_details || "-"}
             </div>
             <Button className="mt-4" onClick={startEdit}>
@@ -176,42 +176,42 @@ export default function OrganizationDetailPage() {
         ) : (
           <form className="space-y-2" onSubmit={handleSave}>
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="sector"
               placeholder="Sector"
               value={fields.sector}
               onChange={handleChange}
             />
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="websiteUrl"
               placeholder="Website URL"
               value={fields.websiteUrl}
               onChange={handleChange}
             />
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="countriesOfOperation"
               placeholder="Countries (comma-separated)"
               value={fields.countriesOfOperation}
               onChange={handleChange}
             />
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="homeUrl"
               placeholder="Home URL"
               value={fields.homeUrl}
               onChange={handleChange}
             />
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="aboutUsUrl"
               placeholder="About Us URL"
               value={fields.aboutUsUrl}
               onChange={handleChange}
             />
             <textarea
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
               name="additionalDetails"
               placeholder="Additional Details"
               value={fields.additionalDetails}

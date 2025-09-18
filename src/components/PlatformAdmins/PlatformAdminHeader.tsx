@@ -14,7 +14,7 @@ const PlatformAdminHeader: React.FC<PlatformAdminHeaderProps> = ({
 }) => {
   return (
     <div className="flex justify-between items-center mb-10">
-      <h1 className="text-4xl font-bold text-blue-400">
+      <h1 className="text-4xl font-bold text-secondary-400">
         Platform Admin Dashboard - {adminLevel.toUpperCase()}
       </h1>
       <div className="flex gap-4">

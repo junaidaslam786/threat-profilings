@@ -12,6 +12,7 @@ import paymentsReducer from "./slices/paymentsSlice";
 import rolesReducer from "./slices/rolesSlice";
 import subscriptionsReducer from "./slices/subscriptionsSlice";
 import tiersReducer from "./slices/tiersSlice";
+import applicationsReducer from "./slices/applicationsSlice";
 
 // Import all APIs
 import { authApi } from "./api/authApi";
@@ -24,6 +25,7 @@ import { rolesApi } from "./api/rolesApi";
 import { subscriptionsApi } from "./api/subscriptionsApi";
 import { tiersApi } from "./api/tiersApi";
 import { threatProfilingApi } from "./api/threatProfilingApi";
+import { applicationsApi } from "./api/applicationsApi";
 
 const coreReducers = {
   // Slice reducers
@@ -35,6 +37,7 @@ const coreReducers = {
   roles: rolesReducer,
   subscriptions: subscriptionsReducer,
   tiers: tiersReducer,
+  applications: applicationsReducer,
   
   // API reducers
   [authApi.reducerPath]: authApi.reducer,
@@ -47,6 +50,7 @@ const coreReducers = {
   [subscriptionsApi.reducerPath]: subscriptionsApi.reducer,
   [tiersApi.reducerPath]: tiersApi.reducer,
   [threatProfilingApi.reducerPath]: threatProfilingApi.reducer,
+  [applicationsApi.reducerPath]: applicationsApi.reducer,
 };
 
 const lazyReducers: Record<string, Reducer> = {};
@@ -81,7 +85,8 @@ const store = configureStore({
       rolesApi.middleware,
       subscriptionsApi.middleware,
       tiersApi.middleware,
-      threatProfilingApi.middleware
+      threatProfilingApi.middleware,
+      applicationsApi.middleware
     ),
   devTools: process.env.NODE_ENV !== 'production',
 });

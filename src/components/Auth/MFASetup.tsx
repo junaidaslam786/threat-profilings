@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import Button from '../Common/Button';
 import InputField from '../Common/InputField';
@@ -17,6 +17,9 @@ interface MFASetupProps {
   onCancel?: () => void;
 }
 
+// Global setup tracking to prevent multiple calls across component re-mounts
+let globalSetupStatus: 'idle' | 'in-progress' | 'completed' | 'error' = 'idle';
+
 const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
   const [step, setStep] = useState<'setup' | 'verify'>('setup');
   const [secretCode, setSecretCode] = useState('');
@@ -25,14 +28,51 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [setupComplete, setSetupComplete] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [hasError, setHasError] = useState(false);
+  const setupCalledRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  // Check if we have a valid session before attempting setup
+  const hasValidSession = useCallback(() => {
+    const authSession = sessionStorage.getItem('currentAuthSession');
+    if (!authSession) return false;
+    
+    try {
+      const parsed = JSON.parse(authSession);
+      return !!(parsed.session);
+    } catch {
+      return false;
+    }
+  }, []);
 
   const setupMFA = useCallback(async () => {
+    // Multiple layers of protection against duplicate calls
+    if (
+      setupCalledRef.current || 
+      globalSetupStatus === 'in-progress' || 
+      globalSetupStatus === 'completed' ||
+      isLoading || 
+      setupComplete || 
+      secretCode ||
+      !hasValidSession()
+    ) {
+      return;
+    }
+
+    setupCalledRef.current = true;
+    globalSetupStatus = 'in-progress';
     setIsLoading(true);
 
     try {
+      // Check if component is still mounted
+      if (!mountedRef.current) return;
+
       // Use the challenge-based MFA setup
       const result = await handleMFASetupChallenge();
       
+      // Check again if component is still mounted after async call
+      if (!mountedRef.current) return;
+
       if (!result.secretCode) {
         throw new Error('Failed to get TOTP secret from Cognito');
       }
@@ -42,12 +82,18 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
       if (!email) {
         const authSession = sessionStorage.getItem('currentAuthSession');
         if (authSession) {
-          const parsed = JSON.parse(authSession);
-          email = parsed.username || 'user@example.com';
+          try {
+            const parsed = JSON.parse(authSession);
+            email = parsed.username || 'user@example.com';
+          } catch {
+            email = 'user@example.com';
+          }
         } else {
           email = 'user@example.com';
         }
-        setUserEmail(email);
+        if (mountedRef.current) {
+          setUserEmail(email);
+        }
       }
 
       // Build the otpauth URI with custom branding
@@ -61,23 +107,84 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
       // Generate QR code
       const qrCodeDataUrl = await otpauthToDataUrl(otpauthUri);
 
-      setSecretCode(result.secretCode);
-      setQrCodeUrl(qrCodeDataUrl);
-      setSetupComplete(true);
+      // Only update state if component is still mounted
+      if (mountedRef.current) {
+        setSecretCode(result.secretCode);
+        setQrCodeUrl(qrCodeDataUrl);
+        setSetupComplete(true);
+        globalSetupStatus = 'completed';
+      }
     } catch (err: unknown) {
       const error = err as Error;
       console.error('MFA setup error:', error);
-      toast.error(error.message || 'Failed to setup MFA. Please try again.');
+      
+      if (mountedRef.current) {
+        // Only show error toast for meaningful errors, not session issues
+        if (!error.message.includes('session can only be used once') && 
+            !error.message.includes('ConcurrentModificationException')) {
+          toast.error(error.message || 'Failed to setup MFA. Please try again.');
+        }
+        
+        setHasError(true);
+        // Reset state to allow retry
+        setupCalledRef.current = false;
+        globalSetupStatus = 'error';
+      }
     } finally {
-      setIsLoading(false);
+      if (mountedRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, [userEmail]);
+  }, [userEmail, isLoading, setupComplete, secretCode, hasValidSession]);
 
   useEffect(() => {
-    if (step === 'setup' && !isLoading && !secretCode && !setupComplete) {
-      setupMFA();
+    return () => {
+      mountedRef.current = false;
+      // Reset global state when component unmounts to allow fresh attempts
+      if (globalSetupStatus === 'error') {
+        globalSetupStatus = 'idle';
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Only attempt setup once when component mounts and we're on setup step
+    if (
+      step === 'setup' && 
+      !setupCalledRef.current && 
+      globalSetupStatus === 'idle' && 
+      !setupComplete && 
+      !secretCode &&
+      hasValidSession()
+    ) {
+      // Add a small delay to ensure React has finished its initial render cycle
+      const timeoutId = setTimeout(() => {
+        if (mountedRef.current) {
+          setupMFA();
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
-  }, [step, isLoading, secretCode, setupComplete, setupMFA]);
+  }, [step, setupComplete, secretCode, setupMFA, hasValidSession]);
+
+  // Add a manual retry function
+  const retrySetup = useCallback(() => {
+    setupCalledRef.current = false;
+    globalSetupStatus = 'idle';
+    setSecretCode('');
+    setQrCodeUrl('');
+    setSetupComplete(false);
+    setIsLoading(false);
+    setHasError(false);
+    
+    // Retry after a short delay
+    setTimeout(() => {
+      if (mountedRef.current && hasValidSession()) {
+        setupMFA();
+      }
+    }, 500);
+  }, [setupMFA, hasValidSession]);
 
   const verifyMFA = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,6 +271,33 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onCancel }) => {
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
                 <p className="text-gray-300 mt-2">Setting up MFA...</p>
+              </div>
+            ) : hasError ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-gray-300 mb-4">There was an issue setting up MFA. This can happen if the session has expired.</p>
+                <div className="flex space-x-4">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => onCancel ? onCancel() : window.location.href = '/auth'}
+                    className="flex-1 bg-white/10 border border-white/30 text-white hover:bg-white/20"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={retrySetup}
+                    className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
+                  >
+                    Try Again
+                  </Button>
+                </div>
               </div>
             ) : (
               <>

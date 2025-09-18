@@ -86,8 +86,8 @@ const OrganizationSettingsPage: React.FC = () => {
             {/* Notifications Settings */}
             <div className="bg-secondary-700/30 rounded-xl p-6 border border-secondary-600/30">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 15h8v-2H4v2zM4 11h10V9H4v2z" />
                   </svg>
                 </div>

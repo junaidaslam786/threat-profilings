@@ -21,7 +21,7 @@ const PaymentStatusCard: React.FC<PaymentStatusCardProps> = ({
     if (isLoading) {
       return (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
           <span className="ml-3">Loading status...</span>
         </div>
       );
@@ -63,7 +63,7 @@ const PaymentStatusCard: React.FC<PaymentStatusCardProps> = ({
 
         <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
           <span className="font-medium">Subscription Level:</span>
-          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+          <span className="px-3 py-1 bg-secondary-100 text-secondary-800 rounded-full text-sm font-medium">
             Tier {paymentStatus.subscription_level}
           </span>
         </div>

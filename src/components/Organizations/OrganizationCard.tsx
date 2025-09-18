@@ -48,7 +48,7 @@ const OrganizationCard: React.FC<OrganizationCardProps> = memo(({
             
             {organization.website_url && (
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-secondary-500 rounded-full"></div>
                 <a
                   href={organization.website_url}
                   target="_blank"

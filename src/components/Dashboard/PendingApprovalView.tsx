@@ -31,8 +31,8 @@ const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({ user }) => {
           Your account is pending approval. You will receive an email when
           your access is activated.
         </p>
-        <div className="bg-gray-900 p-5 rounded-xl border border-blue-700 mb-3">
-          <h3 className="text-lg text-blue-300 font-bold mb-2">
+        <div className="bg-gray-900 p-5 rounded-xl border border-secondary-700 mb-3">
+          <h3 className="text-lg text-secondary-300 font-bold mb-2">
             Your Profile
           </h3>
           <div className="text-left">

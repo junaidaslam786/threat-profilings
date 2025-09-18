@@ -1,7 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  memo,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { performLogout } from "../../utils/authStorage";
+import Image from "/assets/logo.png";
 
 interface NavItem {
   label: string;
@@ -16,28 +24,37 @@ const Navbar: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Memoize static nav items for better performance
-  const adminNavItems: NavItem[] = useMemo(() => [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Organizations", path: "/orgs" },
-    { label: "Join Requests", path: "/admin/join-requests" },
-    { label: "Invite User", path: "/admin/invite-user" },
-    { label: "Payments", path: "/payments" },
-    { label: "Invoices", path: "/invoices" },
-  ], []);
+  const adminNavItems: NavItem[] = useMemo(
+    () => [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Organizations", path: "/orgs" },
+      { label: "Join Requests", path: "/admin/join-requests" },
+      { label: "Invite User", path: "/admin/invite-user" },
+      { label: "Payments", path: "/payments" },
+      { label: "Invoices", path: "/invoices" },
+    ],
+    []
+  );
 
-  const platformAdminPaymentsNavItems: NavItem[] = useMemo(() => [
-    { label: "Dashboard", path: "/platform-admins" },
-    { label: "Platform Stats", path: "/platform-admins/stats" },
-    { label: "Activity Logs", path: "/platform-admins/activity-logs" },
-    { label: "Payment Details", path: "/platform-admin/payments-details" },
-  ], []);
+  const platformAdminPaymentsNavItems: NavItem[] = useMemo(
+    () => [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Platform Stats", path: "/platform-admins/stats" },
+      { label: "Activity Logs", path: "/platform-admins/activity-logs" },
+      { label: "Payment Details", path: "/platform-admin/payments-details" },
+    ],
+    []
+  );
 
-  const userNavItems: NavItem[] = useMemo(() => [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Organizations", path: "/orgs" },
-    { label: "Payments", path: "/payments" },
-    { label: "Profile", path: "/profile" },
-  ], []);
+  const userNavItems: NavItem[] = useMemo(
+    () => [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Organizations", path: "/orgs" },
+      { label: "Payments", path: "/payments" },
+      { label: "Profile", path: "/profile" },
+    ],
+    []
+  );
 
   const getNavItems = useCallback((): NavItem[] => {
     if (isPlatformAdmin) return platformAdminPaymentsNavItems;
@@ -54,7 +71,15 @@ const Navbar: React.FC = () => {
 
     if (isAdmin || isLEAdmin) return adminNavItems;
     return userNavItems;
-  }, [isPlatformAdmin, user?.subscriptions, isAdmin, isLEAdmin, adminNavItems, platformAdminPaymentsNavItems, userNavItems]);
+  }, [
+    isPlatformAdmin,
+    user?.subscriptions,
+    isAdmin,
+    isLEAdmin,
+    adminNavItems,
+    platformAdminPaymentsNavItems,
+    userNavItems,
+  ]);
 
   const handleLogout = useCallback(() => {
     performLogout("/auth");
@@ -62,16 +87,17 @@ const Navbar: React.FC = () => {
 
   // Memoize nav items calculation for better performance
   const navItems = useMemo(() => getNavItems(), [getNavItems]);
-  
+
   // Memoize user role calculation
-  const userRole = useMemo(() => 
-    isPlatformAdmin
-      ? "Platform Admin"
-      : isAdmin
-      ? "Admin"
-      : isLEAdmin
-      ? "LE Admin"
-      : "User",
+  const userRole = useMemo(
+    () =>
+      isPlatformAdmin
+        ? "Platform Admin"
+        : isAdmin
+        ? "Admin"
+        : isLEAdmin
+        ? "LE Admin"
+        : "User",
     [isPlatformAdmin, isAdmin, isLEAdmin]
   );
 
@@ -95,10 +121,12 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate(isPlatformAdmin ? "/platform-admins" : "/")}
-              className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent hover:from-primary-300 hover:to-primary-200 transition-all duration-300 cursor-pointer"
+              onClick={() =>
+                navigate(isPlatformAdmin ? "/platform-admins" : "/")
+              }
+              className="cursor-pointer"
             >
-             TP CYORN
+              <img src={Image} alt="Logo" className="h-8" />
             </button>
           </div>
 
@@ -249,7 +277,7 @@ const Navbar: React.FC = () => {
                       className="w-full text-left px-3 py-2 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all duration-200 cursor-pointer flex items-center gap-3"
                     >
                       <svg
-                        className="w-4 h-4 text-blue-400"
+                        className="w-4 h-4 text-secondary-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -289,7 +317,7 @@ const Navbar: React.FC = () => {
                 )}
 
                 <hr className="my-2 border-secondary-700/50" />
-                
+
                 <button
                   onClick={() => {
                     navigate("/profile");

@@ -77,7 +77,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({
       {/* Header */}
       <div className="flex justify-between items-start mb-8 border-b border-gray-300 pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-blue-600 mb-2">
+          <h1 className="text-3xl font-bold text-secondary-600 mb-2">
             {companyInfo.name}
           </h1>
           <div className="text-sm text-gray-600">
@@ -215,7 +215,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({
             <div className="border-t border-gray-300 pt-2 mt-2">
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total Amount:</span>
-                <span className="text-blue-600">${
+                <span className="text-secondary-600">${
                   isAdminInvoice(invoice) 
                     ? invoice.amount.toFixed(2) 
                     : invoice.total_amount.toFixed(2)

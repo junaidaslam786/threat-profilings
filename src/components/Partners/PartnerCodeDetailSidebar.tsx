@@ -132,11 +132,11 @@ const PartnerCodeDetailSidebar: React.FC<PartnerCodeDetailSidebarProps> = ({
               {partnerCode.discount_percent}%
             </div>
           </div>
-          <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
-            <div className="text-blue-400 text-sm font-medium mb-1">
+          <div className="bg-secondary-500/10 rounded-lg p-4 border border-secondary-500/20">
+            <div className="text-secondary-400 text-sm font-medium mb-1">
               Commission Rate
             </div>
-            <div className="text-2xl font-bold text-blue-300">
+            <div className="text-2xl font-bold text-secondary-300">
               {partnerCode.commission_percent}%
             </div>
           </div>

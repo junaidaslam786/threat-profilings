@@ -133,7 +133,7 @@ const TaxRules: React.FC = () => {
               setNewRule({ country: '', region: '', taxType: '', rate: 0 });
               setShowModal(true);
             }}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-secondary-600 hover:bg-secondary-700"
           >
             Add Tax Rule
           </Button>
@@ -196,7 +196,7 @@ const TaxRules: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
                         onClick={() => handleEditRule(rule)}
-                        className="text-blue-400 hover:text-blue-300"
+                        className="text-secondary-400 hover:text-secondary-300"
                       >
                         Edit
                       </button>
@@ -283,7 +283,7 @@ const TaxRules: React.FC = () => {
                 max="100"
                 step="0.01"
                 required
-                className="shadow appearance-none border rounded-lg w-full py-3 px-4 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-300 ease-in-out border-gray-600 bg-gray-700 text-white"
+                className="shadow appearance-none border rounded-lg w-full py-3 px-4 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-600 focus:border-transparent transition duration-300 ease-in-out border-gray-600 bg-gray-700 text-white"
               />
             </div>
             
@@ -300,7 +300,7 @@ const TaxRules: React.FC = () => {
               </Button>
               <Button
                 onClick={editingRule ? handleUpdateRule : handleCreateRule}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-secondary-600 hover:bg-secondary-700"
                 disabled={!newRule.country || !newRule.taxType || newRule.rate <= 0}
               >
                 {editingRule ? 'Update' : 'Create'} Tax Rule

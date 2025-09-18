@@ -38,7 +38,7 @@ const GrantAdminAccess: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-bold text-blue-400">Grant Admin Access</h1>
+        <h1 className="text-4xl font-bold text-secondary-400">Grant Admin Access</h1>
         <Button
           onClick={() => navigate("/platform-admins")}
           className="bg-gray-600 hover:bg-gray-700"
@@ -47,8 +47,8 @@ const GrantAdminAccess: React.FC = () => {
         </Button>
       </div>
 
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-xl mx-auto">
-        <h2 className="text-2xl font-semibold mb-6 text-blue-300">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-secondary-700 max-w-xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-6 text-secondary-300">
           Provide Admin Privileges
         </h2>
         <form onSubmit={handleSubmit}>
@@ -107,7 +107,7 @@ const GrantAdminAccess: React.FC = () => {
             </Button>
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-secondary-600 hover:bg-secondary-700"
               disabled={isLoading}
             >
               {isLoading ? "Granting..." : "Grant Admin Access"}

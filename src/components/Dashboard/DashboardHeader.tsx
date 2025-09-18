@@ -14,7 +14,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   return (
     <div className="flex justify-between items-center mb-10">
-      <h1 className="text-4xl font-bold text-blue-400">
+      <h1 className="text-4xl font-bold text-secondary-400">
         Dashboard - {userRole}
       </h1>
       <div className="flex items-center gap-4">

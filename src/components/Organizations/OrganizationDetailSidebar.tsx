@@ -88,9 +88,9 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
         {canEdit && (
           <div className="bg-secondary-800/50 rounded-xl p-6 border border-secondary-700/30">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-blue-400"
+                  className="w-4 h-4 text-secondary-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -170,9 +170,9 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
         {/* Threat Profiling Management */}
         <div className="bg-secondary-800/50 rounded-xl p-6 border border-secondary-700/30">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-blue-400"
+                className="w-4 h-4 text-secondary-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -191,12 +191,12 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
           </div>
           <button
             onClick={handleThreatProfilingClick}
-            className="w-full p-4 bg-gradient-to-r from-blue-600/20 to-blue-700/20 rounded-lg hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-400/50 group"
+            className="w-full p-4 bg-gradient-to-r from-secondary-600/20 to-secondary-700/20 rounded-lg hover:from-secondary-500/30 hover:to-secondary-600/30 transition-all duration-200 border border-secondary-500/30 hover:border-secondary-400/50 group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <svg
-                  className="w-5 h-5 text-blue-400 group-hover:text-blue-300"
+                  className="w-5 h-5 text-secondary-400 group-hover:text-secondary-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -302,7 +302,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
               {organization.website_url && (
                 <div className="flex items-center space-x-3 p-3 bg-secondary-700/30 rounded-lg">
                   <svg
-                    className="w-4 h-4 text-blue-400"
+                    className="w-4 h-4 text-secondary-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -318,7 +318,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
                     href={organization.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-300 hover:text-blue-200 transition-colors cursor-pointer flex items-center space-x-1"
+                    className="text-secondary-300 hover:text-secondary-200 transition-colors cursor-pointer flex items-center space-x-1"
                   >
                     <span>{organization.website_url}</span>
                     <svg
@@ -378,7 +378,7 @@ const OrganizationDetailSidebar: React.FC<OrganizationDetailSidebarProps> = ({
               )}
               {organization.updated_at && (
                 <div className="flex items-center space-x-4 p-3 bg-secondary-700/30 rounded-lg">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                  <div className="w-3 h-3 bg-secondary-500 rounded-full flex-shrink-0"></div>
                   <div>
                     <div className="text-sm font-medium text-white">
                       Last Updated

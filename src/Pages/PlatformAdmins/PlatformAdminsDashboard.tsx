@@ -177,7 +177,7 @@ const PlatformAdminDashboard: React.FC = () => {
               className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-primary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary-500/10"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
                   <svg
                     className="w-6 h-6 text-white"
                     fill="none"
@@ -416,10 +416,10 @@ const PlatformAdminDashboard: React.FC = () => {
 
             <button
               onClick={() => navigate("/platform-admins/partners")}
-              className="group p-6 bg-gradient-to-br from-blue-600/20 to-blue-700/20 rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer"
+              className="group p-6 bg-gradient-to-br from-secondary-600/20 to-secondary-700/20 rounded-xl border border-secondary-500/30 hover:border-secondary-400/50 transition-all duration-300 hover:shadow-2xl hover:shadow-secondary-500/20 cursor-pointer"
             >
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
                   <svg
                     className="w-6 h-6 text-white"
                     fill="none"

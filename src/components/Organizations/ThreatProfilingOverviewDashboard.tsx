@@ -45,7 +45,7 @@ const ThreatProfilingOverviewDashboard: React.FC = () => {
       case 'in_progress':
       case 'analyzing':
       case 'generating_report':
-        return 'text-blue-400 bg-blue-900/20 border-blue-500/30';
+        return 'text-secondary-400 bg-secondary-900/20 border-secondary-500/30';
       case 'failed':
         return 'text-red-400 bg-red-900/20 border-red-500/30';
       case 'preparing':
@@ -152,8 +152,8 @@ const ThreatProfilingOverviewDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-gradient-to-br from-secondary-500/20 to-secondary-600/20 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h4" />
                   </svg>
                 </div>
@@ -322,8 +322,8 @@ const ThreatProfilingOverviewDashboard: React.FC = () => {
                             )}
                             {org.has_results && (
                               <div className="flex items-center space-x-1">
-                                <span className="w-3 h-3 bg-blue-500 rounded-full shadow-lg" title="Has results"></span>
-                                <span className="text-xs text-blue-400 font-medium">Results</span>
+                                <span className="w-3 h-3 bg-secondary-500 rounded-full shadow-lg" title="Has results"></span>
+                                <span className="text-xs text-secondary-400 font-medium">Results</span>
                               </div>
                             )}
                           </div>

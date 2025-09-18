@@ -49,7 +49,7 @@ const StartProfilingModal: React.FC<StartProfilingModalProps> = ({
             Reason (Optional)
           </label>
           <textarea
-            className="w-full p-2 rounded bg-gray-700 border border-blue-900 text-white"
+            className="w-full p-2 rounded bg-gray-700 border border-secondary-900 text-white"
             rows={3}
             value={formData.reason || ""}
             onChange={(e) =>
@@ -122,7 +122,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                 <span className={`px-2 py-1 rounded text-sm ${
                   progress.status === 'completed' ? 'bg-green-600' :
                   progress.status === 'failed' ? 'bg-red-600' :
-                  progress.status === 'in_progress' ? 'bg-blue-600' :
+                  progress.status === 'in_progress' ? 'bg-secondary-600' :
                   'bg-yellow-600'
                 }`}>
                   {progress.status.replace('_', ' ').toUpperCase()}
@@ -136,7 +136,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                 </div>
                 <div className="w-full bg-gray-600 rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-secondary-500 h-2 rounded-full transition-all duration-300"
                     style={{width: progress.progress + '%'}}
                   />
                 </div>
@@ -211,20 +211,20 @@ const ResultsModal: React.FC<ResultsModalProps> = ({
               <div className="space-y-6">
                 {/* Executive Summary */}
                 {results.results?.executive_summary && (
-                  <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-6 rounded-lg border border-blue-500/30">
+                  <div className="bg-gradient-to-r from-secondary-900/30 to-purple-900/30 p-6 rounded-lg border border-secondary-500/30">
                     <h4 className="text-xl font-bold text-white mb-4 flex items-center">
-                      <svg className="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 mr-2 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       Executive Summary
                     </h4>
                     <div className="space-y-4">
                       <div>
-                        <h5 className="text-lg font-semibold text-blue-300 mb-2">Overview</h5>
+                        <h5 className="text-lg font-semibold text-secondary-300 mb-2">Overview</h5>
                         <p className="text-gray-300">{results.results.executive_summary.overview}</p>
                       </div>
                       <div>
-                        <h5 className="text-lg font-semibold text-blue-300 mb-2">Risk Posture</h5>
+                        <h5 className="text-lg font-semibold text-secondary-300 mb-2">Risk Posture</h5>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                           results.results.executive_summary.risk_posture === 'high' ? 'bg-red-600 text-white' :
                           results.results.executive_summary.risk_posture === 'medium' ? 'bg-yellow-600 text-white' :
@@ -234,7 +234,7 @@ const ResultsModal: React.FC<ResultsModalProps> = ({
                         </span>
                       </div>
                       <div>
-                        <h5 className="text-lg font-semibold text-blue-300 mb-2">Key Findings</h5>
+                        <h5 className="text-lg font-semibold text-secondary-300 mb-2">Key Findings</h5>
                         <ul className="list-disc list-inside space-y-1 text-gray-300">
                           {results.results.executive_summary.key_findings.map((finding, index) => (
                             <li key={index}>{finding}</li>
@@ -242,7 +242,7 @@ const ResultsModal: React.FC<ResultsModalProps> = ({
                         </ul>
                       </div>
                       <div>
-                        <h5 className="text-lg font-semibold text-blue-300 mb-2">Recommendations</h5>
+                        <h5 className="text-lg font-semibold text-secondary-300 mb-2">Recommendations</h5>
                         <ul className="list-disc list-inside space-y-1 text-gray-300">
                           {results.results.executive_summary.recommendations.map((rec, index) => (
                             <li key={index}>{rec}</li>
@@ -270,7 +270,7 @@ const ResultsModal: React.FC<ResultsModalProps> = ({
                         <div className="text-gray-300">ISM Compliance</div>
                       </div>
                       <div className="bg-gray-800/50 p-4 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-400">
+                        <div className="text-2xl font-bold text-secondary-400">
                           {results.results.compliance_status.overall_security_score}
                         </div>
                         <div className="text-gray-300">Security Score</div>
@@ -502,7 +502,7 @@ const ResultsModal: React.FC<ResultsModalProps> = ({
 
                 {/* Essential 8 */}
                 {results.results?.e8s && results.results.e8s.length > 0 && (
-                  <div className="bg-gradient-to-r from-indigo-900/30 to-blue-900/30 p-6 rounded-lg border border-indigo-500/30">
+                  <div className="bg-gradient-to-r from-indigo-900/30 to-secondary-900/30 p-6 rounded-lg border border-indigo-500/30">
                     <h4 className="text-xl font-bold text-white mb-4 flex items-center">
                       <svg className="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

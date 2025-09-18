@@ -81,10 +81,13 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 5px;
+  height: 5px;
 }
-
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary-500);
+  border-radius: 2.5px;
+}
 /* Custom gradient backgrounds */
 .bg-gradient-primary {
   background: linear-gradient(

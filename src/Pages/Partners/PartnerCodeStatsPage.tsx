@@ -83,7 +83,7 @@ const PartnerCodeStatsPage: React.FC = () => {
           <div className="flex gap-4">
             <button
               onClick={() => refetch()}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-500 hover:to-blue-600 transition-all duration-200 cursor-pointer flex items-center space-x-2"
+              className="px-6 py-3 bg-gradient-to-r from-secondary-600 to-secondary-700 text-white rounded-lg hover:from-secondary-500 hover:to-secondary-600 transition-all duration-200 cursor-pointer flex items-center space-x-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -104,14 +104,14 @@ const PartnerCodeStatsPage: React.FC = () => {
           {/* Usage Count */}
           <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 hover:border-primary-500/30 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                 </svg>
               </div>
             </div>
             <h4 className="text-lg font-semibold text-white mb-2">Usage Count</h4>
-            <p className="text-3xl font-bold text-blue-400 mb-2">{partnerStats.usage_count}</p>
+            <p className="text-3xl font-bold text-secondary-400 mb-2">{partnerStats.usage_count}</p>
             <p className="text-sm text-secondary-400">
               {partnerStats.usage_limit ? `of ${partnerStats.usage_limit} limit` : 'Unlimited usage'}
             </p>
@@ -221,9 +221,9 @@ const PartnerCodeStatsPage: React.FC = () => {
                 ${partnerStats.usage_count > 0 ? (partnerStats.total_discount_given / partnerStats.usage_count).toFixed(2) : '0.00'}
               </div>
             </div>
-            <div className="bg-blue-500/10 rounded-lg p-6 border border-blue-500/20">
-              <div className="text-blue-400 text-sm font-medium mb-2">Average Commission per Use</div>
-              <div className="text-2xl font-bold text-blue-300">
+            <div className="bg-secondary-500/10 rounded-lg p-6 border border-secondary-500/20">
+              <div className="text-secondary-400 text-sm font-medium mb-2">Average Commission per Use</div>
+              <div className="text-2xl font-bold text-secondary-300">
                 ${partnerStats.usage_count > 0 ? (partnerStats.commission_earned / partnerStats.usage_count).toFixed(2) : '0.00'}
               </div>
             </div>

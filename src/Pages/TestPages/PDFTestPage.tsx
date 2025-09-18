@@ -101,7 +101,7 @@ const PDFTestPage: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleUserInvoicePreview}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors"
               >
                 Preview PDF
               </button>
@@ -133,7 +133,7 @@ const PDFTestPage: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleAdminInvoicePreview}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors"
               >
                 Preview PDF
               </button>

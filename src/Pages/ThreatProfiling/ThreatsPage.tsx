@@ -76,7 +76,7 @@ const ThreatsPage: React.FC = () => {
       'Privilege Escalation': 'bg-amber-600/20 text-amber-300',
       'Defense Evasion': 'bg-green-600/20 text-green-300',
       'Credential Access': 'bg-teal-600/20 text-teal-300',
-      'Discovery': 'bg-blue-600/20 text-blue-300',
+      'Discovery': 'bg-secondary-600/20 text-secondary-300',
       'Lateral Movement': 'bg-indigo-600/20 text-indigo-300',
       'Collection': 'bg-purple-600/20 text-purple-300',
       'Command and Control': 'bg-pink-600/20 text-pink-300',

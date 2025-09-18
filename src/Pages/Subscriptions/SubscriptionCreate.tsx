@@ -91,17 +91,17 @@ export default function SubscriptionCreate() {
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-800 p-8 rounded-xl border border-blue-700 w-full max-w-md shadow-lg"
+          className="bg-gray-800 p-8 rounded-xl border border-secondary-700 w-full max-w-md shadow-lg"
         >
-          <h2 className="text-2xl font-bold text-blue-300 mb-4">
+          <h2 className="text-2xl font-bold text-secondary-300 mb-4">
             Create Subscription
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-blue-400 mb-1">Tier *</label>
+              <label className="block text-secondary-400 mb-1">Tier *</label>
               <select
                 name="tier"
-                className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+                className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
                 value={fields.tier}
                 onChange={handleChange}
                 required
@@ -114,10 +114,10 @@ export default function SubscriptionCreate() {
             </div>
 
             <div>
-              <label className="block text-blue-400 mb-1">Payment Method</label>
+              <label className="block text-secondary-400 mb-1">Payment Method</label>
               <select
                 name="payment_method"
-                className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+                className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
                 value={fields.payment_method}
                 onChange={handleChange}
               >
@@ -129,9 +129,9 @@ export default function SubscriptionCreate() {
 
             {fields.payment_method === "partner_code" && (
               <div>
-                <label className="block text-blue-400 mb-1">Partner Code</label>
+                <label className="block text-secondary-400 mb-1">Partner Code</label>
                 <input
-                  className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+                  className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
                   name="partner_code"
                   placeholder="Enter partner code"
                   value={fields.partner_code}
@@ -141,10 +141,10 @@ export default function SubscriptionCreate() {
             )}
 
             <div>
-              <label className="block text-blue-400 mb-1">Currency</label>
+              <label className="block text-secondary-400 mb-1">Currency</label>
               <select
                 name="currency"
-                className="w-full p-2 rounded bg-gray-700 border border-blue-900"
+                className="w-full p-2 rounded bg-gray-700 border border-secondary-900"
                 value={fields.currency}
                 onChange={handleChange}
               >
@@ -164,7 +164,7 @@ export default function SubscriptionCreate() {
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="auto_renewal" className="text-blue-400">
+              <label htmlFor="auto_renewal" className="text-secondary-400">
                 Auto Renewal
               </label>
             </div>

@@ -120,7 +120,7 @@ const ActivityLogs: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-bold text-blue-400">Activity Logs</h1>
+        <h1 className="text-4xl font-bold text-secondary-400">Activity Logs</h1>
         <div className="flex gap-4">
           <Button
             onClick={() => refetch()}
@@ -138,8 +138,8 @@ const ActivityLogs: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-blue-700 mb-8">
-        <h2 className="text-2xl font-semibold mb-4 text-blue-300">Filters</h2>
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-secondary-700 mb-8">
+        <h2 className="text-2xl font-semibold mb-4 text-secondary-300">Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Input
             label="User Email"
@@ -183,7 +183,7 @@ const ActivityLogs: React.FC = () => {
       </div>
 
       {/* Activity Logs Table */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-secondary-700">
         {logs.length === 0 ? (
           <p className="text-center text-gray-400">
             No activity logs found matching your criteria.
@@ -232,7 +232,7 @@ const ActivityLogs: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-300">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-300">
                         {log.user_email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -253,7 +253,7 @@ const ActivityLogs: React.FC = () => {
               <Button
                 onClick={handlePrevPage}
                 disabled={pagination.offset === 0}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-secondary-600 hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </Button>
@@ -265,7 +265,7 @@ const ActivityLogs: React.FC = () => {
               <Button
                 onClick={handleNextPage}
                 disabled={pagination.offset + pagination.limit >= totalLogs}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-secondary-600 hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </Button>

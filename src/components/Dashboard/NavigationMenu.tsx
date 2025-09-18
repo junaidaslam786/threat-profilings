@@ -41,8 +41,8 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({
   };
 
   return (
-    <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 max-w-3xl mx-auto">
-      <h3 className="text-2xl font-semibold mb-2 text-blue-400">
+    <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-secondary-700 max-w-3xl mx-auto">
+      <h3 className="text-2xl font-semibold mb-2 text-secondary-400">
         {getMenuTitle()}
       </h3>
       <p className="text-gray-400 text-sm mb-6">

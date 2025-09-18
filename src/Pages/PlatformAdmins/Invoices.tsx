@@ -180,7 +180,7 @@ const Invoices: React.FC = () => {
               setNewInvoice({ clientName: '', organizationName: '', amount: 0, tier: '', dueDate: '' });
               setShowModal(true);
             }}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-secondary-600 hover:bg-secondary-700"
           >
             Create Invoice
           </Button>
@@ -195,7 +195,7 @@ const Invoices: React.FC = () => {
                 onClick={() => setFilter(status)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   filter === status
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-secondary-600 text-white'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`}
               >
@@ -207,7 +207,7 @@ const Invoices: React.FC = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-800 p-4 rounded-lg border border-blue-700">
+          <div className="bg-gray-800 p-4 rounded-lg border border-secondary-700">
             <h3 className="text-sm font-medium text-gray-400">Total Amount</h3>
             <p className="text-2xl font-bold text-white">${getTotalAmount().toFixed(2)}</p>
           </div>
@@ -300,7 +300,7 @@ const Invoices: React.FC = () => {
                           Cancel
                         </button>
                       )}
-                      <button className="text-blue-400 hover:text-blue-300">
+                      <button className="text-secondary-400 hover:text-secondary-300">
                         View Details
                       </button>
                       <button
@@ -384,7 +384,7 @@ const Invoices: React.FC = () => {
                 min="0"
                 step="0.01"
                 required
-                className="shadow appearance-none border rounded-lg w-full py-3 px-4 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-300 ease-in-out border-gray-600 bg-gray-700 text-white"
+                className="shadow appearance-none border rounded-lg w-full py-3 px-4 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-600 focus:border-transparent transition duration-300 ease-in-out border-gray-600 bg-gray-700 text-white"
               />
             </div>
             
@@ -409,7 +409,7 @@ const Invoices: React.FC = () => {
               </Button>
               <Button
                 onClick={handleCreateInvoice}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-secondary-600 hover:bg-secondary-700"
                 disabled={!newInvoice.clientName || !newInvoice.organizationName || !newInvoice.tier || newInvoice.amount <= 0 || !newInvoice.dueDate}
               >
                 Create Invoice

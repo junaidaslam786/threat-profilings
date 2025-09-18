@@ -166,7 +166,7 @@ const DetectionPage: React.FC = () => {
                         <span className="px-3 py-1 bg-secondary-700 text-secondary-300 text-sm rounded-full">
                           {detection.detection_id}
                         </span>
-                        <span className="px-3 py-1 bg-blue-600/20 text-blue-400 text-sm rounded-full">
+                        <span className="px-3 py-1 bg-secondary-600/20 text-secondary-400 text-sm rounded-full">
                           {detection.query_language}
                         </span>
                       </div>

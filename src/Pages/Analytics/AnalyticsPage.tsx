@@ -97,7 +97,7 @@ const AnalyticsPage: React.FC = () => {
                       index === 0 ? 'bg-red-500' :
                       index === 1 ? 'bg-orange-500' :
                       index === 2 ? 'bg-yellow-500' :
-                      index === 3 ? 'bg-blue-500' : 'bg-purple-500'
+                      index === 3 ? 'bg-secondary-500' : 'bg-purple-500'
                     }`}></div>
                     <span className="text-white font-medium">{threat.name}</span>
                   </div>
@@ -109,7 +109,7 @@ const AnalyticsPage: React.FC = () => {
                           index === 0 ? 'bg-red-500' :
                           index === 1 ? 'bg-orange-500' :
                           index === 2 ? 'bg-yellow-500' :
-                          index === 3 ? 'bg-blue-500' : 'bg-purple-500'
+                          index === 3 ? 'bg-secondary-500' : 'bg-purple-500'
                         }`}
                         style={{ width: `${threat.percentage}%` }}
                       ></div>
@@ -153,7 +153,7 @@ const AnalyticsPage: React.FC = () => {
                   <div className={`w-3 h-3 rounded-full ${
                     alert.type === 'Critical' ? 'bg-red-500' :
                     alert.type === 'High' ? 'bg-orange-500' :
-                    alert.type === 'Medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                    alert.type === 'Medium' ? 'bg-yellow-500' : 'bg-secondary-500'
                   }`}></div>
                   <div>
                     <p className="text-white font-medium">{alert.message}</p>
@@ -163,7 +163,7 @@ const AnalyticsPage: React.FC = () => {
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   alert.type === 'Critical' ? 'bg-red-500/20 text-red-400' :
                   alert.type === 'High' ? 'bg-orange-500/20 text-orange-400' :
-                  alert.type === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
+                  alert.type === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-secondary-500/20 text-secondary-400'
                 }`}>
                   {alert.type}
                 </span>

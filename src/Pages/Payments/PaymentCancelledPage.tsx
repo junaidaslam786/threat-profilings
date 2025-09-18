@@ -25,7 +25,7 @@ export default function PaymentCancelledPage() {
           </p>
 
           <div className="bg-gray-700 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-blue-300 mb-2">What's Next?</h3>
+            <h3 className="text-lg font-semibold text-secondary-300 mb-2">What's Next?</h3>
             <ul className="text-sm text-gray-300 text-left space-y-2">
               <li>• You can try the payment again</li>
               <li>• Your cart/session has been preserved</li>

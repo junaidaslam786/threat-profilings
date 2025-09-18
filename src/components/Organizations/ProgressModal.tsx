@@ -42,7 +42,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                   <span className={`px-2 py-1 rounded text-sm ${
                     progress.status === 'completed' ? 'bg-green-600' :
                     progress.status === 'failed' ? 'bg-red-600' :
-                    progress.status === 'in_progress' ? 'bg-blue-600' :
+                    progress.status === 'in_progress' ? 'bg-secondary-600' :
                     'bg-yellow-600'
                   }`}>
                     {progress.status.replace('_', ' ').toUpperCase()}
@@ -56,7 +56,7 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
                   </div>
                   <div className="w-full bg-gray-600 rounded-full h-2">
                     <div
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-secondary-500 h-2 rounded-full transition-all duration-300"
                       style={{width: progress.progress + '%'}}
                     />
                   </div>

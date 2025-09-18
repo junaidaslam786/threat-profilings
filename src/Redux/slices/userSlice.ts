@@ -85,6 +85,22 @@ export interface UpdateUserRoleDto {
   role: UserRole;
 }
 
+export interface RegisterUserResponse {
+  message: string;
+  client_name: string | null;
+  user_type: string;
+  role: string;
+  platform_admin_level?: string;
+  status: string;
+  access_scope?: string;
+  organizations: string[];
+  can_access_all_orgs?: boolean;
+  joined: boolean;
+  // Additional fields for the component usage
+  name?: string;
+  email?: string;
+}
+
 export interface UserMeResponse {
   user_info: {
     email: string;

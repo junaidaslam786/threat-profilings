@@ -80,8 +80,8 @@ export default function RoleDetailPage() {
             {/* Description */}
             <div className="bg-gradient-to-r from-secondary-800/50 to-secondary-700/30 backdrop-blur-sm rounded-xl p-6 border border-secondary-600/30">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>

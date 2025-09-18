@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-6xl mx-auto p-8">
         <div className="mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-300 to-primary-400 bg-clip-text text-transparent mb-3">
-            Welcome to TP CYORN
+            Welcome to CYORN
           </h1>
           <p className="text-xl text-secondary-300">
             {getUserRoleDisplay()} Dashboard
@@ -444,12 +444,12 @@ const Dashboard: React.FC = () => {
 
             <button
               onClick={() => navigate("/platform-admins/users")}
-              className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer text-left"
+              className="group p-4 bg-gradient-to-br from-secondary-700/50 to-secondary-800/50 rounded-xl border border-secondary-600/50 hover:border-secondary-500/50 transition-all duration-300 cursor-pointer text-left"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-secondary-500/20 rounded-lg flex items-center justify-center">
                   <svg
-                    className="w-5 h-5 text-blue-400"
+                    className="w-5 h-5 text-secondary-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

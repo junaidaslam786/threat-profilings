@@ -14,7 +14,7 @@ export default function OrganizationSwitcher() {
   return (
     <div>
       <select
-        className="bg-gray-800 text-white p-2 rounded border border-blue-800"
+        className="bg-gray-800 text-white p-2 rounded border border-secondary-800"
         value={selected || ""}
         onChange={(e) => setSelected(e.target.value)}
       >
@@ -26,8 +26,8 @@ export default function OrganizationSwitcher() {
         ))}
       </select>
       {switchedOrg && (
-        <div className="mt-4 p-4 rounded bg-gray-900 border border-blue-700">
-          <div className="font-bold text-blue-400">
+        <div className="mt-4 p-4 rounded bg-gray-900 border border-secondary-700">
+          <div className="font-bold text-secondary-400">
             {switchedOrg.organization_name}
           </div>
         </div>

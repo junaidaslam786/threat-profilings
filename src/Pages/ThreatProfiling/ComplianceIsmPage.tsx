@@ -64,7 +64,7 @@ const ComplianceIsmPage: React.FC = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent mb-2">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-secondary-400 to-secondary-300 bg-clip-text text-transparent mb-2">
                   ISM Compliance ({ismControls.length})
                 </h1>
                 <p className="text-lg text-secondary-400">

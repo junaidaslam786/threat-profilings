@@ -16,15 +16,15 @@ const AdminProfileCard: React.FC<AdminProfileCardProps> = ({ admin }) => {
       case 'super':
         return 'bg-purple-600 text-white';
       case 'admin':
-        return 'bg-blue-600 text-white';
+        return 'bg-secondary-600 text-white';
       default:
         return 'bg-green-600 text-white';
     }
   };
 
   return (
-    <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700 mb-10">
-      <h3 className="text-2xl font-semibold mb-3 text-blue-300">
+    <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-secondary-700 mb-10">
+      <h3 className="text-2xl font-semibold mb-3 text-secondary-300">
         Platform Admin Profile
       </h3>
       <div className="mb-1">

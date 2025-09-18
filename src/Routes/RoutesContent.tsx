@@ -12,40 +12,66 @@ const HomePage = lazy(() => import("../Pages/Home/HomePage"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
 
 // Auth Pages
-const AuthRedirectHandlerPage = lazy(() => import("../Pages/Auth/AuthRedirectHandlerPage"));
+const AuthRedirectHandlerPage = lazy(
+  () => import("../Pages/Auth/AuthRedirectHandlerPage")
+);
+const PendingApprovalPage = lazy(
+  () => import("../Pages/Auth/PendingApprovalPage")
+);
 import CustomAuthPage from "../Pages/Auth/CustomAuthPage";
 const MFASetup = lazy(() => import("../components/Auth/MFASetup"));
 const AdminLogin = lazy(() => import("../Pages/Admin/AdminLogin"));
 
-// Enhanced Dashboard
-const EnhancedComponentsDashboard = lazy(() => import("../Pages/Dashboard/EnhancedComponentsDashboard"));
-
 // Threat Profiling Pages
 const IntroPage = lazy(() => import("../Pages/ThreatProfiling/IntroPage"));
-const ThreatActorPage = lazy(() => import("../Pages/ThreatProfiling/ThreatActorPage"));
+const ThreatActorPage = lazy(
+  () => import("../Pages/ThreatProfiling/ThreatActorPage")
+);
 const ThreatsPage = lazy(() => import("../Pages/ThreatProfiling/ThreatsPage"));
-const DetectionPage = lazy(() => import("../Pages/ThreatProfiling/DetectionPage"));
-const ComplianceIsmPage = lazy(() => import("../Pages/ThreatProfiling/ComplianceIsmPage"));
-const ComplianceE8Page = lazy(() => import("../Pages/ThreatProfiling/ComplianceE8Page"));
+const DetectionPage = lazy(
+  () => import("../Pages/ThreatProfiling/DetectionPage")
+);
+const ComplianceIsmPage = lazy(
+  () => import("../Pages/ThreatProfiling/ComplianceIsmPage")
+);
+const ComplianceE8Page = lazy(
+  () => import("../Pages/ThreatProfiling/ComplianceE8Page")
+);
 
 // Admin-specific Pages (non-platform admin)
-const AdminPendingJoinRequests = lazy(() => import("../Pages/Admin/AdminPendingJoinRequests"));
+const AdminPendingJoinRequests = lazy(
+  () => import("../Pages/Admin/AdminPendingJoinRequests")
+);
 const AdminInviteUser = lazy(() => import("../Pages/Admin/AdminInviteUser"));
 
 // Organization Pages
-const OrganizationListPage = lazy(() => import("../Pages/Organizations/OrganizationListPage"));
-const OrganizationDetailPage = lazy(() => import("../Pages/Organizations/OrganizationDetailPage"));
-const OrganizationEditPage = lazy(() => import("../Pages/Organizations/OrganizationEditPage"));
-const OrganizationSettingsPage = lazy(() => import("../Pages/Organizations/OrganizationSettingsPage"));
-const ThreatProfilingManagementPage = lazy(() => import("../Pages/Organizations/ThreatProfilingManagementPage"));
+const OrganizationListPage = lazy(
+  () => import("../Pages/Organizations/OrganizationListPage")
+);
+const OrganizationDetailPage = lazy(
+  () => import("../Pages/Organizations/OrganizationDetailPage")
+);
+const OrganizationEditPage = lazy(
+  () => import("../Pages/Organizations/OrganizationEditPage")
+);
+const OrganizationSettingsPage = lazy(
+  () => import("../Pages/Organizations/OrganizationSettingsPage")
+);
+const ThreatProfilingManagementPage = lazy(
+  () => import("../Pages/Organizations/ThreatProfilingManagementPage")
+);
 
 // Role Pages
 const RoleListPage = lazy(() => import("../Pages/Roles/RoleListPage"));
 const RoleDetailPage = lazy(() => import("../Pages/Roles/RoleDetailPage"));
 
 // Subscription Pages
-const SubscriptionDetailPage = lazy(() => import("../Pages/Subscriptions/SubscriptionDetailPage"));
-const SubscriptionCreate = lazy(() => import("../Pages/Subscriptions/SubscriptionCreate"));
+const SubscriptionDetailPage = lazy(
+  () => import("../Pages/Subscriptions/SubscriptionDetailPage")
+);
+const SubscriptionCreate = lazy(
+  () => import("../Pages/Subscriptions/SubscriptionCreate")
+);
 
 // Tier Pages
 const TierListPage = lazy(() => import("../Pages/Tiers/TierListPage"));
@@ -53,31 +79,59 @@ const TierDetailPage = lazy(() => import("../Pages/Tiers/TierDetailPage"));
 
 // User Pages
 const RegisterPage = lazy(() => import("../Pages/Users/RegisterPage"));
-const JoinOrgRequestPage = lazy(() => import("../Pages/Users/JoinOrgRequestPage"));
+const JoinOrgRequestPage = lazy(
+  () => import("../Pages/Users/JoinOrgRequestPage")
+);
 const ProfilePage = lazy(() => import("../Pages/Users/ProfilePage"));
 
 // Platform Admin Pages
-const PlatformAdminDashboard = lazy(() => import("../Pages/PlatformAdmins/PlatformAdminsDashboard"));
-const PlatformStats = lazy(() => import("../Pages/PlatformAdmins/PlatformStats"));
+const PlatformAdminDashboard = lazy(
+  () => import("../Pages/PlatformAdmins/PlatformAdminsDashboard")
+);
+const PlatformStats = lazy(
+  () => import("../Pages/PlatformAdmins/PlatformStats")
+);
 const ActivityLogs = lazy(() => import("../Pages/PlatformAdmins/ActivityLogs"));
-const AdminManagement = lazy(() => import("../Pages/PlatformAdmins/AdminManagement"));
-const UserManagement = lazy(() => import("../Pages/PlatformAdmins/UserManagement"));
-const GrantAdminAccess = lazy(() => import("../Pages/PlatformAdmins/GrantAdminAccess"));
+const AdminManagement = lazy(
+  () => import("../Pages/PlatformAdmins/AdminManagement")
+);
+const UserManagement = lazy(
+  () => import("../Pages/PlatformAdmins/UserManagement")
+);
+const GrantAdminAccess = lazy(
+  () => import("../Pages/PlatformAdmins/GrantAdminAccess")
+);
 
 // Partner Pages
-const PartnerCodeListPage = lazy(() => import("../Pages/Partners/PartnerCodeListPage"));
-const PartnerCodeCreatePage = lazy(() => import("../Pages/Partners/PartnerCodeCreatePage"));
-const PartnerCodeEditPage = lazy(() => import("../Pages/Partners/PartnerCodeEditPage"));
-const PartnerCodeStatsPage = lazy(() => import("../Pages/Partners/PartnerCodeStatsPage"));
+const PartnerCodeListPage = lazy(
+  () => import("../Pages/Partners/PartnerCodeListPage")
+);
+const PartnerCodeCreatePage = lazy(
+  () => import("../Pages/Partners/PartnerCodeCreatePage")
+);
+const PartnerCodeEditPage = lazy(
+  () => import("../Pages/Partners/PartnerCodeEditPage")
+);
+const PartnerCodeStatsPage = lazy(
+  () => import("../Pages/Partners/PartnerCodeStatsPage")
+);
 
 // Payments Pages
 const PaymentPage = lazy(() => import("../Pages/Payments/PaymentPage"));
-const PaymentDashboard = lazy(() => import("../Pages/Payments/PaymentDashboard"));
+const PaymentDashboard = lazy(
+  () => import("../Pages/Payments/PaymentDashboard")
+);
 const PaymentTestPage = lazy(() => import("../Pages/Payments/PaymentTestPage"));
 const InvoicesPage = lazy(() => import("../Pages/Payments/InvoicesPage"));
-const PaymentSuccessPage = lazy(() => import("../Pages/Payments/PaymentSuccessPage"));
-const PaymentCancelledPage = lazy(() => import("../Pages/Payments/PaymentCancelledPage"));
-const PaymentDetailsPage = lazy(() => import("../Pages/PlatformAdmins/PaymentDetailsPage"));
+const PaymentSuccessPage = lazy(
+  () => import("../Pages/Payments/PaymentSuccessPage")
+);
+const PaymentCancelledPage = lazy(
+  () => import("../Pages/Payments/PaymentCancelledPage")
+);
+const PaymentDetailsPage = lazy(
+  () => import("../Pages/PlatformAdmins/PaymentDetailsPage")
+);
 const SettingsPage = lazy(() => import("../Pages/Settings/SettingsPage"));
 const AnalyticsPage = lazy(() => import("../Pages/Analytics/AnalyticsPage"));
 
@@ -90,13 +144,19 @@ const RoutesContent: React.FC = () => {
       <Suspense fallback={<LoadingScreen />}>
         <Routes>
           {/* Public routes - no authentication required */}
-          <Route path="/auth-redirect-handler" element={<AuthRedirectHandlerPage />} />
+          <Route
+            path="/auth-redirect-handler"
+            element={<AuthRedirectHandlerPage />}
+          />
           <Route path="/auth" element={<CustomAuthPage />} />
+          <Route path="/pending-approval" element={<PendingApprovalPage />} />
           <Route
             path="/mfa-setup"
             element={
               <MFASetup
-                onComplete={() => (window.location.href = "/auth-redirect-handler")}
+                onComplete={() =>
+                  (window.location.href = "/auth-redirect-handler")
+                }
                 onCancel={() => (window.location.href = "/auth")}
               />
             }
@@ -108,7 +168,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <HomePage />
               </ProtectedRoute>
             }
@@ -126,7 +188,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/home"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <HomePage />
               </ProtectedRoute>
             }
@@ -136,7 +200,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/intro"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <IntroPage />
               </ProtectedRoute>
             }
@@ -144,7 +210,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/threat-actor"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <ThreatActorPage />
               </ProtectedRoute>
             }
@@ -152,7 +220,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/threats"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <ThreatsPage />
               </ProtectedRoute>
             }
@@ -160,7 +230,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/detection"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <DetectionPage />
               </ProtectedRoute>
             }
@@ -168,7 +240,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/compliance-ism"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <ComplianceIsmPage />
               </ProtectedRoute>
             }
@@ -176,7 +250,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/threat-profiling/compliance-e8"
             element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
+              <ProtectedRoute
+                requiredRoles={["admin", "LE_ADMIN", "viewer", "runner"]}
+              >
                 <ComplianceE8Page />
               </ProtectedRoute>
             }
@@ -196,16 +272,6 @@ const RoutesContent: React.FC = () => {
             element={
               <ProtectedRoute requireAuth={true} requireActive={false}>
                 <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Enhanced dashboard with basic auth check */}
-          <Route
-            path="/enhanced"
-            element={
-              <ProtectedRoute requireAuth={true} requireActive={true}>
-                <EnhancedComponentsDashboard />
               </ProtectedRoute>
             }
           />
@@ -294,7 +360,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/subscriptions/:client_name"
             element={
-              <ProtectedRoute requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}>
+              <ProtectedRoute
+                requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}
+              >
                 <SubscriptionDetailPage />
               </ProtectedRoute>
             }
@@ -462,7 +530,14 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/test/pdf"
             element={
-              <ProtectedRoute requiredRoles={["platform_admin", "admin", "LE_ADMIN", "viewer"]}>
+              <ProtectedRoute
+                requiredRoles={[
+                  "platform_admin",
+                  "admin",
+                  "LE_ADMIN",
+                  "viewer",
+                ]}
+              >
                 <PDFTestPage />
               </ProtectedRoute>
             }
@@ -480,7 +555,9 @@ const RoutesContent: React.FC = () => {
           <Route
             path="/payment-dashboard"
             element={
-              <ProtectedRoute requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}>
+              <ProtectedRoute
+                requiredRoles={["admin", "platform_admin", "LE_ADMIN"]}
+              >
                 <PaymentDashboard />
               </ProtectedRoute>
             }

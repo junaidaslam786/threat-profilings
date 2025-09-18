@@ -195,7 +195,7 @@ const PartnerCodeCreatePage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-secondary-400 text-sm">Commission</div>
-                  <div className="text-blue-400 font-medium">{formData.commission_percent || 0}%</div>
+                  <div className="text-secondary-400 font-medium">{formData.commission_percent || 0}%</div>
                 </div>
                 <div>
                   <div className="text-secondary-400 text-sm">Usage Limit</div>

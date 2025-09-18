@@ -25,7 +25,7 @@ const InputField: React.FC<{
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className={`${className} shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-300 ease-in-out
+      className={`${className} shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-600 focus:border-transparent transition duration-300 ease-in-out
         ${error ? 'border-red-500' : 'border-gray-600 bg-gray-700 text-white'}`}
       pattern={pattern}
       title={title}

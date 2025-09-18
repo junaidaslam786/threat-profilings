@@ -64,7 +64,7 @@ const CustomSignUp: React.FC<CustomSignUpProps> = ({
 
     try {
       const { isSignUpComplete, nextStep }: SignUpOutput = await customSignUp({
-        username: formData.email,
+        username: formData.email.replace('@', '_'),
         password: formData.password,
         options: {
           userAttributes: {

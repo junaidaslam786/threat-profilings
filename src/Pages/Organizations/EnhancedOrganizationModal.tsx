@@ -164,13 +164,13 @@ export default function EnhancedOrganizationModal({
   };
 
   const inputClasses =
-    "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary-500";
   const labelClasses = "block text-sm font-medium text-gray-300 mb-2";
 
   return (
     <Modal show={isOpen} onClose={onClose} size="2xl">
       <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
-        <h2 className="text-2xl font-bold text-blue-300 mb-6">
+        <h2 className="text-2xl font-bold text-secondary-300 mb-6">
           {isEditing
             ? "Edit Organization"
             : isLEOrg

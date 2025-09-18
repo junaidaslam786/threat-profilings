@@ -15,14 +15,22 @@ import type { UserWithPartnerInfo } from "../../Redux/api/platformAdminApi";
 const UserManagement: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   // State for filters and pagination
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
-  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get("status") || "");
-  const [userTypeFilter, setUserTypeFilter] = useState<string>(searchParams.get("user_type") || "");
-  const [partnerFilter, setPartnerFilter] = useState<string>(searchParams.get("has_partner") || "");
-  const [searchTerm, setSearchTerm] = useState<string>(searchParams.get("search") || "");
+  const [statusFilter, setStatusFilter] = useState<string>(
+    searchParams.get("status") || ""
+  );
+  const [userTypeFilter, setUserTypeFilter] = useState<string>(
+    searchParams.get("user_type") || ""
+  );
+  const [partnerFilter, setPartnerFilter] = useState<string>(
+    searchParams.get("has_partner") || ""
+  );
+  const [searchTerm, setSearchTerm] = useState<string>(
+    searchParams.get("search") || ""
+  );
 
   const {
     data: usersResponse,
@@ -43,9 +51,8 @@ const UserManagement: React.FC = () => {
   const [deleteUser] = useDeleteUserMutation();
 
   const [showSuspendModal, setShowSuspendModal] = useState(false);
-  const [userToSuspend, setUserToSuspend] = useState<UserWithPartnerInfo | null>(
-    null
-  );
+  const [userToSuspend, setUserToSuspend] =
+    useState<UserWithPartnerInfo | null>(null);
   const [suspendReason, setSuspendReason] = useState("");
   const [suspendDuration, setSuspendDuration] = useState(""); // e.g., "7d", "30d", "permanent"
 
@@ -77,12 +84,6 @@ const UserManagement: React.FC = () => {
         toast.error(errorMessage);
       }
     }
-  };
-
-  // Update delete function for UserWithPartnerInfo type
-  const handleDeleteClick = (user: UserWithPartnerInfo) => {
-    setUserToDelete(user);
-    setShowDeleteModal(true);
   };
 
   const confirmSuspendUser = async () => {
@@ -153,15 +154,19 @@ const UserManagement: React.FC = () => {
     if (!user.subscriptions || user.subscriptions.length === 0) {
       return "No Subscription";
     }
-    
+
     // Get the highest tier subscription
-    const tierPriority = { "L3": 3, "L2": 2, "L1": 1, "L0": 0 };
+    const tierPriority = { L3: 3, L2: 2, L1: 1, L0: 0 };
     const highestTier = user.subscriptions.reduce((prev, current) => {
-      const prevPriority = tierPriority[prev.subscription_level as keyof typeof tierPriority] || -1;
-      const currentPriority = tierPriority[current.subscription_level as keyof typeof tierPriority] || -1;
+      const prevPriority =
+        tierPriority[prev.subscription_level as keyof typeof tierPriority] ||
+        -1;
+      const currentPriority =
+        tierPriority[current.subscription_level as keyof typeof tierPriority] ||
+        -1;
       return currentPriority > prevPriority ? current : prev;
     });
-    
+
     return highestTier.subscription_level;
   };
 
@@ -171,7 +176,7 @@ const UserManagement: React.FC = () => {
       case "L3":
         return `${baseClasses} bg-purple-600 text-white`;
       case "L2":
-        return `${baseClasses} bg-blue-600 text-white`;
+        return `${baseClasses} bg-secondary-600 text-white`;
       case "L1":
         return `${baseClasses} bg-green-600 text-white`;
       case "L0":
@@ -261,11 +266,12 @@ const UserManagement: React.FC = () => {
 
   // Get users from the correct response structure
   const users = usersResponse?.users || [];
-  
+
   // Handle potential API inconsistency - try both 'total' and 'total_users'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const apiResponse = usersResponse as any;
-  const totalUsers = usersResponse?.total || apiResponse?.total_users || users.length || 0;
+  const totalUsers =
+    usersResponse?.total || apiResponse?.total_users || users.length || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900 text-white">
@@ -278,7 +284,8 @@ const UserManagement: React.FC = () => {
               User Management
             </h1>
             <p className="text-secondary-300 text-lg">
-              Manage platform users, permissions, and access control ({totalUsers} users)
+              Manage platform users, permissions, and access control (
+              {totalUsers} users)
             </p>
           </div>
           <div className="flex gap-4">
@@ -312,11 +319,15 @@ const UserManagement: React.FC = () => {
 
         {/* Filters Section */}
         <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50 mb-6">
-          <h3 className="text-lg font-semibold text-primary-300 mb-4">Search & Filters</h3>
+          <h3 className="text-lg font-semibold text-primary-300 mb-4">
+            Search & Filters
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
             <div>
-              <label className="block text-sm font-medium text-secondary-300 mb-2">Search Users</label>
+              <label className="block text-sm font-medium text-secondary-300 mb-2">
+                Search Users
+              </label>
               <input
                 type="text"
                 placeholder="Search by email or name..."
@@ -328,7 +339,9 @@ const UserManagement: React.FC = () => {
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-secondary-300 mb-2">Status</label>
+              <label className="block text-sm font-medium text-secondary-300 mb-2">
+                Status
+              </label>
               <select
                 value={statusFilter}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
@@ -344,7 +357,9 @@ const UserManagement: React.FC = () => {
 
             {/* User Type Filter */}
             <div>
-              <label className="block text-sm font-medium text-secondary-300 mb-2">User Type</label>
+              <label className="block text-sm font-medium text-secondary-300 mb-2">
+                User Type
+              </label>
               <select
                 value={userTypeFilter}
                 onChange={(e) => handleFilterChange("userType", e.target.value)}
@@ -360,7 +375,9 @@ const UserManagement: React.FC = () => {
 
             {/* Partner Filter */}
             <div>
-              <label className="block text-sm font-medium text-secondary-300 mb-2">Partner Status</label>
+              <label className="block text-sm font-medium text-secondary-300 mb-2">
+                Partner Status
+              </label>
               <select
                 value={partnerFilter}
                 onChange={(e) => handleFilterChange("partner", e.target.value)}
@@ -374,16 +391,30 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-blue-700">
+        <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-secondary-700">
           {users.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-secondary-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                <svg
+                  className="w-8 h-8 text-secondary-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-secondary-300 mb-2">No users found</h3>
-              <p className="text-secondary-400">Try adjusting your search or filters.</p>
+              <h3 className="text-lg font-medium text-secondary-300 mb-2">
+                No users found
+              </h3>
+              <p className="text-secondary-400">
+                Try adjusting your search or filters.
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -424,7 +455,7 @@ const UserManagement: React.FC = () => {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
                     >
-                      Status & Type
+                      Status
                     </th>
                     <th
                       scope="col"
@@ -448,12 +479,19 @@ const UserManagement: React.FC = () => {
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {users.map((user: UserWithPartnerInfo) => (
-                    <tr key={user.email} className="hover:bg-gray-700/50 transition-colors">
+                    <tr
+                      key={user.email}
+                      className="hover:bg-gray-700/50 transition-colors"
+                    >
                       {/* User Details */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <div className="text-sm font-medium text-white">{user.name}</div>
-                          <div className="text-sm text-blue-300">{user.email}</div>
+                          <div className="text-sm font-medium text-white">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-secondary-300">
+                            {user.email}
+                          </div>
                         </div>
                       </td>
 
@@ -471,14 +509,17 @@ const UserManagement: React.FC = () => {
 
                       {/* Subscription Tier */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={getTierBadge(getSubscriptionTier(user))}>
+                        <span
+                          className={getTierBadge(getSubscriptionTier(user))}
+                        >
                           {getSubscriptionTier(user)}
                         </span>
                       </td>
 
                       {/* Organization */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {user.organization?.organization_name || "No organization"}
+                        {user.organization?.organization_name ||
+                          "No organization"}
                       </td>
 
                       {/* Status & Type */}
@@ -486,9 +527,6 @@ const UserManagement: React.FC = () => {
                         <div className="flex flex-col gap-2">
                           <span className={getStatusBadge(user.status)}>
                             {user.status}
-                          </span>
-                          <span className="px-2 py-1 bg-blue-600/20 text-blue-300 border border-blue-400/30 rounded text-xs">
-                            {user.user_type}
                           </span>
                         </div>
                       </td>
@@ -498,13 +536,24 @@ const UserManagement: React.FC = () => {
                         {user.partner_relationship?.has_partner ? (
                           <div className="flex flex-col">
                             <span className="text-primary-300 font-medium">
-                              {user.partner_relationship.partner_info?.partner_code}
+                              {
+                                user.partner_relationship.partner_info
+                                  ?.partner_code
+                              }
                             </span>
                             <span className="text-xs text-green-400">
-                              {user.partner_relationship.partner_info?.discount_percent}% discount
+                              {
+                                user.partner_relationship.partner_info
+                                  ?.discount_percent
+                              }
+                              % discount
                             </span>
                             <span className="text-xs text-secondary-400">
-                              {user.partner_relationship.partner_info?.commission_percent}% commission
+                              {
+                                user.partner_relationship.partner_info
+                                  ?.commission_percent
+                              }
+                              % commission
                             </span>
                           </div>
                         ) : (
@@ -517,14 +566,21 @@ const UserManagement: React.FC = () => {
                         {user.payment_summary ? (
                           <div className="flex flex-col">
                             <span className="text-primary-300 font-medium">
-                              ${user.payment_summary.total_amount_spent?.toFixed(2) || "0.00"}
+                              $
+                              {user.payment_summary.total_amount_spent?.toFixed(
+                                2
+                              ) || "0.00"}
                             </span>
                             <span className="text-xs text-secondary-300">
-                              {user.payment_summary.total_payments || 0} payments
+                              {user.payment_summary.total_payments || 0}{" "}
+                              payments
                             </span>
                             {user.payment_summary.last_payment_date && (
                               <span className="text-xs text-secondary-400">
-                                Last: {new Date(user.payment_summary.last_payment_date).toLocaleDateString()}
+                                Last:{" "}
+                                {new Date(
+                                  user.payment_summary.last_payment_date
+                                ).toLocaleDateString()}
                               </span>
                             )}
                           </div>
@@ -551,12 +607,6 @@ const UserManagement: React.FC = () => {
                               Suspend
                             </button>
                           )}
-                          <button
-                            onClick={() => handleDeleteClick(user)}
-                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs transition-colors"
-                          >
-                            Delete
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -570,7 +620,8 @@ const UserManagement: React.FC = () => {
           {users.length > 0 && (
             <div className="mt-6 flex items-center justify-between">
               <div className="text-sm text-gray-400">
-                Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, totalUsers)} of {totalUsers} users
+                Showing {(page - 1) * limit + 1} to{" "}
+                {Math.min(page * limit, totalUsers)} of {totalUsers} users
               </div>
               <div className="flex gap-2">
                 <button

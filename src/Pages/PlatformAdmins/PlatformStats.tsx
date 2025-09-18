@@ -121,7 +121,7 @@ const PlatformStats: React.FC = () => {
         {/* User Statistics */}
         <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-8 border border-secondary-700/50 mb-8">
           <div className="flex items-center space-x-4 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
+            <div className="w-1 h-8 bg-gradient-to-b from-secondary-400 to-secondary-600 rounded-full"></div>
             <h2 className="text-2xl font-bold text-white">User Statistics</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
@@ -129,7 +129,7 @@ const PlatformStats: React.FC = () => {
               onClick={() => navigate("/platform-admins/users")}
               className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-primary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -247,9 +247,9 @@ const PlatformStats: React.FC = () => {
             </div>
             <div 
               onClick={() => navigate("/platform-admins/admins")}
-              className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-blue-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
+              className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-secondary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -264,7 +264,7 @@ const PlatformStats: React.FC = () => {
                   />
                 </svg>
               </div>
-              <p className="text-3xl font-bold text-blue-400 mb-1">
+              <p className="text-3xl font-bold text-secondary-400 mb-1">
                 {platformStats.users?.platform_admins || 0}
               </p>
               <p className="text-sm text-secondary-400">Admins</p>
@@ -303,7 +303,7 @@ const PlatformStats: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-primary-500/30 transition-colors">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -392,9 +392,9 @@ const PlatformStats: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-secondary-700/20 rounded-xl p-6 border border-secondary-600/20">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
                   <svg
-                    className="w-4 h-4 text-blue-400"
+                    className="w-4 h-4 text-secondary-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -419,7 +419,7 @@ const PlatformStats: React.FC = () => {
                       className="flex justify-between items-center bg-secondary-600/30 p-4 rounded-lg hover:bg-secondary-600/50 transition-colors"
                     >
                       <span className="text-white font-medium">{industry}</span>
-                      <span className="text-blue-400 font-bold text-lg">
+                      <span className="text-secondary-400 font-bold text-lg">
                         {count}
                       </span>
                     </div>
@@ -478,7 +478,7 @@ const PlatformStats: React.FC = () => {
               onClick={() => navigate("/platform-admin/payments-details")}
               className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-primary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -545,9 +545,9 @@ const PlatformStats: React.FC = () => {
             </div>
             <div 
               onClick={() => navigate("/platform-admin/payments-details")}
-              className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-blue-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
+              className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-secondary-500/30 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -562,7 +562,7 @@ const PlatformStats: React.FC = () => {
                   />
                 </svg>
               </div>
-              <p className="text-3xl font-bold text-blue-400 mb-1">
+              <p className="text-3xl font-bold text-secondary-400 mb-1">
                 {platformStats.subscriptions.l2}
               </p>
               <p className="text-sm text-secondary-400">L2 (Premium)</p>
@@ -658,11 +658,11 @@ const PlatformStats: React.FC = () => {
                   {Math.floor(parseInt(platformStats.system.uptime) / 60)}m
                 </span>
               </div>
-              <div className="bg-secondary-700/30 p-4 rounded-xl border border-secondary-600/30 flex justify-between items-center hover:border-blue-500/30 transition-colors">
+              <div className="bg-secondary-700/30 p-4 rounded-xl border border-secondary-600/30 flex justify-between items-center hover:border-secondary-500/30 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-secondary-500/20 rounded-lg flex items-center justify-center">
                     <svg
-                      className="w-4 h-4 text-blue-400"
+                      className="w-4 h-4 text-secondary-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -679,7 +679,7 @@ const PlatformStats: React.FC = () => {
                     Total API Calls
                   </span>
                 </div>
-                <span className="text-blue-400 font-bold text-lg">
+                <span className="text-secondary-400 font-bold text-lg">
                   {(platformStats.system.total_api_calls / 1000).toFixed(1)}K
                 </span>
               </div>
@@ -834,8 +834,8 @@ const PlatformStats: React.FC = () => {
                 </p>
                 <p className="text-sm text-secondary-400">Daily Logins</p>
               </div>
-              <div className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-blue-500/30 transition-colors">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <div className="bg-secondary-700/30 p-6 rounded-xl border border-secondary-600/30 text-center hover:border-secondary-500/30 transition-colors">
+                <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <svg
                     className="w-6 h-6 text-white"
                     fill="none"
@@ -850,7 +850,7 @@ const PlatformStats: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <p className="text-3xl font-bold text-blue-400 mb-1">
+                <p className="text-3xl font-bold text-secondary-400 mb-1">
                   {platformStats.activity.weekly_logins}
                 </p>
                 <p className="text-sm text-secondary-400">Weekly Logins</p>

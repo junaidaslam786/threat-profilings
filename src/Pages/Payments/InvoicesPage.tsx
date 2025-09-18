@@ -109,7 +109,7 @@ const InvoicesPage: React.FC = () => {
         <ErrorMessage message={errorMessage} onClose={() => refetch()} />
         <button
           onClick={() => refetch()}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          className="mt-4 bg-secondary-600 text-white px-4 py-2 rounded-md hover:bg-secondary-700 transition-colors"
         >
           Try Again
         </button>
@@ -259,7 +259,7 @@ const InvoicesPage: React.FC = () => {
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handlePreviewPDF(invoice)}
-                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-300 bg-blue-500/10 border border-blue-400/30 rounded hover:bg-blue-500/20 transition-colors"
+                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-secondary-300 bg-secondary-500/10 border border-secondary-400/30 rounded hover:bg-secondary-500/20 transition-colors"
                             title="Preview Invoice"
                           >
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -337,8 +337,8 @@ const PaymentDashboard: React.FC = () => {
           {/* Quick Actions */}
           <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-secondary-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -370,16 +370,16 @@ const PaymentDashboard: React.FC = () => {
 
               <button
                 onClick={() => navigate("/invoices")}
-                className="w-full p-4 bg-gradient-to-r from-blue-600/20 to-blue-700/20 rounded-lg hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-200 border border-blue-500/30 hover:border-blue-400/50 group text-left"
+                className="w-full p-4 bg-gradient-to-r from-secondary-600/20 to-secondary-700/20 rounded-lg hover:from-secondary-500/30 hover:to-secondary-600/30 transition-all duration-200 border border-secondary-500/30 hover:border-secondary-400/50 group text-left"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-blue-400 group-hover:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-secondary-400 group-hover:text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <div>
                       <div className="text-white font-medium">View Invoices</div>
-                      <div className="text-blue-300 text-sm">Payment history & receipts</div>
+                      <div className="text-secondary-300 text-sm">Payment history & receipts</div>
                     </div>
                   </div>
                   <svg className="w-4 h-4 text-secondary-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

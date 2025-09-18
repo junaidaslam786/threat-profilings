@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { createAuthenticatedBaseQuery } from "../../utils/authenticatedBaseQuery";
 import type {
   RegisterUserDto,
+  RegisterUserResponse,
   JoinOrgRequestDto,
   ApproveJoinDto,
   InviteUserDto,
@@ -34,7 +35,7 @@ export const userApi = createApi({
       },
     }),
 
-    createUser: builder.mutation<GenericSuccessResponse, RegisterUserDto>({
+    createUser: builder.mutation<RegisterUserResponse, RegisterUserDto>({
       query: (body) => ({
         url: "/users/register",
         method: "POST",

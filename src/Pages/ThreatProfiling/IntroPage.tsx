@@ -140,9 +140,9 @@ const IntroPage: React.FC = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-secondary-900/50 p-6 rounded-lg text-center">
-                  <div className="w-12 h-12 bg-blue-600/30 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-secondary-600/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <svg
-                      className="w-6 h-6 text-blue-400"
+                      className="w-6 h-6 text-secondary-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -155,7 +155,7 @@ const IntroPage: React.FC = () => {
                       />
                     </svg>
                   </div>
-                  <div className="text-2xl font-bold text-blue-400 mb-2">
+                  <div className="text-2xl font-bold text-secondary-400 mb-2">
                     {data?.results?.tas?.length || 0}
                   </div>
                   <div className="text-sm text-secondary-400">
@@ -254,12 +254,12 @@ const IntroPage: React.FC = () => {
                     <h4 className="text-lg font-semibold text-white mb-3">
                       ISM Compliance
                     </h4>
-                    <div className="text-3xl font-bold text-blue-400 mb-2">
+                    <div className="text-3xl font-bold text-secondary-400 mb-2">
                       {complianceStatus.ism_compliance_percentage}%
                     </div>
                     <div className="w-full bg-secondary-700 rounded-full h-2">
                       <div
-                        className="bg-blue-400 h-2 rounded-full"
+                        className="bg-secondary-400 h-2 rounded-full"
                         style={{
                           width: `${complianceStatus.ism_compliance_percentage}%`,
                         }}

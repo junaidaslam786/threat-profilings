@@ -38,9 +38,13 @@ const HomePage: React.FC = () => {
   // Check if user is authenticated
   const hasToken = !!getIdToken();
 
-  // Fetch organizations data only if authenticated
+  // Check if user has L0 subscription level
+  const hasL0Subscription = user?.subscriptions && user.subscriptions.length > 0 && 
+                           user.subscriptions.some(sub => sub.subscription_level === 'L0');
+
+  // Fetch organizations data only if authenticated and user doesn't have L0 subscription
   const { data: orgsData, isLoading: orgsLoading, error: orgsError } = useGetOrgsQuery(undefined, {
-    skip: !hasToken
+    skip: !hasToken || hasL0Subscription
   });
 
   // Update organization mutation
@@ -149,8 +153,8 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Show loading only if user is loading or if user is authenticated and orgs are loading
-  if (userLoading || (hasToken && orgsLoading)) {
+  // Show loading only if user is loading or if user is authenticated, doesn't have L0, and orgs are loading
+  if (userLoading || (hasToken && !hasL0Subscription && orgsLoading)) {
     return <LoadingScreen />;
   }
 
@@ -158,6 +162,107 @@ const HomePage: React.FC = () => {
   if (!hasToken || !user) {
     navigate('/auth/login');
     return null;
+  }
+
+  // If user has L0 subscription, show subscription prompt
+  if (hasL0Subscription) {
+    return (
+      <ThreatProfilingLayout>
+        <div className="p-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent mb-4">
+                Welcome to Threat Profiling
+              </h1>
+              <p className="text-lg text-secondary-400">By: CYORN</p>
+            </div>
+
+            {/* Subscription Required Card */}
+            <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-xl p-8 text-center">
+              <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Subscription Required
+              </h2>
+              
+              <p className="text-lg text-secondary-300 mb-6 max-w-2xl mx-auto">
+                To activate your organization and start using the CYORN threat profiling tools, 
+                you need to subscribe to a tier that fits your needs.
+              </p>
+              
+              <div className="bg-secondary-800/50 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h3 className="text-lg font-semibold text-white mb-2">Your Current Status</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-secondary-400">Organization:</span>
+                    <span className="text-white">{user.accessible_organizations?.[0]?.organization_name || 'Unknown'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-secondary-400">Current Plan:</span>
+                    <span className="text-amber-400 font-medium">L0 (Inactive)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-secondary-400">Status:</span>
+                    <span className="text-red-400">Requires Subscription</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={() => navigate('/payments')}
+                  variant="primary"
+                  className="px-8 py-3 text-lg"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Subscribe to a Tier
+                </Button>
+              </div>
+            </div>
+
+            {/* Features Preview */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-secondary-800/30 rounded-lg p-6 text-center border border-secondary-700/50">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">Threat Assessment</h3>
+                <p className="text-sm text-secondary-400">Comprehensive threat profiling for your organization</p>
+              </div>
+              
+              <div className="bg-secondary-800/30 rounded-lg p-6 text-center border border-secondary-700/50">
+                <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">Real-time Scanning</h3>
+                <p className="text-sm text-secondary-400">Monitor your applications and infrastructure</p>
+              </div>
+              
+              <div className="bg-secondary-800/30 rounded-lg p-6 text-center border border-secondary-700/50">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">Detailed Reports</h3>
+                <p className="text-sm text-secondary-400">Comprehensive security reports and recommendations</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ThreatProfilingLayout>
+    );
   }
 
   if (orgsError || !organization) {
@@ -169,7 +274,7 @@ const HomePage: React.FC = () => {
             <p className="text-secondary-300 mb-4">
               No organization data available. Please contact support if this persists.
             </p>
-            <Button onClick={() => navigate('/organizations')} variant="primary">
+            <Button onClick={() => navigate('/orgs')} variant="primary">
               Manage Organizations
             </Button>
           </div>
@@ -195,7 +300,7 @@ const HomePage: React.FC = () => {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent">
                 Threat Readiness Action Plan
               </h1>
-              <p className="text-lg text-secondary-400 mt-2">By: Fortilligence</p>
+              <p className="text-lg text-secondary-400 mt-2">By: CYORN</p>
             </div>
           </div>
           
@@ -474,7 +579,7 @@ const HomePage: React.FC = () => {
         {organization.apps && organization.apps.length > 0 && (
           <div className="bg-secondary-800/50 rounded-xl border border-secondary-700/50 p-6 mb-8">
             <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
-              <svg className="w-6 h-6 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-secondary-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
               </svg>
               Applications
@@ -485,19 +590,19 @@ const HomePage: React.FC = () => {
                 <div key={index} className="bg-secondary-900/50 rounded-lg p-4 border border-secondary-600/30">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-blue-400 mb-1">Application Name</label>
+                      <label className="block text-sm font-medium text-secondary-400 mb-1">Application Name</label>
                       <p className="text-white font-medium">{app.app_name}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-blue-400 mb-1">Application Profile</label>
+                      <label className="block text-sm font-medium text-secondary-400 mb-1">Application Profile</label>
                       <p className="text-white">{app.app_profile}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-blue-400 mb-1">Application Details</label>
+                      <label className="block text-sm font-medium text-secondary-400 mb-1">Application Details</label>
                       <p className="text-secondary-300">{app.app_additional_details || 'No additional details'}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-blue-400 mb-1">Application Link</label>
+                      <label className="block text-sm font-medium text-secondary-400 mb-1">Application Link</label>
                       <p className="text-white">{app.app_url || 'N/A'}</p>
                     </div>
                   </div>
@@ -518,8 +623,8 @@ const HomePage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl font-bold text-blue-400">7</span>
+              <div className="w-16 h-16 bg-secondary-600/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-2xl font-bold text-secondary-400">7</span>
               </div>
               <h4 className="text-lg font-semibold text-white mb-1">Assessment Areas</h4>
               <p className="text-sm text-secondary-400">Complete threat profiling sections</p>

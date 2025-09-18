@@ -110,20 +110,40 @@ export default function DynamicRegistrationForm({
         setSuccess(
           "Join request sent successfully! You will be notified when it's approved."
         );
-
-        // For join requests, we don't redirect to dashboard immediately
-        // as the user needs approval first
+        
         setTimeout(() => {
           navigate("/dashboard", { replace: true });
         }, 3000);
       } else {
-        // Use regular user creation for other registration types
-        await createUser(fields as unknown as RegisterUserDto).unwrap();
-        setSuccess("Registration successful! Redirecting to dashboard...");
+        const result = await createUser(fields as unknown as RegisterUserDto).unwrap();
+        setSuccess("Registration successful! Redirecting...");
 
-        // Redirect to dashboard after successful registration
+        // Handle role-based redirection
         setTimeout(() => {
-          navigate("/dashboard", { replace: true });
+          // Check if user has platform_admin or super_admin role
+          if (result.role === "platform_admin" || result.role === "super_admin") {
+            // Check if user has pending join (registration_type is not join_existing)
+            if (flowData.registration_type !== "join_existing") {
+              // Show pending approval screen for platform admins who are not joining existing org
+              navigate("/pending-approval", { 
+                replace: true,
+                state: { 
+                  userDetails: {
+                    ...result,
+                    email: fields.email as string,
+                    name: fields.name as string
+                  },
+                  showPendingApproval: true 
+                }
+              });
+            } else {
+              // Direct access to platform admins area for those joining existing org
+              navigate("/platform-admins", { replace: true });
+            }
+          } else {
+            // Regular users go to dashboard/home
+            navigate("/", { replace: true });
+          }
         }, 2000);
       }
     } catch (err: unknown) {
@@ -322,15 +342,15 @@ export default function DynamicRegistrationForm({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
-      <div className="bg-gray-800 p-8 rounded-xl border border-blue-700 w-full max-w-md shadow-lg">
+      <div className="bg-gray-800 p-8 rounded-xl border border-secondary-700 w-full max-w-md shadow-lg">
         <button
           onClick={onBack}
-          className="text-blue-400 hover:text-blue-300 mb-4 flex items-center"
+          className="text-secondary-400 hover:text-secondary-300 mb-4 flex items-center"
         >
           ← Back
         </button>
 
-        <h2 className="text-2xl font-bold text-blue-300 mb-2">
+        <h2 className="text-2xl font-bold text-secondary-300 mb-2">
           {getFormTitle()}
         </h2>
         <p className="text-gray-300 mb-6">{getFormDescription()}</p>

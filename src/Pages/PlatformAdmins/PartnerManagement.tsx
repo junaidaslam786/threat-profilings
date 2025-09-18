@@ -192,9 +192,9 @@ const PartnerManagement: React.FC = () => {
 
           <div className="bg-gradient-to-br from-secondary-800 to-secondary-900 rounded-xl p-6 border border-secondary-700/50">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-secondary-500/20 rounded-lg flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-blue-400"
+                  className="w-6 h-6 text-secondary-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,7 +209,7 @@ const PartnerManagement: React.FC = () => {
               </div>
               <div>
                 <p className="text-secondary-400 text-sm">Total Referrals</p>
-                <p className="text-2xl font-bold text-blue-400">
+                <p className="text-2xl font-bold text-secondary-400">
                   {partnerAnalytics?.total_referrals || 
                    partners.reduce((sum, p) => sum + p.total_referrals, 0)}
                 </p>
@@ -331,7 +331,7 @@ const PartnerManagement: React.FC = () => {
                           <div className="text-sm font-medium text-white">
                             {partner.partner_code}
                           </div>
-                          <div className="text-sm text-blue-300">
+                          <div className="text-sm text-secondary-300">
                             {partner.partner_email}
                           </div>
                         </div>
@@ -401,7 +401,7 @@ const PartnerManagement: React.FC = () => {
                     <label className="block text-sm font-medium text-secondary-300 mb-1">
                       Email
                     </label>
-                    <p className="text-blue-300">
+                    <p className="text-secondary-300">
                       {selectedPartner.partner_email}
                     </p>
                   </div>
@@ -505,7 +505,7 @@ const PartnerManagement: React.FC = () => {
                       <label className="block text-sm font-medium text-secondary-300 mb-1">
                         Registered Users
                       </label>
-                      <p className="text-blue-300 font-bold">{selectedPartner.registered_users}</p>
+                      <p className="text-secondary-300 font-bold">{selectedPartner.registered_users}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-secondary-300 mb-1">
@@ -596,7 +596,7 @@ const PartnerManagement: React.FC = () => {
                       <label className="block text-sm font-medium text-secondary-300 mb-1">
                         Recent Registrations
                       </label>
-                      <p className="text-blue-300 font-bold">{selectedPartner.recent_registrations}</p>
+                      <p className="text-secondary-300 font-bold">{selectedPartner.recent_registrations}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-secondary-300 mb-1">

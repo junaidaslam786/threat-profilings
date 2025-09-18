@@ -24,7 +24,7 @@ export const PaymentTestPage: React.FC = () => {
               This page is for testing the payment flow integration.
             </p>
             
-            <div className="border-l-4 border-blue-500 pl-4 py-2">
+            <div className="border-l-4 border-secondary-500 pl-4 py-2">
               <h3 className="font-semibold text-gray-900">Test Scenarios:</h3>
               <ul className="mt-2 text-sm text-gray-600 space-y-1">
                 <li>✓ Session ID extraction from URL</li>

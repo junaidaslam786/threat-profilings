@@ -126,7 +126,7 @@ export default function SecurityAssessmentModal({
     }
   };
 
-  const inputClasses = "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const inputClasses = "w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary-500";
   const labelClasses = "block text-sm font-medium text-gray-300 mb-2";
 
   const sections = [
@@ -346,7 +346,7 @@ export default function SecurityAssessmentModal({
               </div>
             </div>
             <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <h4 className="text-md font-medium text-blue-200 mb-3">
+              <h4 className="text-md font-medium text-secondary-200 mb-3">
                 Assessment Details
               </h4>
               <p className="text-gray-400 text-sm">
@@ -382,7 +382,7 @@ export default function SecurityAssessmentModal({
               />
             </div>
             <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <h4 className="text-md font-medium text-blue-200 mb-3">
+              <h4 className="text-md font-medium text-secondary-200 mb-3">
                 Critical Gaps
               </h4>
               <p className="text-gray-400 text-sm">
@@ -418,7 +418,7 @@ export default function SecurityAssessmentModal({
               />
             </div>
             <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <h4 className="text-md font-medium text-blue-200 mb-3">
+              <h4 className="text-md font-medium text-secondary-200 mb-3">
                 Remediation Roadmap
               </h4>
               <p className="text-gray-400 text-sm">
@@ -436,7 +436,7 @@ export default function SecurityAssessmentModal({
   return (
     <Modal show={isOpen} onClose={onClose} size="2xl">
       <div className="text-white max-h-[80vh] overflow-auto scrollbar-hide">
-        <h2 className="text-2xl font-bold text-blue-300 mb-6">
+        <h2 className="text-2xl font-bold text-secondary-300 mb-6">
           {editingAssessment ? "Edit Security Assessment" : "Create Security Assessment"}
         </h2>
 
@@ -455,7 +455,7 @@ export default function SecurityAssessmentModal({
               onClick={() => setCurrentSection(index)}
               className={`px-3 py-1 rounded text-sm ${
                 currentSection === index 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-secondary-600 text-white' 
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
@@ -466,7 +466,7 @@ export default function SecurityAssessmentModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-            <h3 className="text-lg font-semibold text-blue-300 mb-4">
+            <h3 className="text-lg font-semibold text-secondary-300 mb-4">
               {sections[currentSection]}
             </h3>
             {renderSection()}

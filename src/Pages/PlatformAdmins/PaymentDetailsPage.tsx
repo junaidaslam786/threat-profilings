@@ -484,7 +484,7 @@ const PaymentDetailsPage = () => {
                 </div>
                 <div className="bg-secondary-700/30 rounded-lg p-4">
                   <p className="text-secondary-400 text-sm">Payment Source</p>
-                  <p className="text-xl font-bold text-blue-400">
+                  <p className="text-xl font-bold text-secondary-400">
                     {activeTab === "le"
                       ? lePaymentsData?.partner_analytics?.direct_payments
                           ?.count || 0

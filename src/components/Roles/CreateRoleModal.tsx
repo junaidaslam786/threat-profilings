@@ -92,7 +92,7 @@ export default function RoleCreateModal({
   return (
     <Modal show={isOpen} onClose={onClose} size="xl">
       <div className="text-white max-h-[80vh] overflow-visible">
-        <h2 className="text-xl font-bold text-blue-300 mb-4">Create Role</h2>
+        <h2 className="text-xl font-bold text-secondary-300 mb-4">Create Role</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded">
@@ -101,7 +101,7 @@ export default function RoleCreateModal({
           )}
           <div className="space-y-4 overflow-visible">
             <input
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900 text-white placeholder-gray-400"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900 text-white placeholder-gray-400"
               name="name"
               placeholder="Role Name *"
               value={fields.name}
@@ -109,7 +109,7 @@ export default function RoleCreateModal({
               required
             />
             <textarea
-              className="w-full p-2 rounded bg-gray-700 border border-blue-900 text-white placeholder-gray-400"
+              className="w-full p-2 rounded bg-gray-700 border border-secondary-900 text-white placeholder-gray-400"
               name="description"
               placeholder="Description"
               value={fields.description}

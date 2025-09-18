@@ -53,8 +53,8 @@ export default function PaymentSection({
   };
 
   return (
-    <div className={`bg-gray-800 border border-blue-900 rounded-lg p-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-blue-300 mb-4">{title}</h3>
+    <div className={`bg-gray-800 border border-secondary-900 rounded-lg p-6 ${className}`}>
+      <h3 className="text-lg font-semibold text-secondary-300 mb-4">{title}</h3>
       
       {description && (
         <p className="text-gray-300 mb-4">{description}</p>
