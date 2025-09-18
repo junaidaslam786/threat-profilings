@@ -2,7 +2,7 @@ import React from "react";
 
 // Enhanced smooth LoadingScreen component for seamless UX
 const LoadingScreen: React.FC = () => (
-  <div className="min-h-screen min-w-screen flex items-center justify-center bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900">
+  <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900">
     <div className="text-center flex flex-col items-center loading-fade-in">
       <div className="relative mb-6">
         <div className="w-12 h-12 border-4 border-primary-600/30 border-t-primary-500 rounded-full animate-spin"></div>

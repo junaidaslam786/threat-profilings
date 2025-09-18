@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ThreatProfilingLayout from '../../components/Common/ThreatProfilingLayout';
 import LoadingScreen from '../../components/Common/LoadingScreen';
 import Button from '../../components/Common/Button';
 import { useGetProfilingResultsQuery } from '../../Redux/api/threatProfilingApi';
 
 const DetectionPage: React.FC = () => {
-  const { client_name } = useParams<{ client_name: string }>();
+  const client_name = localStorage.getItem("selectedOrg") || "";
   const navigate = useNavigate();
   const [selectedDetections, setSelectedDetections] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { data: profilingResults, isLoading, error } = useGetProfilingResultsQuery(client_name || 'tunki_com');
+  const { data: profilingResults, isLoading, error } = useGetProfilingResultsQuery(client_name);
 
   const hasResults = profilingResults?.has_results || false;
   const detections = profilingResults?.results?.detections || [];
@@ -32,7 +32,7 @@ const DetectionPage: React.FC = () => {
               <p className="text-secondary-300 mb-4">
                 Threat profiling results are not available for this organization yet. Please run threat profiling first.
               </p>
-              <Button onClick={() => navigate(`/threat-profiling/${client_name}`)} variant="primary">
+              <Button onClick={() => navigate(`/`)} variant="primary">
                 Back to Overview
               </Button>
             </div>
@@ -95,7 +95,7 @@ const DetectionPage: React.FC = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate(`/threat-profiling/${client_name}`)} 
+                onClick={() => navigate("/")} 
                 variant="outline"
               >
                 ← Back to Overview

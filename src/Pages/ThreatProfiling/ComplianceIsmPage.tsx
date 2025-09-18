@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ThreatProfilingLayout from '../../components/Common/ThreatProfilingLayout';
-import LoadingScreen from '../../components/Common/LoadingScreen';
-import Button from '../../components/Common/Button';
-import { useGetProfilingResultsQuery } from '../../Redux/api/threatProfilingApi';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ThreatProfilingLayout from "../../components/Common/ThreatProfilingLayout";
+import LoadingScreen from "../../components/Common/LoadingScreen";
+import Button from "../../components/Common/Button";
+import { useGetProfilingResultsQuery } from "../../Redux/api/threatProfilingApi";
 
 const ComplianceIsmPage: React.FC = () => {
-  const { client_name } = useParams<{ client_name: string }>();
+  const client_name = localStorage.getItem("selectedOrg") || "";
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { data: profilingResults, isLoading, error } = useGetProfilingResultsQuery(client_name || 'tunki_com');
+  const {
+    data: profilingResults,
+    isLoading,
+    error,
+  } = useGetProfilingResultsQuery(client_name);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -24,11 +28,16 @@ const ComplianceIsmPage: React.FC = () => {
         <div className="p-6">
           <div className="max-w-6xl mx-auto">
             <div className="bg-amber-600/20 border border-amber-500/30 rounded-lg p-6 text-center">
-              <h3 className="text-xl font-semibold text-amber-400 mb-2">No ISM Data Available</h3>
+              <h3 className="text-xl font-semibold text-amber-400 mb-2">
+                No ISM Data Available
+              </h3>
               <p className="text-secondary-300 mb-4">
                 ISM compliance data is not available for this organization yet.
               </p>
-              <Button onClick={() => navigate(`/threat-profiling/${client_name}`)} variant="primary">
+              <Button
+                onClick={() => navigate(`/`)}
+                variant="primary"
+              >
                 Back to Overview
               </Button>
             </div>
@@ -39,21 +48,29 @@ const ComplianceIsmPage: React.FC = () => {
   }
 
   const ismControls = profilingResults?.results?.isms || [];
-  const filteredControls = ismControls.filter(control =>
-    control.control_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    control.control_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredControls = ismControls.filter(
+    (control) =>
+      control.control_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      control.control_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredControls.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedControls = filteredControls.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedControls = filteredControls.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'implemented': return 'text-green-400';
-      case 'partially_implemented': return 'text-yellow-400';
-      case 'not_implemented': return 'text-red-400';
-      default: return 'text-secondary-400';
+      case "implemented":
+        return "text-green-400";
+      case "partially_implemented":
+        return "text-yellow-400";
+      case "not_implemented":
+        return "text-red-400";
+      default:
+        return "text-secondary-400";
     }
   };
 
@@ -71,8 +88,8 @@ const ComplianceIsmPage: React.FC = () => {
                   Information Security Manual compliance assessment
                 </p>
               </div>
-              <Button 
-                onClick={() => navigate(`/threat-profiling/${client_name}`)} 
+             <Button
+                onClick={() => navigate("/")}
                 variant="outline"
               >
                 ← Back to Overview
@@ -95,35 +112,67 @@ const ComplianceIsmPage: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-secondary-900/50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">Control</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">Score</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">Recommendations</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">
+                      Control
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">
+                      Score
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider">
+                      Recommendations
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-secondary-700/50">
                   {paginatedControls.map((control, index) => (
-                    <tr key={control.control_id || index} className="hover:bg-secondary-700/30">
+                    <tr
+                      key={control.control_id || index}
+                      className="hover:bg-secondary-700/30"
+                    >
                       <td className="px-6 py-4">
                         <div>
-                          <div className="text-white font-medium">{control.control_name}</div>
-                          <div className="text-sm text-secondary-400">{control.control_id}</div>
-                          <div className="text-sm text-secondary-500 mt-1">{control.control_description}</div>
+                          <div className="text-white font-medium">
+                            {control.control_name}
+                          </div>
+                          <div className="text-sm text-secondary-400">
+                            {control.control_id}
+                          </div>
+                          <div className="text-sm text-secondary-500 mt-1">
+                            {control.control_description}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`font-medium ${getStatusColor(control.implementation_status)}`}>
-                          {control.implementation_status?.replace('_', ' ').toUpperCase()}
+                        <span
+                          className={`font-medium ${getStatusColor(
+                            control.implementation_status
+                          )}`}
+                        >
+                          {control.implementation_status
+                            ?.replace("_", " ")
+                            .toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-lg font-bold text-white">{Math.round(control.compliance_score * 100)}%</div>
+                        <div className="text-lg font-bold text-white">
+                          {Math.round(control.compliance_score * 100)}%
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          {control.recommendations?.slice(0, 2).map((rec, idx) => (
-                            <div key={idx} className="text-sm text-secondary-300">• {rec}</div>
-                          ))}
+                          {control.recommendations
+                            ?.slice(0, 2)
+                            .map((rec, idx) => (
+                              <div
+                                key={idx}
+                                className="text-sm text-secondary-300"
+                              >
+                                • {rec}
+                              </div>
+                            ))}
                         </div>
                       </td>
                     </tr>
@@ -140,7 +189,9 @@ const ComplianceIsmPage: React.FC = () => {
               </div>
               <div className="flex space-x-2">
                 <Button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   variant="outline"
                   className="px-3 py-1 text-sm"
@@ -148,7 +199,9 @@ const ComplianceIsmPage: React.FC = () => {
                   Previous
                 </Button>
                 <Button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   variant="outline"
                   className="px-3 py-1 text-sm"

@@ -40,6 +40,15 @@ const HomePage: React.FC = () => {
   // State for organization selection
   const [selectedOrgIndex, setSelectedOrgIndex] = useState<number>(0);
 
+  // Save selected organization to localStorage when it changes
+  const handleOrganizationChange = (index: number) => {
+    setSelectedOrgIndex(index);
+    const selectedOrg = availableOrganizations[index];
+    if (selectedOrg) {
+      const typedOrg = selectedOrg as { client_name: string };
+      localStorage.setItem('selectedOrg', typedOrg.client_name);
+    }
+  };
 
   // Helper function to get organization field value by EditableField name
   const getOrgFieldValue = (orgData: typeof org, field: EditableField): string | string[] => {
@@ -114,6 +123,64 @@ const HomePage: React.FC = () => {
   };
 
   const availableOrganizations = getAvailableOrganizations();
+
+  // Load selected organization from localStorage on component mount
+  useEffect(() => {
+    if (orgsData) {
+      // Recalculate available organizations inside useEffect
+      let availableOrgs: unknown[] = [];
+      if (Array.isArray(orgsData)) {
+        availableOrgs = orgsData;
+      } else if (orgsData && "managed_orgs" in orgsData) {
+        availableOrgs = (orgsData as { managed_orgs: unknown[] }).managed_orgs || [];
+      } else if (orgsData && "le_master" in orgsData) {
+        const orgData = orgsData as Record<string, unknown>;
+        const leMaster = orgData.le_master;
+        availableOrgs = leMaster ? [leMaster] : [];
+      }
+      
+      if (availableOrgs.length > 0) {
+        const savedSelectedOrg = localStorage.getItem('selectedOrg');
+        
+        if (savedSelectedOrg) {
+          // Try to find the saved organization
+          const orgIndex = availableOrgs.findIndex(
+            (org) => (org as { client_name?: string }).client_name === savedSelectedOrg
+          );
+          if (orgIndex !== -1) {
+            setSelectedOrgIndex(orgIndex);
+          } else {
+            // If saved org not found, default to first organization and update localStorage
+            setSelectedOrgIndex(0);
+            const firstOrg = availableOrgs[0];
+            if (firstOrg && (firstOrg as { client_name?: string }).client_name) {
+              localStorage.setItem('selectedOrg', (firstOrg as { client_name: string }).client_name);
+            }
+          }
+        } else {
+          // No localStorage value exists, set it to the first organization
+          setSelectedOrgIndex(0);
+          const firstOrg = availableOrgs[0];
+          if (firstOrg && (firstOrg as { client_name?: string }).client_name) {
+            localStorage.setItem('selectedOrg', (firstOrg as { client_name: string }).client_name);
+          }
+        }
+      }
+    }
+  }, [orgsData]);
+
+  // Always keep localStorage in sync with the currently active organization
+  useEffect(() => {
+    if (availableOrganizations.length > 0) {
+      const currentOrg = availableOrganizations[selectedOrgIndex];
+      if (currentOrg && (currentOrg as { client_name?: string }).client_name) {
+        const clientName = (currentOrg as { client_name: string }).client_name;
+        localStorage.setItem('selectedOrg', clientName);
+      }
+    }
+  }, [availableOrganizations, selectedOrgIndex]);
+
+  // Get current organization based on selected index
   const organization = availableOrganizations[selectedOrgIndex] || null;
 
   // Type assertion for organization to avoid TypeScript errors
@@ -512,7 +579,7 @@ const HomePage: React.FC = () => {
                 </label>
                 <select
                   value={selectedOrgIndex}
-                  onChange={(e) => setSelectedOrgIndex(Number(e.target.value))}
+                  onChange={(e) => handleOrganizationChange(Number(e.target.value))}
                   className="w-full px-4 py-3 bg-secondary-700 border border-secondary-600 rounded-lg text-white text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   {availableOrganizations.map((orgItem, index) => {

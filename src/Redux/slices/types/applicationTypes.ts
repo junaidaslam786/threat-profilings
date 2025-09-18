@@ -30,36 +30,36 @@ export interface UpdateApplicationRequest {
 }
 
 export interface Application {
-  appId: string;
-  clientName: string;
-  appName: string;
+  app_id: string;
+  client_name: string;
+  app_name: string;
   description?: string;
-  appType: AppType;
+  app_type: AppType;
   technologies: string[];
-  repositoryUrl?: string;
-  deploymentUrl?: string;
-  contactEmail?: string;
+  repository_url?: string;
+  deployment_url?: string;
+  contact_email?: string;
   priority: AppPriority;
   status: AppStatus;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  lastScanDate?: string;
-  scanStatus?: ScanStatus;
-  scanCount: number;
-  threatScore?: number;
-  complianceStatus?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  last_scan_date?: string;
+  scan_status?: ScanStatus;
+  scan_count: number;
+  threat_score?: number;
+  compliance_status?: string;
   canEdit?: boolean;
   canDelete?: boolean;
   scanAllowed?: boolean;
 }
 
 export interface ApplicationSummary {
-  totalApps: number;
-  activeApps: number;
-  archivedApps: number;
-  recentScans: number;
-  averageThreatScore: number;
+  total_apps: number;
+  active_apps: number;
+  archived_apps: number;
+  recent_scans: number;
+  average_threat_score: number;
 }
 
 export interface ApplicationLimits {

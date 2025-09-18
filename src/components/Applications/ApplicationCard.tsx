@@ -54,7 +54,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
     try {
       await updateApplication({
-        appId: application.appId,
+        appId: application.app_id,
         data: {
           [editingField]: editValue.trim()
         }
@@ -86,13 +86,13 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!canDelete || !window.confirm(`Are you sure you want to archive "${application.appName}"?`)) {
+    if (!canDelete || !window.confirm(`Are you sure you want to archive "${application.app_name}"?`)) {
       return;
     }
 
     setIsDeleting(true);
     try {
-      await deleteApplication(application.appId).unwrap();
+      await deleteApplication(application.app_id).unwrap();
       toast.success('Application archived successfully');
     } catch (error: unknown) {
       console.error('Error deleting application:', error);
@@ -231,7 +231,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white mb-2 break-words">
-            {application.appName}
+            {application.app_name}
           </h3>
           <div className="flex flex-wrap gap-2">
             <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(application.status)}`}>
@@ -241,7 +241,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
               {application.priority}
             </span>
             <span className="px-2 py-1 text-xs font-medium rounded-full border bg-secondary-100 text-secondary-800 border-secondary-200">
-              {application.appType}
+              {application.app_type}
             </span>
           </div>
         </div>
@@ -295,7 +295,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
             {application.technologies.length > 0 ? (
               application.technologies.map((tech: string, index: number) => (
                 <span
-                  key={index}
+                  key={`${tech}-${index}`}
                   className="px-2 py-1 bg-secondary-700 text-secondary-200 text-xs rounded-md border border-secondary-600"
                 >
                   {tech}
@@ -310,20 +310,20 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
         {/* URLs and Contact */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {renderEditableField(
-            'repositoryUrl', 
-            application.repositoryUrl || '', 
+            'repository_url', 
+            application.repository_url || '', 
             'Repository URL'
           )}
           
           {renderEditableField(
-            'deploymentUrl', 
-            application.deploymentUrl || '', 
+            'deployment_url', 
+            application.deployment_url || '', 
             'Deployment URL'
           )}
           
           {renderEditableField(
-            'contactEmail', 
-            application.contactEmail || '', 
+            'contact_email', 
+            application.contact_email || '', 
             'Contact Email'
           )}
         </div>
@@ -332,9 +332,9 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-secondary-700">
           <div>
             <label className="text-sm font-medium text-gray-300">Threat Score</label>
-            <div className={`text-lg font-bold ${getThreatScoreColor(application.threatScore)}`}>
-              {application.threatScore !== undefined && application.threatScore !== null 
-                ? application.threatScore.toFixed(1) 
+            <div className={`text-lg font-bold ${getThreatScoreColor(application.threat_score)}`}>
+              {application.threat_score !== undefined && application.threat_score !== null 
+                ? application.threat_score.toFixed(1) 
                 : 'N/A'}
             </div>
           </div>
@@ -342,22 +342,22 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
           <div>
             <label className="text-sm font-medium text-gray-300">Scan Count</label>
             <div className="text-lg font-bold text-white">
-              {application.scanCount || 0}
+              {application.scan_count || 0}
             </div>
           </div>
           
           <div>
             <label className="text-sm font-medium text-gray-300">Compliance</label>
             <div className="text-sm text-white">
-              {application.complianceStatus || 'Not assessed'}
+              {application.compliance_status || 'Not assessed'}
             </div>
           </div>
           
           <div>
             <label className="text-sm font-medium text-gray-300">Last Scan</label>
             <div className="text-sm text-white">
-              {application.lastScanDate 
-                ? new Date(application.lastScanDate).toLocaleDateString()
+              {application.last_scan_date 
+                ? new Date(application.last_scan_date).toLocaleDateString()
                 : 'Never'}
             </div>
           </div>
@@ -365,8 +365,8 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
         {/* Footer */}
         <div className="flex justify-between items-center pt-4 border-t border-secondary-700 text-xs text-gray-400">
-          <span>Created: {new Date(application.createdAt).toLocaleDateString()}</span>
-          <span>Updated: {new Date(application.updatedAt).toLocaleDateString()}</span>
+          <span>Created: {new Date(application.created_at).toLocaleDateString()}</span>
+          <span>Updated: {new Date(application.updated_at).toLocaleDateString()}</span>
         </div>
       </div>
     </div>

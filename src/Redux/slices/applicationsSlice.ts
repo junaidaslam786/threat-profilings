@@ -136,19 +136,19 @@ const applicationsSlice = createSlice({
     },
     
     updateApplication: (state, action: PayloadAction<Application>) => {
-      const index = state.applications.findIndex(app => app.appId === action.payload.appId);
+      const index = state.applications.findIndex(app => app.app_id === action.payload.app_id);
       if (index !== -1) {
         state.applications[index] = action.payload;
       }
-      if (state.selectedApplication?.appId === action.payload.appId) {
+      if (state.selectedApplication?.app_id === action.payload.app_id) {
         state.selectedApplication = action.payload;
       }
     },
     
     removeApplication: (state, action: PayloadAction<string>) => {
-      state.applications = state.applications.filter(app => app.appId !== action.payload);
+      state.applications = state.applications.filter(app => app.app_id !== action.payload);
       state.pagination.totalItems -= 1;
-      if (state.selectedApplication?.appId === action.payload) {
+      if (state.selectedApplication?.app_id === action.payload) {
         state.selectedApplication = null;
       }
     },
@@ -178,13 +178,13 @@ const applicationsSlice = createSlice({
         state.selectedApplication = action.payload.application;
         if (action.payload.mode === 'edit') {
           state.applicationForm = {
-            appName: action.payload.application.appName,
+            appName: action.payload.application.app_name,
             description: action.payload.application.description || '',
-            appType: action.payload.application.appType,
+            appType: action.payload.application.app_type,
             technologies: [...action.payload.application.technologies],
-            repositoryUrl: action.payload.application.repositoryUrl || '',
-            deploymentUrl: action.payload.application.deploymentUrl || '',
-            contactEmail: action.payload.application.contactEmail || '',
+            repositoryUrl: action.payload.application.repository_url || '',
+            deploymentUrl: action.payload.application.deployment_url || '',
+            contactEmail: action.payload.application.contact_email || '',
             priority: action.payload.application.priority,
           };
         }

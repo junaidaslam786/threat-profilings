@@ -4,11 +4,9 @@ import ThreatProfilingLayout from "../../components/Common/ThreatProfilingLayout
 import LoadingScreen from "../../components/Common/LoadingScreen";
 import Button from "../../components/Common/Button";
 import { useGetProfilingResultsQuery } from "../../Redux/api/threatProfilingApi";
-import { useGetProfileQuery } from "../../Redux/api/userApi";
 
 const IntroPage: React.FC = () => {
-  const {data: client} = useGetProfileQuery();
-  const client_name = client?.user_info.client_name || "";
+  const client_name = localStorage.getItem("selectedOrg") || "";
   const navigate = useNavigate();
   const {
     data: profilingResults,
@@ -39,10 +37,7 @@ const IntroPage: React.FC = () => {
                 Threat profiling results are not available for this organization
                 yet. Please run threat profiling first.
               </p>
-              <Button
-                onClick={() => navigate(`/threat-profiling/${client_name}`)}
-                variant="primary"
-              >
+              <Button onClick={() => navigate(`/`)} variant="primary">
                 Back to Overview
               </Button>
             </div>
@@ -68,10 +63,7 @@ const IntroPage: React.FC = () => {
                     "Comprehensive threat profiling analysis"}
                 </p>
               </div>
-              <Button
-                onClick={() => navigate(`/threat-profiling/${client_name}`)}
-                variant="outline"
-              >
+              <Button onClick={() => navigate("/")} variant="outline">
                 ← Back to Overview
               </Button>
             </div>
@@ -299,34 +291,6 @@ const IntroPage: React.FC = () => {
               </div>
             )}
 
-            {/* Recommendations */}
-            {executiveSummary?.recommendations &&
-              executiveSummary.recommendations.length > 0 && (
-                <div className="bg-secondary-800/50 rounded-xl border border-secondary-700/50 p-8">
-                  <h3 className="text-xl font-semibold text-white mb-6">
-                    Key Recommendations
-                  </h3>
-                  <div className="space-y-4">
-                    {executiveSummary.recommendations.map(
-                      (recommendation, index) => (
-                        <div key={index} className="flex items-start space-x-4">
-                          <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                            <span className="text-white text-sm font-semibold">
-                              {index + 1}
-                            </span>
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-secondary-300">
-                              {recommendation}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
-
             {/* Analysis Metadata */}
             {metadata && (
               <div className="bg-secondary-800/50 rounded-xl border border-secondary-700/50 p-8">
@@ -373,10 +337,7 @@ const IntroPage: React.FC = () => {
 
           {/* Navigation */}
           <div className="flex justify-between items-center mt-8 pt-6 border-t border-secondary-700">
-            <Button
-              onClick={() => navigate(`/threat-profiling/${client_name}`)}
-              variant="outline"
-            >
+            <Button onClick={() => navigate("/")} variant="outline">
               ← Back to Overview
             </Button>
             <div className="text-center">

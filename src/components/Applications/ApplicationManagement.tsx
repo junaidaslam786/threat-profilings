@@ -113,24 +113,24 @@ const ApplicationManagement: React.FC<ApplicationManagementProps> = ({ className
         {summary && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-secondary-900/50 rounded-lg border border-secondary-600/30">
             <div className="text-center">
-              <div className="text-2xl font-bold text-secondary-400">{summary.totalApps}</div>
+              <div className="text-2xl font-bold text-secondary-400">{summary.total_apps}</div>
               <div className="text-sm text-secondary-400">Total Apps</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">{summary.activeApps}</div>
+              <div className="text-2xl font-bold text-green-400">{summary.active_apps}</div>
               <div className="text-sm text-secondary-400">Active</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-400">{summary.archivedApps}</div>
+              <div className="text-2xl font-bold text-gray-400">{summary.archived_apps}</div>
               <div className="text-sm text-secondary-400">Archived</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400">{summary.recentScans}</div>
+              <div className="text-2xl font-bold text-yellow-400">{summary.recent_scans}</div>
               <div className="text-sm text-secondary-400">Recent Scans</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-400">
-                {summary.averageThreatScore ? summary.averageThreatScore.toFixed(1) : 'N/A'}
+                {summary.average_threat_score ? summary.average_threat_score.toFixed(1) : 'N/A'}
               </div>
               <div className="text-sm text-secondary-400">Avg Threat Score</div>
             </div>
@@ -168,7 +168,7 @@ const ApplicationManagement: React.FC<ApplicationManagementProps> = ({ className
           <div className="space-y-6">
             {apps.map((app) => (
               <ApplicationCard
-                key={app.appId}
+                key={app.app_id}
                 application={app}
                 showActions={true}
               />

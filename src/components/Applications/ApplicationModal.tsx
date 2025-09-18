@@ -200,7 +200,7 @@ const ApplicationModal: React.FC<ApplicationModalProps> = ({
         toast.success("Application created successfully");
       } else if (modalMode === "edit" && selectedApplication) {
         await updateApplication({
-          appId: selectedApplication.appId,
+          appId: selectedApplication.app_id,
           data: formData,
         }).unwrap();
         toast.success("Application updated successfully");
